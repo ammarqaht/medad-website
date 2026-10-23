@@ -2,7 +2,7 @@
 /* Hero: the ink opener stage, the brand word written out of the ink, and the
    headline stamped in word by word (last word boxed in green). */
 import { site } from '../../content/site';
-import { BRAND, text } from '../../content/brand';
+import { text } from '../../content/brand';
 
 const BRAND_LABEL = text('مداد');
 
@@ -12,9 +12,10 @@ const words = hero.headline.split(' ');
 <section class="hero" data-hero aria-labelledby="hero-title">
   <div class="hero__stage" data-stage>
     <canvas class="hero__ink" aria-hidden="true"></canvas>
+    <!-- The logo itself, as images: ink (revealed drop by drop) and paper. -->
     <p class="hero__word" role="img" aria-label={BRAND_LABEL} data-word>
-      <span class="hero__outline brand-word" aria-hidden="true">{BRAND}</span>
-      <span class="hero__fill brand-word" aria-hidden="true">{BRAND}</span>
+      <img class="hero__fill" src="/logo/medad-mark-ink.png" alt="" width="808" height="267" />
+      <img class="hero__paper" src="/logo/medad-mark-paper.png" alt="" width="808" height="267" />
     </p>
   </div>
 
@@ -31,7 +32,6 @@ const words = hero.headline.split(' ');
     <span>{hero.scroll}</span>
     <span class="hero__arrow" aria-hidden="true"></span>
   </a>
-  <button class="hero__skip" type="button" data-skip>{hero.skip}</button>
 </section>
 
 <style>
@@ -62,17 +62,17 @@ const words = hero.headline.split(' ');
   .hero__word {
     position: relative;
     display: grid;
-    font-size: 17cqi;
-    line-height: 1;
+    inline-size: 54cqi;
     translate: 0 -4%;
   }
-  .hero__outline,
-  .hero__fill { grid-area: 1 / 1; }
-  /* Ink on paper until the blot is drawn behind it, so the word never vanishes */
-  .hero__fill { color: var(--ink); }
+  .hero__word img { grid-area: 1 / 1; inline-size: 100%; block-size: auto; }
+  /* Ink logo until the blot is drawn behind it, then the paper logo on the ink:
+     the logo is never invisible, even without the canvas. */
+  .hero__paper { visibility: hidden; }
+  .hero:global(.has-blot) .hero__paper,
+  .hero__stage:global(.no-canvas) .hero__paper { visibility: visible; }
   .hero:global(.has-blot) .hero__fill,
-  .hero__stage:global(.no-canvas) .hero__fill { color: var(--paper); }
-  .hero__outline { visibility: hidden; color: transparent; -webkit-text-stroke: max(2px, .012em) var(--ink); }
+  .hero__stage:global(.no-canvas) .hero__fill { visibility: hidden; }
   /* No canvas: a flat ink slab stands in for the blot */
   .hero__stage:global(.no-canvas) { background: var(--ink); border: var(--bw) solid var(--ink); box-shadow: var(--sx) var(--off) 0 0 var(--green-500); }
 
@@ -116,38 +116,14 @@ const words = hero.headline.split(' ');
   }
   @keyframes cue { to { translate: 0 8px; } }
 
-  .hero__skip {
-    display: none;
-    position: absolute;
-    inset-block-end: clamp(16px, 3vw, 32px);
-    inset-inline-start: var(--gutter);
-    min-block-size: 44px;
-    padding: 8px 16px;
-    border: var(--bw) solid var(--ink);
-    background: var(--white);
-    font-weight: 900;
-    font-size: 16px;
-    cursor: pointer;
-    box-shadow: var(--shadow);
-  }
 
   /* ---------- Opener choreography (html.opening set by boot.js) ---------- */
-  :global(html.opening) .hero__skip { display: inline-flex; align-items: center; }
-  /* 1-2: an empty outline that each landed drop dyes with ink, right to left */
-  :global(html.opening) .hero__outline { visibility: visible; }
-  :global(html.opening) .hero__fill {
-    color: var(--ink);
-    clip-path: inset(-15% 0 -15% calc(100% - var(--dyed, 0%)));
-  }
-  /* 3: the burst. The word turns to paper on the ink and is stamped down */
-  :global(html.opening) .hero:global(.is-burst) .hero__outline { visibility: hidden; }
-  :global(html.opening) .hero:global(.is-burst) .hero__fill {
-    color: var(--paper);
-    clip-path: none;
-    animation: slam 330ms steps(4, jump-end) both;
-  }
+  /* 1-2: nothing there yet; each landed drop reveals its part of the logo, right to left */
+  :global(html.opening) .hero__fill { clip-path: inset(-15% 0 -15% calc(100% - var(--dyed, 0%))); }
+  /* 3: the burst. The logo turns to paper on the ink and is stamped down */
+  :global(html.opening) .hero:global(.is-burst) .hero__paper { animation: slam 330ms steps(4, jump-end) both; }
   @keyframes slam {
-    0% { scale: 1.3; rotate: -4deg; }
+    0% { scale: 1.14; rotate: -4deg; }
     50% { scale: .92; rotate: 1deg; }
     75% { scale: 1.04; rotate: 0deg; }
     100% { scale: 1; rotate: 0deg; }

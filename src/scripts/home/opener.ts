@@ -1,13 +1,13 @@
 /* The ink opener (FR-04), at 12 frames per second:
-   1. The brand word waits as an empty outline.
+   1. The paper is empty.
    2. Drops fall one by one, right to left (the writing direction); each one
-      splashes onto the word and dyes its part of the logo with ink.
+      splashes where it lands and reveals its part of the logo in ink.
    3. Once the word is full, a blot bursts out behind it with a hard green
-      shadow and straight impact strokes, splashing irregular ink around it;
-      the word turns to paper and is stamped down.
+      shadow and straight impact strokes that vanish; the logo turns to paper
+      and is stamped down. The end state is a clean blot, nothing around it.
    4. The headline stamps in word by word.
    The text is in the HTML from the start; this only animates its reveal.
-   Any input skips to the end. Later visits in the session, reduced motion
+   Any input (scroll, touch, key, a tap on the stage) skips to the end. Later visits in the session, reduced motion
    and a missing canvas all show the final state at once. */
 import { reducedMotion } from '../motion/reduced';
 import { FPS } from '../motion/steps';
@@ -29,7 +29,6 @@ const BLEED = 0.07;
 
 type Shape = {
   waves: { k: number; amp: number; ph: number }[];
-  drops: { a: number; d: number; r: number; at: number }[];
 };
 
 /* Deterministic randomness: the blot looks the same on every visit and resize. */
@@ -44,14 +43,7 @@ function random(seed: number): () => number {
 function makeShape(): Shape {
   const r = random(173);
   const waves = [2, 3, 5, 7, 11].map((k) => ({ k, amp: 0.025 + r() * (k > 5 ? 0.02 : 0.06), ph: r() * Math.PI * 2 }));
-  const drops = [];
-  for (let i = 0; i < 10; i++) {
-    // Keep splatter out of the lower sector, where the headline sits.
-    let a = r() * Math.PI * 2;
-    if (a > Math.PI * 0.2 && a < Math.PI * 0.8) a += Math.PI;
-    drops.push({ a, d: 1.08 + r() * 0.16, r: 0.007 + r() * 0.012, at: BURST_AT + 2 + Math.floor(r() * 3) });
-  }
-  return { waves, drops };
+  return { waves };
 }
 
 export function initOpener(): void {
@@ -115,21 +107,11 @@ export function initOpener(): void {
   };
 
   /* The big blot behind the word, with its splatter. */
-  const blot = (scale: number, dx: number, dy: number, color: string, upTo: number) => {
+  const blot = (scale: number, dx: number, dy: number, color: string) => {
     if (!ctx || scale <= 0) return;
     const cx = bx + sw / 2 + dx;
     const cy = by + sh / 2 + dy;
     blob(cx, cy, sw * 0.4 * scale, sh * 0.37 * scale, color);
-    // Splashes: irregular, stretched away from the blot like flung ink, never round dots.
-    for (const d of shape.drops) {
-      if (d.at > upTo) continue;
-      const k = Math.max(scale, 0.9) * d.d;
-      ctx.save();
-      ctx.translate(cx + Math.cos(d.a) * sw * 0.4 * k, cy + Math.sin(d.a) * sh * 0.37 * k);
-      ctx.rotate(d.a);
-      blob(0, 0, sw * d.r * 2.2, sw * d.r * 0.9, color);
-      ctx.restore();
-    }
   };
 
   /* Where drop i lands: across the word, right to left. */
@@ -156,7 +138,7 @@ export function initOpener(): void {
   const splat = (i: number, age: number) => {
     const { x, y } = landing(i);
     const grow = [0.5, 1.15, 1][Math.min(age, 2)];
-    const r = wordBox.h * 0.32 * grow;
+    const r = wordBox.h * 0.22 * grow;
     blob(x, y, r * 1.2, r * 0.8, INK);
   };
 
@@ -188,8 +170,8 @@ export function initOpener(): void {
     ctx.clearRect(0, 0, sw + bx * 2, sh + by * 2);
     if (final) {
       const [dx, dy] = shadowOffset();
-      blot(1, dx, dy, GREEN, 999);
-      blot(1, 0, 0, INK, 999);
+      blot(1, dx, dy, GREEN);
+      blot(1, 0, 0, INK);
       return;
     }
     if (frame < 0) return;
@@ -198,9 +180,9 @@ export function initOpener(): void {
       const i = frame - BURST_AT;
       if (frame >= SHADOW_AT) {
         const [dx, dy] = shadowOffset();
-        blot(1, dx, dy, GREEN, frame);
+        blot(1, dx, dy, GREEN);
       }
-      blot(SPREAD[Math.min(i, SPREAD.length - 1)], 0, 0, INK, frame);
+      blot(SPREAD[Math.min(i, SPREAD.length - 1)], 0, 0, INK);
       strokes(i - 3);
     }
     // Drops falling and the splats they leave on the word (until the burst covers them).
@@ -233,7 +215,6 @@ export function initOpener(): void {
     if (done) return;
     done = true;
     window.clearTimeout(timer);
-    const hadFocus = hero.contains(document.activeElement) && document.activeElement?.matches('[data-skip]');
     root.classList.remove('opening');
     hero.classList.remove('is-dyeing', 'is-burst', 'is-titling');
     word.style.removeProperty('--dyed');
@@ -247,8 +228,6 @@ export function initOpener(): void {
     }
     seen();
     ['wheel', 'touchstart', 'keydown'].forEach((ev) => window.removeEventListener(ev, finish));
-    // The skip button disappears: hand focus to the headline.
-    if (hadFocus) hero.querySelector<HTMLElement>('h1')?.focus();
   };
 
   const redraw = () => {
@@ -276,7 +255,6 @@ export function initOpener(): void {
 
   ['wheel', 'touchstart', 'keydown'].forEach((ev) => window.addEventListener(ev, finish, { passive: true, once: true }));
   stage.addEventListener('pointerdown', finish, { once: true });
-  hero.querySelector('[data-skip]')?.addEventListener('click', finish);
 
   // Seen as soon as it starts: leaving mid-opener does not replay it.
   seen();
@@ -292,7 +270,7 @@ export function initOpener(): void {
       frame++;
       draw();
       dye();
-      if (frame === BURST_AT + 3) hero.classList.add('is-burst', 'has-blot');
+      if (frame === BURST_AT + 4) hero.classList.add('is-burst', 'has-blot');
       if (frame === END) {
         hero.classList.add('is-titling');
         timer = window.setTimeout(finish, 1500);
