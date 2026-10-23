@@ -1,0 +1,91 @@
+/* ============================================================
+   Medad Style Lab: shared tokens
+   Palette, @font-face and RTL base reset. Every style imports this.
+   Hues: only the logo green family (173.6° ± 2) plus neutrals.
+   ============================================================ */
+
+/* ---- Body / UI: Thmanyah Sans ---- */
+@font-face { font-family: "Thmanyah Sans"; src: url("/fonts/thmanyahsans-Light.woff2") format("woff2");   font-weight: 300; font-style: normal; font-display: swap; }
+@font-face { font-family: "Thmanyah Sans"; src: url("/fonts/thmanyahsans-Regular.woff2") format("woff2"); font-weight: 400; font-style: normal; font-display: swap; }
+@font-face { font-family: "Thmanyah Sans"; src: url("/fonts/thmanyahsans-Medium.woff2") format("woff2");  font-weight: 500; font-style: normal; font-display: swap; }
+@font-face { font-family: "Thmanyah Sans"; src: url("/fonts/thmanyahsans-Bold.woff2") format("woff2");    font-weight: 700; font-style: normal; font-display: swap; }
+@font-face { font-family: "Thmanyah Sans"; src: url("/fonts/thmanyahsans-Black.woff2") format("woff2");   font-weight: 900; font-style: normal; font-display: swap; }
+
+/* ---- Display / headlines: Thmanyah Serif Display ---- */
+@font-face { font-family: "Thmanyah Serif Display"; src: url("/fonts/thmanyahserifdisplay-Light.woff2") format("woff2");   font-weight: 300; font-style: normal; font-display: swap; }
+@font-face { font-family: "Thmanyah Serif Display"; src: url("/fonts/thmanyahserifdisplay-Regular.woff2") format("woff2"); font-weight: 400; font-style: normal; font-display: swap; }
+@font-face { font-family: "Thmanyah Serif Display"; src: url("/fonts/thmanyahserifdisplay-Medium.woff2") format("woff2");  font-weight: 500; font-style: normal; font-display: swap; }
+@font-face { font-family: "Thmanyah Serif Display"; src: url("/fonts/thmanyahserifdisplay-Bold.woff2") format("woff2");    font-weight: 700; font-style: normal; font-display: swap; }
+@font-face { font-family: "Thmanyah Serif Display"; src: url("/fonts/thmanyahserifdisplay-Black.woff2") format("woff2");   font-weight: 900; font-style: normal; font-display: swap; }
+
+:root {
+  /* Green ramp, all derived from the logo hue */
+  --green-50:  #F1F9F8;
+  --green-100: #DEF2F0;
+  --green-200: #BCE6E1;
+  --green-300: #85D6CD;
+  --green-400: #36C9BA; /* neon: readable text and glow on dark */
+  --green-500: #1A8A7D; /* the logo green: large text and graphics on light */
+  --green-600: #126E64; /* green text and button fills on light (AA) */
+  --green-700: #0D544D;
+  --green-800: #083A35; /* bottle green */
+  --green-900: #042421;
+  --green-950: #051211;
+
+  /* Neutrals */
+  --paper:     #F6F4EF; /* warm off-white */
+  --gray:      #E7E6E1; /* soft gray */
+  --ink:       #0C1715; /* near-black, tinted to the logo hue */
+  --ink-muted: #4A5552; /* secondary text on light, 7:1 on paper */
+  --white:     #FFFFFF;
+
+  /* Semantic aliases */
+  --brand: var(--green-500);
+  --neon:  var(--green-400);
+
+  /* Type */
+  --font-body:    "Thmanyah Sans", system-ui, sans-serif;
+  --font-display: "Thmanyah Serif Display", "Thmanyah Sans", serif;
+
+}
+
+/* ---- Base reset (RTL) ---- */
+*, *::before, *::after { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
+html, body { margin: 0; padding: 0; }
+body {
+  font-family: var(--font-body);
+  line-height: 1.7;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: clip;
+}
+h1, h2, h3, h4, p, figure, blockquote, ul, ol { margin: 0; }
+ul, ol { padding: 0; list-style: none; }
+img, svg, canvas { display: block; max-width: 100%; }
+a { color: inherit; }
+button { font: inherit; color: inherit; }
+
+/* ---- The brand word «مـــــداد» ----
+   Fixed rule: wherever the word Medad appears, it is written as مـــــداد
+   (five tatweels) in Thmanyah Serif Display Black. The font maps this to the
+   ligature meemAr.init_kashida×5, which is the logo's exact letterform.
+   Never apply letter-spacing to it: spacing breaks the Arabic joining. */
+.brand-word {
+  font-family: var(--font-display) !important;
+  font-weight: 900 !important;
+  font-style: normal !important;
+  letter-spacing: 0 !important;
+  word-spacing: 0 !important;
+  text-transform: none !important;
+  white-space: nowrap;
+}
+
+.sr-only {
+  position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+  overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto !important; }
+}

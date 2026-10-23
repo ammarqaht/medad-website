@@ -1,0 +1,41 @@
+---
+import { site, WHATSAPP } from '../content/site';
+import { html } from '../content/brand';
+---
+<footer class="footer">
+  <img class="footer__logo" src="/logo/medad-mark-paper.png" alt="مداد" width="808" height="267" />
+  <p class="footer__line">{site.footer.line}</p>
+  <a class="footer__wa" href={WHATSAPP} target="_blank" rel="noopener noreferrer">{site.footer.cta}</a>
+  <p class="footer__copy" set:html={html(site.footer.copyright)} />
+</footer>
+
+<style>
+  .footer {
+    background: var(--ink);
+    color: var(--paper);
+    border-block-start: var(--bw) solid var(--ink);
+    padding: 40px var(--gutter) 48px;
+    display: grid;
+    gap: 14px;
+    justify-items: start;
+    font-weight: 500;
+  }
+  .footer__logo { inline-size: 120px; block-size: auto; }
+  .footer__line { font-size: 18px; }
+  .footer__wa {
+    display: inline-flex;
+    align-items: center;
+    min-block-size: 44px;
+    color: var(--green-400);
+    font-weight: 700;
+    font-size: 18px;
+    text-decoration: none;
+    border-block-end: var(--bw) solid var(--green-400);
+  }
+  .footer__wa:hover { color: var(--ink); background: var(--green-400); }
+  .footer__wa:focus-visible { outline-color: var(--green-400); }
+  .footer__copy { font-size: 15px; color: var(--gray); }
+  @media (min-width: 900px) {
+    .footer { grid-template-columns: auto 1fr auto auto; align-items: center; gap: 32px; }
+  }
+</style>

@@ -1,0 +1,48 @@
+---
+import '../styles/global.css';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import InkFlood from '../components/InkFlood.astro';
+import { site } from '../content/site';
+import { text } from '../content/brand';
+
+interface Props {
+  /** Page title; the brand is appended unless this is the home page. */
+  title?: string;
+  description?: string;
+  noindex?: boolean;
+}
+const { title, description = site.meta.description, noindex = false } = Astro.props;
+const brand = text(site.meta.title);
+const fullTitle = title ? `${title} · ${brand}` : brand;
+const canonical = new URL(Astro.url.pathname, Astro.site).href;
+---
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>{fullTitle}</title>
+  <meta name="description" content={text(description)} />
+  {noindex ? <meta name="robots" content="noindex" /> : <link rel="canonical" href={canonical} />}
+  <meta name="theme-color" content="#F6F4EF" />
+  <link rel="icon" href="/favicon.ico" sizes="any" />
+  <link rel="icon" href="/logo/favicon-64.png" type="image/png" />
+  <link rel="apple-touch-icon" href="/logo/apple-touch-icon.png" />
+  <link rel="preload" href="/fonts/thmanyahserifdisplay-Black.woff2" as="font" type="font/woff2" crossorigin />
+  <link rel="preload" href="/fonts/thmanyahsans-Bold.woff2" as="font" type="font/woff2" crossorigin />
+  <script is:inline src="/boot.js"></script>
+</head>
+<body>
+  <InkFlood />
+  <a class="skip" href="#content">{site.nav.skip}</a>
+  <Header />
+  <main id="content" tabindex="-1">
+    <slot />
+  </main>
+  <Footer />
+  <script>
+    import '../scripts/base';
+  </script>
+</body>
+</html>

@@ -1,0 +1,14 @@
+node_modules/
+dist/
+.astro/
+.DS_Store
+.env*
+
+# Internal docs stay local: they name clients and products (MEDAD.md §5).
+# The GitHub repo is public because CranL only builds public repos.
+docs/
+reference/
+assets/
+MEDAD.md
+KICKOFF.md
+.banned-words

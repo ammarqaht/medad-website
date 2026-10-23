@@ -1,0 +1,19 @@
+---
+/* The signature brutalist button. External links (WhatsApp) open in a new tab. */
+interface Props {
+  href: string;
+  variant?: 'lg' | 'sm' | 'paper';
+  class?: string;
+}
+const { href, variant = 'lg', class: extra = '' } = Astro.props;
+const external = /^https?:\/\//.test(href);
+const cls = ['btn', `btn--${variant}`, variant === 'paper' ? 'btn--lg' : '', extra]
+  .filter(Boolean)
+  .join(' ');
+---
+<a
+  class={cls}
+  href={href}
+  target={external ? '_blank' : undefined}
+  rel={external ? 'noopener noreferrer' : undefined}
+><slot /></a>

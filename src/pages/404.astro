@@ -1,0 +1,31 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Button from '../components/Button.astro';
+import { site } from '../content/site';
+---
+<BaseLayout title={site.notFound.title} noindex>
+  <section class="lost wrap">
+    <p class="lost__code display" aria-hidden="true">٤٠٤</p>
+    <h1 class="lost__title display">{site.notFound.title}</h1>
+    <p class="lost__line box">{site.notFound.line}</p>
+    <div class="lost__cta">
+      <Button href="/">{site.notFound.home}</Button>
+      <Button href="/works" variant="paper">{site.notFound.works}</Button>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .lost { padding-block: clamp(40px, 7vw, 96px) clamp(64px, 9vw, 120px); display: grid; gap: clamp(20px, 3vw, 32px); justify-items: start; }
+  .lost__code {
+    font-size: clamp(120px, 22vw, 280px);
+    line-height: .9;
+    color: var(--paper);
+    -webkit-text-stroke: var(--bw) var(--ink);
+    paint-order: stroke fill;
+    text-shadow: calc(var(--sx) * .8) calc(var(--off) * .8) 0 var(--ink);
+  }
+  .lost__title { font-size: clamp(40px, 6vw, 84px); line-height: 1.15; text-wrap: balance; }
+  .lost__line { padding: 18px 20px; font-size: clamp(19px, 1.7vw, 23px); line-height: 1.6; max-inline-size: 36ch; rotate: -.6deg; }
+  .lost__cta { display: flex; flex-wrap: wrap; gap: 20px; margin-block-start: 8px; }
+</style>

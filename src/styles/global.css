@@ -1,0 +1,148 @@
+/* ============================================================
+   Medad website: Neo-Brutalism base (DESIGN.md)
+   Flat blocks, 3px ink borders, hard 6px offset shadows.
+   RTL: shadows fall to the inline end (left) and down.
+   Motion is stepped: no soft easing anywhere.
+   ============================================================ */
+@import './tokens.css';
+
+:root {
+  --bw: 3px;                     /* border width */
+  --off: 6px;                    /* shadow offset */
+  --sx: calc(var(--off) * -1);   /* RTL: shadow falls to the left */
+  --shadow: var(--sx) var(--off) 0 0 var(--ink);
+  --snap: 90ms steps(2, jump-end);
+  --stamp: 240ms steps(3, jump-end);
+  --gutter: clamp(16px, 4.5vw, 64px);
+  --max: 1320px;
+}
+
+html { background: var(--paper); }
+
+/* Arriving through the ink flood: nothing but ink until the drain starts,
+   even before the flood element is parsed. boot.js lifts this if JS stalls. */
+html[data-flood] { background: var(--ink); }
+html[data-flood] body { background: var(--ink); }
+html[data-flood] body > :not(.flood) { visibility: hidden; }
+body {
+  background-color: var(--paper);
+  /* flat hard dot grid, no soft falloff */
+  background-image: radial-gradient(var(--gray) 1.6px, transparent 1.7px);
+  background-size: 26px 26px;
+  color: var(--ink);
+  font-weight: 700;
+  min-block-size: 100dvh;
+  display: flex;
+  flex-direction: column;
+}
+main { flex: 1; overflow-x: clip; }
+main:focus-visible { outline: none; } /* skip-link target, not interactive */
+
+::selection { background: var(--ink); color: var(--green-400); }
+:focus-visible { outline: 3px solid var(--ink); outline-offset: 4px; }
+
+.skip {
+  position: absolute;
+  inset-block-start: 8px;
+  inset-inline-start: 8px;
+  z-index: 200;
+  padding: 10px 16px;
+  background: var(--ink);
+  color: var(--paper);
+  border: var(--bw) solid var(--ink);
+  text-decoration: none;
+  translate: 0 -200%;
+}
+.skip:focus-visible { translate: 0 0; outline-color: var(--green-400); }
+
+.wrap {
+  max-inline-size: var(--max);
+  margin-inline: auto;
+  padding-inline: var(--gutter);
+}
+
+/* ---------- The shared block: ink border + hard shadow ---------- */
+.box {
+  border: var(--bw) solid var(--ink);
+  box-shadow: var(--shadow);
+  background: var(--white);
+}
+
+.display {
+  font-family: var(--font-display);
+  font-weight: 900;
+  letter-spacing: 0;
+}
+
+/* ---------- Signature button: presses down into its shadow ---------- */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  min-block-size: 44px;
+  border: var(--bw) solid var(--ink);
+  background: var(--green-500);
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-weight: 900;
+  line-height: 1;
+  text-decoration: none;
+  white-space: nowrap;
+  cursor: pointer;
+  box-shadow: var(--sx) var(--off) 0 0 var(--ink);
+  transition: translate var(--snap), box-shadow var(--snap), background-color var(--snap);
+  -webkit-tap-highlight-color: transparent;
+}
+.btn::after {
+  /* a blunt arrow pointing along the reading direction (left in RTL) */
+  content: "";
+  inline-size: .9em;
+  block-size: .9em;
+  background: currentColor;
+  clip-path: polygon(0 50%, 55% 0, 55% 30%, 100% 30%, 100% 70%, 55% 70%, 55% 100%);
+  transition: translate var(--snap);
+}
+.btn:hover { translate: calc(var(--off) / -2) calc(var(--off) / 2); box-shadow: calc(var(--sx) / 2) calc(var(--off) / 2) 0 0 var(--ink); }
+.btn:hover::after { translate: -4px 0; }
+.btn:active, .btn.is-pressed { translate: var(--sx) var(--off); box-shadow: 0 0 0 0 var(--ink); }
+
+.btn--lg { font-size: clamp(20px, 2.2vw, 26px); padding: 18px 28px; }
+.btn--paper { background: var(--white); }
+.btn--paper:hover { background: var(--green-300); }
+.btn--sm {
+  font-size: 16px;
+  padding: 10px 16px;
+  background: var(--ink);
+  color: var(--paper);
+  box-shadow: var(--sx) var(--off) 0 0 var(--green-500);
+}
+.btn--sm::after { display: none; }
+.btn--sm:hover { background: var(--green-800); box-shadow: calc(var(--sx) / 2) calc(var(--off) / 2) 0 0 var(--green-500); }
+.btn--sm:active, .btn--sm.is-pressed { box-shadow: 0 0 0 0 var(--green-500); }
+
+/* ---------- Stamp-in on scroll: stepped, no easing ----------
+   Hidden only when JS runs (html.js is set by /boot.js before first paint). */
+.js [data-pop] {
+  opacity: 0;
+  scale: 1.14;
+  transition:
+    opacity 0s linear var(--d, 0s),
+    scale var(--stamp) var(--d, 0s),
+    translate var(--snap),
+    rotate var(--snap),
+    box-shadow var(--snap);
+}
+.js [data-pop].is-in { opacity: 1; scale: 1; }
+@media print { .js [data-pop] { opacity: 1 !important; scale: 1 !important; } }
+
+/* ---------- Reduced motion: fades only ---------- */
+@media (prefers-reduced-motion: reduce) {
+  .js [data-pop] { scale: 1; transition: opacity .5s ease var(--d, 0s); }
+  .btn, .btn::after { transition: background-color .2s ease, box-shadow .2s ease, color .2s ease; }
+  .btn:hover, .btn:active, .btn.is-pressed, .btn:hover::after { translate: none; }
+  .btn:hover { background: var(--green-300); box-shadow: var(--sx) var(--off) 0 0 var(--ink); }
+  .btn--sm:hover { background: var(--green-800); box-shadow: var(--sx) var(--off) 0 0 var(--green-500); }
+  main { animation: page-fade .3s ease both; }
+}
+@keyframes page-fade { from { opacity: 0; } }

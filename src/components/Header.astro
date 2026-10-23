@@ -1,0 +1,47 @@
+---
+import Button from './Button.astro';
+import { site, WHATSAPP } from '../content/site';
+
+const path = Astro.url.pathname.replace(/\/$/, '') || '/';
+const onWorks = path === '/works' || path.startsWith('/works/');
+---
+<header class="topbar">
+  <a class="topbar__logo" href="/" aria-label="مداد، الرئيسية">
+    <img src="/logo/medad-mark-ink.png" alt="" width="808" height="267" />
+  </a>
+  <nav class="topbar__nav" aria-label="الرئيسية">
+    <a class="topbar__link" href="/works" aria-current={onWorks ? 'page' : undefined}>{site.nav.works}</a>
+    <Button href={WHATSAPP} variant="sm">{site.nav.cta}</Button>
+  </nav>
+</header>
+
+<style>
+  .topbar {
+    position: sticky;
+    inset-block-start: 0;
+    z-index: 50;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 12px var(--gutter);
+    background: var(--paper);
+    border-block-end: var(--bw) solid var(--ink);
+  }
+  .topbar__logo { display: flex; align-items: center; min-block-size: 44px; flex: none; }
+  .topbar__logo img { inline-size: clamp(88px, 10vw, 128px); block-size: auto; }
+  .topbar__nav { display: flex; align-items: center; gap: clamp(12px, 2.4vw, 28px); }
+  .topbar__link {
+    display: inline-flex;
+    align-items: center;
+    min-block-size: 44px;
+    padding-inline: 10px;
+    font-weight: 900;
+    font-size: 17px;
+    text-decoration: none;
+    border-block-end: var(--bw) solid transparent;
+    transition: border-color var(--snap), background-color var(--snap);
+  }
+  .topbar__link:hover { border-block-end-color: var(--ink); }
+  .topbar__link[aria-current="page"] { background: var(--green-300); border-block-end-color: var(--ink); }
+</style>

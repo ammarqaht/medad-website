@@ -1,0 +1,53 @@
+---
+/* Phase 1 placeholder gallery: the two arms and five works as plain cards.
+   The interactive archive and demos arrive in phases 3 to 5. */
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { site } from '../../content/site';
+---
+<BaseLayout title={site.works.title}>
+  <section class="works wrap">
+    <h1 class="works__title display box" data-pop>{site.works.headline}</h1>
+    <p class="works__line">{site.works.line}</p>
+
+    {site.works.arms.map((arm, i) => (
+      <section class="arm" aria-labelledby={`arm-${i}`}>
+        <h2 class="arm__title display" id={`arm-${i}`}>{arm.title}</h2>
+        <ul class="arm__list">
+          {arm.items.map((item, j) => (
+            <li class={`card box card--${(i + j) % 3}`} data-pop={String(j * 0.06)}>
+              <span class="card__kind">{item.kind}</span>
+              <span class="card__name display">{item.name}</span>
+            </li>
+          ))}
+        </ul>
+      </section>
+    ))}
+  </section>
+</BaseLayout>
+
+<style>
+  .works { padding-block: clamp(32px, 6vw, 80px) clamp(64px, 9vw, 120px); display: grid; gap: clamp(28px, 4vw, 48px); }
+  .works__title {
+    justify-self: start;
+    padding: 12px 24px 18px;
+    background: var(--green-300);
+    font-size: clamp(48px, 8vw, 112px);
+    line-height: 1.15;
+    rotate: -2deg;
+  }
+  .works__line { font-size: clamp(19px, 1.7vw, 23px); line-height: 1.6; max-inline-size: 40ch; }
+  .arm { display: grid; gap: 20px; }
+  .arm__title {
+    font-size: clamp(30px, 3.4vw, 46px);
+    line-height: 1.2;
+    padding-block-end: 8px;
+    border-block-end: var(--bw) solid var(--ink);
+  }
+  .arm__list { display: grid; gap: 28px; grid-template-columns: repeat(auto-fill, minmax(min(100%, 260px), 1fr)); }
+  .card { display: grid; gap: 8px; padding: 22px 24px 26px; }
+  .card--0 { background: var(--white); rotate: -1deg; }
+  .card--1 { background: var(--green-500); }
+  .card--2 { background: var(--green-300); rotate: .8deg; }
+  .card__kind { font-size: 19px; font-weight: 900; }
+  .card__name { font-size: clamp(30px, 3vw, 40px); line-height: 1.2; }
+</style>

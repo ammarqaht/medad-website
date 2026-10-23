@@ -1,0 +1,63 @@
+---
+import { BRAND } from '../content/brand';
+---
+<div class="flood" aria-hidden="true">
+  <span class="flood__word brand-word">{BRAND}</span>
+</div>
+
+<style>
+  .flood {
+    --fx: 50%;
+    --fy: 50%;
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+    display: grid;
+    place-items: center;
+    background: var(--ink);
+    pointer-events: none;
+    visibility: hidden;
+  }
+  .flood__word {
+    color: var(--green-400);
+    font-size: clamp(72px, 16vw, 220px);
+    line-height: 1;
+    opacity: 0;
+  }
+
+  /* Cover: ink spreads from the click point in five hard frames. */
+  .flood:global(.is-covering) {
+    visibility: visible;
+    pointer-events: auto;
+    animation: flood-in 420ms steps(5, jump-end) forwards;
+  }
+  .flood:global(.is-covering) .flood__word { animation: word-in 420ms steps(1, end) forwards; }
+
+  /* Arrive covered (set by /boot.js before first paint). */
+  :global(html[data-flood]) .flood { visibility: visible; }
+  :global(html[data-flood]) .flood__word { opacity: 1; }
+
+  /* Drain: ink falls away from the top in five hard frames. */
+  .flood:global(.is-receding) {
+    visibility: visible;
+    animation: flood-out 420ms steps(5, jump-end) forwards;
+  }
+  .flood:global(.is-receding) .flood__word { opacity: 1; }
+
+  @keyframes flood-in {
+    from { clip-path: circle(0 at var(--fx) var(--fy)); }
+    to   { clip-path: circle(150vmax at var(--fx) var(--fy)); }
+  }
+  @keyframes word-in {
+    0%, 70% { opacity: 0; }
+    100% { opacity: 1; }
+  }
+  @keyframes flood-out {
+    from { clip-path: inset(0 0 0 0); }
+    to   { clip-path: inset(100% 0 0 0); }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .flood { display: none; }
+  }
+</style>
