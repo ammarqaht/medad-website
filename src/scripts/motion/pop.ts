@@ -1,8 +1,6 @@
 /* Stamp-in on scroll for [data-pop] elements. data-pop="0.08" staggers by
    seconds. Once landed, the delay is dropped so hovers snap instantly. */
 export function initPop(root: ParentNode = document): void {
-  // We own the reveal now: cancel boot.js's fail-open timer.
-  window.clearTimeout(window.__medadBoot?.js);
   const els = Array.from(root.querySelectorAll<HTMLElement>('[data-pop]'));
   if (!els.length) return;
 

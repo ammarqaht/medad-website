@@ -1,0 +1,164 @@
+---
+/* The story (FR-05): one ink line, written by the scroll, runs through three
+   chapters. At each chapter it hits a numbered stamp, and the chapter's card
+   is stamped onto the page (FR-06). */
+import { site } from '../../content/site';
+const chapters = site.home.story;
+const numerals = ['١', '٢', '٣'];
+---
+<section class="story" id="story" aria-label="القصة" data-story>
+  <svg class="story__line" aria-hidden="true"><path class="story__ink" /></svg>
+
+  {chapters.map((c, i) => (
+    <article class={`chapter chapter--${i + 1}`}>
+      <span class="chapter__node display" aria-hidden="true" data-node>{numerals[i]}</span>
+      <div class="chapter__card box" data-pop>
+        <h3 class="chapter__title display" data-ink>{c.title}</h3>
+        <p class="chapter__text">{c.text}</p>
+        <div class={`ill ill--${i + 1}`} aria-hidden="true">
+          {i === 0 && (<div class="bubble"><i></i><i></i><i></i></div>)}
+          {i === 1 && (<div class="frame"><div class="frame__bar"><i></i><i></i><i></i></div><div class="frame__body"><i></i><i></i><i></i><b></b></div></div>)}
+          {i === 2 && (<div class="frame"><div class="frame__bar"><i></i><i></i><i></i></div><div class="frame__run"><span class="switch"></span><span class="bars"><i></i><i></i><i></i><i></i><i></i></span></div></div>)}
+        </div>
+      </div>
+    </article>
+  ))}
+</section>
+
+<style>
+  .story {
+    position: relative;
+    max-inline-size: var(--max);
+    margin-inline: auto;
+    padding: clamp(48px, 8vw, 120px) var(--gutter) clamp(56px, 8vw, 120px);
+    padding-inline-start: calc(var(--gutter) + 56px);
+    display: grid;
+    row-gap: clamp(56px, 9vw, 140px);
+    column-gap: 24px;
+  }
+  .story__line {
+    position: absolute;
+    inset: 0;
+    inline-size: 100%;
+    block-size: 100%;
+    max-inline-size: none;
+    overflow: visible;
+    pointer-events: none;
+  }
+  .story__ink {
+    fill: none;
+    stroke: var(--ink);
+    stroke-width: 6;
+    stroke-linecap: square;
+    stroke-linejoin: miter;
+  }
+
+  .chapter { position: relative; }
+  .chapter__node {
+    position: absolute;
+    z-index: 2;
+    inset-block-start: -22px;
+    inset-inline-start: -56px;
+    inline-size: 64px;
+    block-size: 64px;
+    display: grid;
+    place-items: center;
+    background: var(--paper);
+    border: var(--bw) solid var(--ink);
+    box-shadow: var(--shadow);
+    font-size: 40px;
+    line-height: 1;
+    transition: background-color var(--snap), scale var(--snap);
+  }
+  .chapter__node:global(.is-hit) { background: var(--green-500); }
+  .chapter__card {
+    padding: clamp(22px, 3vw, 40px);
+    display: grid;
+    gap: 14px;
+  }
+  .chapter__title { font-size: clamp(32px, 4.4vw, 64px); line-height: 1.2; justify-self: start; }
+  .chapter__text { font-size: clamp(19px, 1.8vw, 24px); line-height: 1.6; max-inline-size: 34ch; }
+  .chapter--1 .chapter__card { rotate: -1deg; }
+  .chapter--2 .chapter__card { background: var(--green-300); rotate: .8deg; }
+  .chapter--3 .chapter__card { background: var(--green-500); rotate: -.6deg; }
+
+  @media (min-width: 900px) {
+    .story { grid-template-columns: repeat(12, 1fr); padding-inline-start: var(--gutter); }
+    /* zigzag balanced around the centre line */
+    .chapter { grid-column: 2 / span 7; }
+    .chapter--2 { grid-column: 5 / span 7; }
+    .chapter--3 { grid-column: 3 / span 8; }
+    .chapter__node { inline-size: 88px; block-size: 88px; font-size: 56px; inset-block-start: -44px; inset-inline-start: -44px; }
+    .chapter__card { grid-template-columns: 1fr auto; column-gap: 32px; align-items: center; }
+    .chapter__title, .chapter__text { grid-column: 1; }
+    .ill { grid-column: 2; grid-row: 1 / span 2; }
+  }
+
+  /* ---------- Illustrations: drawn in hard frames once the card lands ---------- */
+  .ill { inline-size: min(100%, 240px); }
+  @media (min-width: 900px) { .ill { inline-size: clamp(170px, 16vw, 230px); } }
+  .bubble, .frame { border: var(--bw) solid var(--ink); background: var(--white); box-shadow: var(--shadow); }
+  .bubble {
+    position: relative;
+    display: grid;
+    gap: 10px;
+    padding: 18px;
+    margin-block-end: 18px;
+  }
+  .bubble::after {
+    content: "";
+    position: absolute;
+    inset-block-start: 100%;
+    inset-inline-end: 24px;
+    inline-size: 26px;
+    block-size: 20px;
+    background: var(--ink);
+    clip-path: polygon(0 0, 100% 0, 100% 100%);
+  }
+  .bubble i, .frame__body i { display: block; block-size: 12px; background: var(--ink); }
+  .bubble i:nth-child(1) { inline-size: 90%; }
+  .bubble i:nth-child(2) { inline-size: 70%; }
+  .bubble i:nth-child(3) { inline-size: 45%; background: var(--green-500); }
+
+  .frame__bar { display: flex; gap: 6px; padding: 8px 10px; border-block-end: var(--bw) solid var(--ink); background: var(--gray); }
+  .frame__bar i { inline-size: 10px; block-size: 10px; border: 2px solid var(--ink); }
+  .frame__body { display: grid; gap: 10px; padding: 16px; }
+  .frame__body i:nth-child(1) { inline-size: 80%; }
+  .frame__body i:nth-child(2) { inline-size: 95%; }
+  .frame__body i:nth-child(3) { inline-size: 60%; }
+  .frame__body b { display: block; inline-size: 44%; block-size: 26px; background: var(--green-500); border: var(--bw) solid var(--ink); margin-block-start: 4px; }
+
+  .frame__run { display: flex; align-items: end; justify-content: space-between; gap: 16px; padding: 16px; }
+  .switch { position: relative; inline-size: 56px; block-size: 30px; border: var(--bw) solid var(--ink); background: var(--green-400); }
+  .switch::after { content: ""; position: absolute; inset-block: 3px; inset-inline-start: 3px; inline-size: 20px; background: var(--ink); }
+  .bars { display: flex; align-items: end; gap: 6px; block-size: 64px; }
+  .bars i { inline-size: 12px; background: var(--ink); block-size: 40%; }
+
+  /* Writing the bars, frame by frame, after the card is stamped */
+  :global(.js) .chapter__card:global(.is-in) .bubble i,
+  :global(.js) .chapter__card:global(.is-in) .frame__body i,
+  :global(.js) .chapter__card:global(.is-in) .frame__body b { animation: draw 500ms steps(6, jump-end) both; }
+  :global(.js) .chapter__card:global(.is-in) :is(.bubble, .frame__body) > :nth-child(2) { animation-delay: 300ms; }
+  :global(.js) .chapter__card:global(.is-in) :is(.bubble, .frame__body) > :nth-child(3) { animation-delay: 600ms; }
+  :global(.js) .chapter__card:global(.is-in) .frame__body b { animation-delay: 900ms; }
+  @keyframes draw { from { clip-path: inset(0 0 0 100%); } to { clip-path: inset(0 0 0 0); } }
+
+  :global(.js) .chapter__card:global(.is-in) .switch::after { animation: flip 300ms steps(2, jump-end) 400ms both; }
+  @keyframes flip { from { inset-inline-start: calc(100% - 23px); } to { inset-inline-start: 3px; } }
+  :global(.js) .chapter__card:global(.is-in) .bars i { animation: pulse 1.2s steps(3, jump-none) infinite; }
+  .bars i:nth-child(2) { animation-delay: -.2s !important; }
+  .bars i:nth-child(3) { animation-delay: -.5s !important; }
+  .bars i:nth-child(4) { animation-delay: -.8s !important; }
+  .bars i:nth-child(5) { animation-delay: -1s !important; }
+  @keyframes pulse { 0%, 100% { block-size: 30%; } 50% { block-size: 100%; } }
+
+  @media (prefers-reduced-motion: reduce) {
+    :global(.js) .chapter__card:global(.is-in) :is(.bubble i, .frame__body i, .frame__body b, .switch::after, .bars i) { animation: none; }
+    .chapter__node { transition: background-color .2s ease; }
+  }
+</style>
+
+<script>
+  import { initStory } from '../../scripts/home/story';
+  initStory();
+</script>

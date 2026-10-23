@@ -1,17 +1,29 @@
 ---
-import Button from './Button.astro';
-import { site, WHATSAPP } from '../content/site';
+/* Header: logo and the works link only. Contact lives at the bottom of the
+   page so the top never pulls visitors away from the story. Inside the works
+   section the link becomes a back control to the page the visitor came from. */
+import { site } from '../content/site';
 
 const path = Astro.url.pathname.replace(/\/$/, '') || '/';
-const onWorks = path === '/works' || path.startsWith('/works/');
+const inWorks = path === '/works' || path.startsWith('/works/');
+const onWork = path.startsWith('/works/');
+const back = onWork
+  ? { href: '/works', label: site.nav.backWorks }
+  : { href: '/', label: site.nav.backHome };
 ---
 <header class="topbar">
   <a class="topbar__logo" href="/" aria-label="مداد، الرئيسية">
     <img src="/logo/medad-mark-ink.png" alt="" width="808" height="267" />
   </a>
-  <nav class="topbar__nav" aria-label="الرئيسية">
-    <a class="topbar__link" href="/works" aria-current={onWorks ? 'page' : undefined}>{site.nav.works}</a>
-    <Button href={WHATSAPP} variant="sm">{site.nav.cta}</Button>
+  <nav class="topbar__nav" aria-label="التنقل">
+    {inWorks ? (
+      <a class="back" href={back.href} data-back data-label-home={site.nav.backHome} data-label-works={site.nav.backWorks}>
+        <span class="back__arrow" aria-hidden="true"></span>
+        <span class="back__label">{back.label}</span>
+      </a>
+    ) : (
+      <a class="topbar__works" href="/works">{site.nav.works}</a>
+    )}
   </nav>
 </header>
 
@@ -24,24 +36,58 @@ const onWorks = path === '/works' || path.startsWith('/works/');
     align-items: center;
     justify-content: space-between;
     gap: 16px;
-    padding: 12px var(--gutter);
+    padding: 10px var(--gutter);
     background: var(--paper);
     border-block-end: var(--bw) solid var(--ink);
   }
   .topbar__logo { display: flex; align-items: center; min-block-size: 44px; flex: none; }
   .topbar__logo img { inline-size: clamp(88px, 10vw, 128px); block-size: auto; }
-  .topbar__nav { display: flex; align-items: center; gap: clamp(12px, 2.4vw, 28px); }
-  .topbar__link {
+  .topbar__nav { display: flex; align-items: center; }
+
+  /* Works link: an ink tab that presses into its green shadow */
+  .topbar__works,
+  .back {
     display: inline-flex;
     align-items: center;
+    gap: 10px;
     min-block-size: 44px;
-    padding-inline: 10px;
+    padding: 8px 18px;
+    border: var(--bw) solid var(--ink);
     font-weight: 900;
     font-size: 17px;
+    line-height: 1;
     text-decoration: none;
-    border-block-end: var(--bw) solid transparent;
-    transition: border-color var(--snap), background-color var(--snap);
+    transition: translate var(--snap), box-shadow var(--snap), background-color var(--snap);
   }
-  .topbar__link:hover { border-block-end-color: var(--ink); }
-  .topbar__link[aria-current="page"] { background: var(--green-300); border-block-end-color: var(--ink); }
+  .topbar__works {
+    background: var(--ink);
+    color: var(--paper);
+    box-shadow: var(--sx) var(--off) 0 0 var(--green-500);
+  }
+  .topbar__works:hover { background: var(--green-800); translate: calc(var(--off) / -2) calc(var(--off) / 2); box-shadow: calc(var(--sx) / 2) calc(var(--off) / 2) 0 0 var(--green-500); }
+  .topbar__works:active { translate: var(--sx) var(--off); box-shadow: none; }
+
+  /* Back: a green slip with an arrow pointing back (right in RTL) */
+  .back {
+    background: var(--green-300);
+    color: var(--ink);
+    box-shadow: var(--shadow);
+    rotate: -1.5deg;
+  }
+  .back:hover { background: var(--green-500); translate: calc(var(--off) / -2) calc(var(--off) / 2); box-shadow: calc(var(--sx) / 2) calc(var(--off) / 2) 0 0 var(--ink); }
+  .back:active { translate: var(--sx) var(--off); box-shadow: none; }
+  .back__arrow {
+    inline-size: .95em;
+    block-size: .95em;
+    background: currentColor;
+    clip-path: polygon(100% 50%, 45% 0, 45% 30%, 0 30%, 0 70%, 45% 70%, 45% 100%);
+    transition: translate var(--snap);
+  }
+  .back:hover .back__arrow { translate: 4px 0; }
+
+  @media (prefers-reduced-motion: reduce) {
+    .topbar__works, .back, .back__arrow { transition: background-color .2s ease; }
+    .topbar__works:hover, .topbar__works:active, .back:hover, .back:active, .back:hover .back__arrow { translate: none; }
+    .back { rotate: none; }
+  }
 </style>

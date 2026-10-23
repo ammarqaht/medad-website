@@ -1,0 +1,66 @@
+---
+/* Signature: two thick marquee bands crossing like tape (DESIGN.md §5.6).
+   Decorative duplicates of real content, hidden from assistive tech. */
+import { site } from '../../content/site';
+import { html } from '../../content/brand';
+const { bands } = site.home;
+---
+<section class="bands" aria-hidden="true" data-bands>
+  <div class="band band--green" data-dir="1">
+    <div class="band__track">
+      <div class="band__unit">
+        {bands.green.map((t) => (<><span set:html={html(t)} /><i class="sep"></i></>))}
+      </div>
+    </div>
+  </div>
+  <div class="band band--ink" data-dir="-1">
+    <div class="band__track">
+      <div class="band__unit">
+        {bands.ink.map((t) => (<><span>{t}</span><i class="sep"></i></>))}
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .bands { position: relative; overflow: clip; padding-block: clamp(36px, 6vw, 72px); display: grid; }
+  .band {
+    position: relative;
+    inline-size: calc(100% + 120px);
+    margin-inline: -60px;
+    overflow: hidden;
+    border-block: var(--bw) solid var(--ink);
+    padding-block: clamp(10px, 1.4vw, 18px);
+  }
+  .band--green { background: var(--green-500); color: var(--ink); rotate: -3deg; z-index: 2; box-shadow: 0 var(--off) 0 0 var(--ink); }
+  .band--ink { background: var(--ink); color: var(--paper); rotate: 2deg; margin-block-start: -6px; z-index: 1; }
+  .band--ink .sep { background: var(--green-400); }
+  .band__track { display: flex; inline-size: max-content; will-change: transform; }
+  .band__unit {
+    display: flex;
+    align-items: center;
+    gap: clamp(20px, 2.4vw, 36px);
+    padding-inline-end: clamp(20px, 2.4vw, 36px);
+    flex: none;
+    font-family: var(--font-display);
+    font-weight: 900;
+    font-size: clamp(34px, 5.6vw, 84px);
+    line-height: 1.25;
+    white-space: nowrap;
+  }
+  .band--ink .band__unit { font-size: clamp(26px, 3.8vw, 56px); font-family: var(--font-body); }
+  .sep {
+    flex: none;
+    display: inline-block;
+    inline-size: .62em;
+    block-size: .62em;
+    background: var(--ink);
+    clip-path: polygon(50% 0, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
+  }
+  @media (prefers-reduced-motion: reduce) { .band__track { transform: none !important; } }
+</style>
+
+<script>
+  import { initBands } from '../../scripts/home/bands';
+  initBands();
+</script>

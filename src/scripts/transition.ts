@@ -10,6 +10,33 @@ const STUCK_MS = 4000;
 
 const clean = (path: string) => path.replace(/\/+$/, '') || '/';
 
+/** A back control returns through history when the visitor came from this site,
+    so the previous page keeps its scroll position; otherwise it follows its href. */
+function cameFromSite(): boolean {
+  if (!document.referrer || history.length < 2) return false;
+  try {
+    return new URL(document.referrer).origin === location.origin;
+  } catch {
+    return false;
+  }
+}
+
+/** Name the back control after the page it will actually return to. */
+export function initBack(): void {
+  const a = document.querySelector<HTMLAnchorElement>('a[data-back]');
+  if (!a) return;
+  const from = cameFromSite() ? clean(new URL(document.referrer).pathname) : '';
+  const label = from === '/' ? a.dataset.labelHome : from === '/works' ? a.dataset.labelWorks : null;
+  if (!label) {
+    // Came from elsewhere: follow the link's own destination, not history.
+    a.removeAttribute('data-back');
+    return;
+  }
+  const span = a.querySelector('.back__label');
+  if (span) span.textContent = label;
+  a.href = from;
+}
+
 export function initFlood(): void {
   const flood = document.querySelector<HTMLElement>('.flood');
   const root = document.documentElement;
@@ -52,9 +79,16 @@ export function initFlood(): void {
     if (/\bexternal\b/.test(a.rel)) return;
     const url = new URL(a.href, location.href);
     if (url.origin !== location.origin) return;
+    const viaHistory = a.hasAttribute('data-back') && cameFromSite();
     if (/\.[a-z0-9]+$/i.test(url.pathname)) return; // files (pdf, png...) are not pages
-    if (clean(url.pathname) === clean(location.pathname) && url.search === location.search) return;
-    if (reducedMotion()) return;
+    if (!viaHistory && clean(url.pathname) === clean(location.pathname) && url.search === location.search) return;
+    if (reducedMotion()) {
+      if (viaHistory) {
+        e.preventDefault();
+        history.back();
+      }
+      return;
+    }
 
     e.preventDefault();
     // Keyboard activation has no pointer position: spread from the centre.
@@ -69,7 +103,8 @@ export function initFlood(): void {
       /* storage blocked: the next page simply opens uncovered */
     }
     window.setTimeout(() => {
-      location.assign(url.href);
+      if (viaHistory) history.back();
+      else location.assign(url.href);
       // Navigation failed or was stopped: give the page back.
       window.setTimeout(reset, STUCK_MS);
     }, COVER_MS);

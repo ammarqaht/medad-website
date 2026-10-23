@@ -146,3 +146,45 @@ main:focus-visible { outline: none; } /* skip-link target, not interactive */
   main { animation: page-fade .3s ease both; }
 }
 @keyframes page-fade { from { opacity: 0; } }
+
+/* ---------- Ink writing (key headings) ----------
+   Each rendered line is written in turn, right to left, behind a pen nib that
+   rides the writing edge. The ink is its final colour from the first stroke.
+   Hidden only when JS runs; without JS the heading is simply there. */
+.js [data-ink]:not(.is-writing, .is-written) { clip-path: inset(0 0 0 100%); }
+.ink-line { display: block; }
+.ink-run {
+  position: relative;
+  display: inline-block;
+  clip-path: inset(-25% -.4em -25% 100%);
+  animation: ink-write var(--ink-dur, 800ms) steps(var(--ink-steps, 10), jump-end) var(--ink-delay, 0ms) forwards;
+}
+.ink-nib {
+  /* a pen nib, point down, on the writing edge. Physical left on purpose:
+     Arabic is written right to left, so the edge travels leftwards. */
+  position: absolute;
+  inset-block-end: .08em;
+  left: 100%;
+  inline-size: .26em;
+  block-size: .9em;
+  /* hard-stop slit down the middle of the nib */
+  background: linear-gradient(90deg, var(--ink) 44%, var(--paper) 44% 56%, var(--ink) 56%);
+  clip-path: polygon(0 0, 100% 0, 100% 64%, 50% 100%, 0 64%);
+  transform-origin: 50% 100%;
+  rotate: -28deg;
+  visibility: hidden;
+  animation: ink-nib var(--ink-dur, 800ms) steps(var(--ink-steps, 10), jump-end) var(--ink-delay, 0ms) forwards;
+}
+@keyframes ink-write {
+  from { clip-path: inset(-25% -.4em -25% 100%); }
+  to   { clip-path: inset(-25% -.4em -25% 0); }
+}
+@keyframes ink-nib {
+  0%   { left: 100%; visibility: visible; }
+  99%  { left: 0%; visibility: visible; }
+  100% { left: 0%; visibility: hidden; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .js [data-ink]:not(.is-writing, .is-written) { clip-path: none; opacity: 0; }
+  .js [data-ink].is-written { animation: page-fade .5s ease both; }
+}

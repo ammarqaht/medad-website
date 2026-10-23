@@ -1,0 +1,97 @@
+---
+/* A glimpse of the archive (FR-08): three printed files, fanned on the desk.
+   Each opens its work; the button opens the whole archive. */
+import Button from '../Button.astro';
+import { site } from '../../content/site';
+const { glimpse } = site.home;
+---
+<section class="glimpse" aria-labelledby="glimpse-title">
+  <div class="glimpse__head">
+    <h2 class="glimpse__title display" id="glimpse-title" data-ink>{glimpse.title}</h2>
+    <p class="glimpse__line">{glimpse.line}</p>
+  </div>
+
+  <ul class="files">
+    {glimpse.items.map((f, i) => (
+      <li class={`file file--${i + 1}`} data-pop={String(i * 0.1)}>
+        <a class="file__body" href={f.href}>
+          <span class="file__kind">{f.kind}</span>
+          <span class="file__name display">{f.name}</span>
+          <span class="file__line">{f.line}</span>
+          <span class="file__open" aria-hidden="true"></span>
+        </a>
+      </li>
+    ))}
+  </ul>
+
+  <div class="glimpse__cta"><Button href="/works" variant="paper">{glimpse.cta}</Button></div>
+</section>
+
+<style>
+  .glimpse {
+    max-inline-size: var(--max);
+    margin-inline: auto;
+    padding: clamp(32px, 6vw, 80px) var(--gutter) clamp(56px, 8vw, 112px);
+    display: grid;
+    gap: clamp(28px, 4vw, 48px);
+  }
+  .glimpse__head { display: grid; gap: 12px; }
+  .glimpse__title { font-size: clamp(40px, 6vw, 88px); line-height: 1.15; justify-self: start; }
+  .glimpse__line { font-size: clamp(19px, 1.7vw, 23px); line-height: 1.6; max-inline-size: 40ch; }
+
+  .files { display: grid; gap: 40px; padding-block-start: 24px; }
+  .file { position: relative; transition: translate var(--snap), rotate var(--snap); }
+  /* the folder tab */
+  .file::before {
+    content: "";
+    position: absolute;
+    inset-block-end: 100%;
+    inset-inline-start: 18px;
+    inline-size: 42%;
+    block-size: 26px;
+    background: inherit;
+    border: var(--bw) solid var(--ink);
+    border-block-end: 0;
+    clip-path: polygon(0 100%, 8% 0, 92% 0, 100% 100%);
+    background-color: var(--file-bg);
+  }
+  .file--1 { --file-bg: var(--white); rotate: -2deg; }
+  .file--2 { --file-bg: var(--green-500); rotate: 1.5deg; }
+  .file--3 { --file-bg: var(--green-300); rotate: -1deg; }
+  .file__body {
+    display: grid;
+    gap: 8px;
+    min-block-size: 220px;
+    align-content: start;
+    padding: 26px 24px 28px;
+    background: var(--file-bg);
+    border: var(--bw) solid var(--ink);
+    box-shadow: var(--shadow);
+    color: var(--ink);
+    text-decoration: none;
+    transition: box-shadow var(--snap);
+  }
+  .file__kind { font-size: 19px; font-weight: 900; }
+  .file__name { font-size: clamp(36px, 3.6vw, 52px); line-height: 1.15; }
+  .file__line { font-size: 19px; line-height: 1.6; font-weight: 700; }
+  .file__open {
+    justify-self: end;
+    margin-block-start: 8px;
+    inline-size: 34px;
+    block-size: 34px;
+    background: var(--ink);
+    clip-path: polygon(0 50%, 55% 0, 55% 30%, 100% 30%, 100% 70%, 55% 70%, 55% 100%);
+  }
+  .file:hover { translate: 0 -14px; rotate: 0deg; z-index: 3; }
+  .file:hover .file__body { box-shadow: calc(var(--sx) * 2) calc(var(--off) * 2) 0 0 var(--ink); }
+
+  @media (min-width: 900px) {
+    .files { grid-template-columns: repeat(3, 1fr); gap: 0; }
+    .file + .file { margin-inline-start: -24px; }
+    .file--2 { margin-block-start: 40px; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .file { transition: none; }
+    .file:hover { translate: none; }
+  }
+</style>

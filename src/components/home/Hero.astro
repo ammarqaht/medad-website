@@ -1,0 +1,175 @@
+---
+/* Hero: the ink opener stage, the brand word written out of the ink, and the
+   headline stamped in word by word (last word boxed in green). */
+import { site } from '../../content/site';
+import { BRAND } from '../../content/brand';
+
+const { hero } = site.home;
+const words = hero.headline.split(' ');
+---
+<section class="hero" data-hero aria-labelledby="hero-title">
+  <div class="hero__stage" data-stage>
+    <canvas class="hero__ink" aria-hidden="true"></canvas>
+    <p class="hero__word" role="img" aria-label="مداد" data-word>
+      <span class="hero__outline brand-word" aria-hidden="true">{BRAND}</span>
+      <span class="hero__fill brand-word" aria-hidden="true">{BRAND}</span>
+    </p>
+  </div>
+
+  <h1 class="hero__title display" id="hero-title">
+    {words.map((w, i) => (
+      <>
+        <span class={i === words.length - 1 ? 'w hl' : 'w'}>{w}</span>{i < words.length - 1 ? ' ' : ''}
+      </>
+    ))}
+  </h1>
+  <p class="hero__line box">{hero.line}</p>
+
+  <a class="hero__cue" href="#story">
+    <span>{hero.scroll}</span>
+    <span class="hero__arrow" aria-hidden="true"></span>
+  </a>
+  <button class="hero__skip" type="button" data-skip>{hero.skip}</button>
+</section>
+
+<style>
+  .hero {
+    position: relative;
+    min-block-size: calc(100svh - 70px);
+    max-inline-size: var(--max);
+    margin-inline: auto;
+    padding: clamp(20px, 4vw, 48px) var(--gutter) clamp(40px, 6vw, 72px);
+    display: grid;
+    justify-items: center;
+    align-content: center;
+    gap: clamp(20px, 3vw, 36px);
+    text-align: center;
+  }
+
+  /* Stage: canvas ink blot with the brand word inside it */
+  .hero__stage {
+    position: relative;
+    container-type: inline-size;
+    inline-size: min(100%, 860px);
+    aspect-ratio: 4 / 3;
+    display: grid;
+    place-items: center;
+  }
+  @media (min-width: 600px) { .hero__stage { aspect-ratio: 2.3 / 1; } }
+  .hero__ink { position: absolute; inset: 0; inline-size: 100%; block-size: 100%; max-inline-size: none; pointer-events: none; }
+  .hero__word {
+    position: relative;
+    display: grid;
+    font-size: 17cqi;
+    line-height: 1;
+    translate: 0 -4%;
+  }
+  .hero__outline,
+  .hero__fill { grid-area: 1 / 1; }
+  .hero__fill { color: var(--paper); }
+  .hero__outline { visibility: hidden; color: transparent; -webkit-text-stroke: max(2px, .012em) var(--ink); }
+  /* No canvas: a flat ink slab stands in for the blot */
+  .hero__stage:global(.no-canvas) { background: var(--ink); border: var(--bw) solid var(--ink); box-shadow: var(--sx) var(--off) 0 0 var(--green-500); }
+
+  .hero__title {
+    font-size: clamp(44px, 7.2vw, 112px);
+    line-height: 1.12;
+    text-wrap: balance;
+  }
+  .hl {
+    display: inline-block;
+    padding: 0 .14em .06em;
+    background: var(--green-500);
+    border: var(--bw) solid var(--ink);
+    box-shadow: var(--shadow);
+    line-height: 1.05;
+    rotate: -2deg;
+  }
+  .hero__line {
+    max-inline-size: 46ch;
+    padding: 14px 20px;
+    font-size: clamp(18px, 1.7vw, 23px);
+    line-height: 1.6;
+    rotate: .6deg;
+  }
+
+  .hero__cue {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    min-block-size: 44px;
+    font-weight: 900;
+    font-size: 17px;
+    text-decoration: none;
+  }
+  .hero__arrow {
+    inline-size: 22px;
+    block-size: 30px;
+    background: var(--ink);
+    clip-path: polygon(30% 0, 70% 0, 70% 55%, 100% 55%, 50% 100%, 0 55%, 30% 55%);
+    animation: cue 1s steps(2, jump-none) infinite;
+  }
+  @keyframes cue { to { translate: 0 8px; } }
+
+  .hero__skip {
+    display: none;
+    position: absolute;
+    inset-block-end: clamp(16px, 3vw, 32px);
+    inset-inline-start: var(--gutter);
+    min-block-size: 44px;
+    padding: 8px 16px;
+    border: var(--bw) solid var(--ink);
+    background: var(--white);
+    font-weight: 900;
+    font-size: 16px;
+    cursor: pointer;
+    box-shadow: var(--shadow);
+  }
+
+  /* ---------- Opener choreography (html.opening set by boot.js) ---------- */
+  :global(html.opening) .hero__skip { display: inline-flex; align-items: center; }
+  /* 1-2: an empty outline that each landed drop dyes with ink, right to left */
+  :global(html.opening) .hero__outline { visibility: visible; }
+  :global(html.opening) .hero__fill {
+    color: var(--ink);
+    clip-path: inset(-15% 0 -15% calc(100% - var(--dyed, 0%)));
+  }
+  /* 3: the burst. The word turns to paper on the ink and is stamped down */
+  :global(html.opening) .hero:global(.is-burst) .hero__outline { visibility: hidden; }
+  :global(html.opening) .hero:global(.is-burst) .hero__fill {
+    color: var(--paper);
+    clip-path: none;
+    animation: slam 330ms steps(4, jump-end) both;
+  }
+  @keyframes slam {
+    0% { scale: 1.3; rotate: -4deg; }
+    50% { scale: .92; rotate: 1deg; }
+    75% { scale: 1.04; rotate: 0deg; }
+    100% { scale: 1; rotate: 0deg; }
+  }
+
+  :global(html.opening) .w,
+  :global(html.opening) .hero__line,
+  :global(html.opening) .hero__cue { opacity: 0; }
+  :global(html.opening) .hero:global(.is-titling) .w { animation: stamp 250ms steps(3, jump-end) forwards; }
+  :global(html.opening) .hero:global(.is-titling) .w:nth-child(2) { animation-delay: 170ms; }
+  :global(html.opening) .hero:global(.is-titling) .w:nth-child(3) { animation-delay: 340ms; }
+  :global(html.opening) .hero:global(.is-titling) .w:nth-child(4) { animation-delay: 510ms; }
+  :global(html.opening) .hero:global(.is-titling) .w:nth-child(5) { animation-delay: 680ms; }
+  :global(html.opening) .hero:global(.is-titling) .hero__line { animation: stamp 250ms steps(3, jump-end) 850ms forwards; }
+  :global(html.opening) .hero:global(.is-titling) .hero__cue { animation: stamp 250ms steps(3, jump-end) 1050ms forwards; }
+  @keyframes stamp {
+    0% { opacity: 1; scale: 1.35; }
+    60% { opacity: 1; scale: .94; }
+    100% { opacity: 1; scale: 1; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .hero__arrow { animation: none; }
+  }
+</style>
+
+<script>
+  import { initOpener } from '../../scripts/home/opener';
+  initOpener();
+</script>

@@ -1,0 +1,121 @@
+---
+/* The two worlds (FR-07): the ink line forks. One branch builds screens
+   (digital solutions), the other beats like a pulse (live experiences).
+   Each arm opens the works archive filtered to it. */
+import { site } from '../../content/site';
+const { arms } = site.home;
+---
+<section class="arms" aria-labelledby="arms-title" data-arms>
+  <h2 class="arms__title display" id="arms-title" data-ink>{arms.title}</h2>
+
+  <svg class="arms__fork" viewBox="0 0 400 120" preserveAspectRatio="none" aria-hidden="true">
+    <path d="M200 0 V40 C200 80 300 70 300 120" />
+    <path d="M200 40 C200 80 100 70 100 120" />
+  </svg>
+
+  <div class="arms__grid">
+    <a class="arm arm--digital box" href={arms.digital.href} data-pop>
+      <h3 class="arm__title display">{arms.digital.title}</h3>
+      <p class="arm__text">{arms.digital.text}</p>
+      <div class="screens" aria-hidden="true">
+        <span class="screen"></span><span class="screen"></span><span class="screen"></span>
+      </div>
+      <span class="arm__cta">{arms.digital.cta}<span class="arm__arrow" aria-hidden="true"></span></span>
+    </a>
+
+    <a class="arm arm--live box" href={arms.live.href} data-pop="0.12">
+      <h3 class="arm__title display">{arms.live.title}</h3>
+      <p class="arm__text">{arms.live.text}</p>
+      <svg class="pulse" viewBox="0 0 300 80" preserveAspectRatio="none" aria-hidden="true">
+        <path d="M0 50 H70 L85 50 L100 12 L118 72 L132 30 L142 50 H200 L212 50 L224 22 L238 64 L248 50 H300" />
+      </svg>
+      <span class="arm__cta">{arms.live.cta}<span class="arm__arrow" aria-hidden="true"></span></span>
+    </a>
+  </div>
+</section>
+
+<style>
+  .arms {
+    max-inline-size: var(--max);
+    margin-inline: auto;
+    padding: clamp(32px, 6vw, 80px) var(--gutter) clamp(56px, 8vw, 112px);
+    display: grid;
+    justify-items: center;
+  }
+  .arms__title { font-size: clamp(40px, 6.4vw, 96px); line-height: 1.15; text-align: center; text-wrap: balance; }
+  .arms__fork { inline-size: min(70%, 720px); block-size: clamp(60px, 9vw, 120px); max-inline-size: none; overflow: visible; display: none; }
+  .arms__fork path { fill: none; stroke: var(--ink); stroke-width: 6; stroke-linecap: square; vector-effect: non-scaling-stroke; }
+  .arms__grid { inline-size: 100%; display: grid; gap: 32px; margin-block-start: 28px; }
+
+  .arm {
+    display: grid;
+    gap: 16px;
+    align-content: start;
+    padding: clamp(22px, 3vw, 40px);
+    text-decoration: none;
+    color: inherit;
+    transition: translate var(--snap), box-shadow var(--snap);
+  }
+  .arm:hover { translate: calc(var(--off) / -2) calc(var(--off) / 2); box-shadow: calc(var(--sx) / 2) calc(var(--off) / 2) 0 0 var(--ink); }
+  .arm:active { translate: var(--sx) var(--off); box-shadow: none; }
+  .arm--digital { rotate: -1deg; }
+  .arm--live { background: var(--ink); color: var(--paper); box-shadow: var(--sx) var(--off) 0 0 var(--green-500); rotate: .8deg; }
+  .arm--live:hover { box-shadow: calc(var(--sx) / 2) calc(var(--off) / 2) 0 0 var(--green-500); }
+  .arm--live:focus-visible { outline-color: var(--green-400); }
+  .arm__title { font-size: clamp(34px, 4vw, 56px); line-height: 1.2; }
+  .arm__text { font-size: clamp(19px, 1.7vw, 22px); line-height: 1.6; max-inline-size: 36ch; }
+
+
+  .arm__cta { display: inline-flex; align-items: center; gap: 12px; font-weight: 900; font-size: clamp(19px, 1.8vw, 22px); }
+  .arm__arrow { inline-size: .9em; block-size: .9em; background: currentColor; clip-path: polygon(0 50%, 55% 0, 55% 30%, 100% 30%, 100% 70%, 55% 70%, 55% 100%); transition: translate var(--snap); }
+  .arm:hover .arm__arrow { translate: -6px 0; }
+
+  /* Digital: three screens stamped one after the other */
+  .screens { display: flex; gap: 12px; block-size: 92px; align-items: end; }
+  .screen { flex: 1; border: var(--bw) solid var(--ink); background: var(--white); box-shadow: var(--shadow); position: relative; }
+  .screen::before { content: ""; position: absolute; inset-inline: 0; inset-block-start: 0; block-size: 12px; background: var(--ink); }
+  .screen:nth-child(1) { block-size: 70%; }
+  .screen:nth-child(2) { block-size: 100%; background: var(--green-500); }
+  .screen:nth-child(3) { block-size: 55%; }
+  :global(.js) .arm--digital:global(.is-in) .screen { animation: rise 360ms steps(4, jump-end) both; }
+  :global(.js) .arm--digital:global(.is-in) .screen:nth-child(2) { animation-delay: 240ms; }
+  :global(.js) .arm--digital:global(.is-in) .screen:nth-child(3) { animation-delay: 480ms; }
+  @keyframes rise { from { clip-path: inset(100% 0 0 0); } to { clip-path: inset(0 0 0 0); } }
+
+  /* Live: the pulse line, travelling in hard frames */
+  .pulse { inline-size: 100%; block-size: 80px; max-inline-size: none; }
+  .pulse path { fill: none; stroke: var(--green-400); stroke-width: 5; stroke-linejoin: miter; vector-effect: non-scaling-stroke; stroke-dasharray: 120 600; }
+  :global(.js) .arm--live:global(.is-in) .pulse path { animation: beat 1.6s steps(16, jump-none) infinite; }
+  @keyframes beat { from { stroke-dashoffset: 720; } to { stroke-dashoffset: 0; } }
+
+  @media (min-width: 900px) {
+    .arms__fork { display: block; }
+    .arms__grid { grid-template-columns: 1fr 1fr; gap: 48px; margin-block-start: 0; }
+    .arm--live { margin-block-start: 56px; }
+  }
+  :global(.js) .arms__fork path { stroke-dasharray: 400; stroke-dashoffset: 400; }
+  :global(.js) .arms:global(.is-forked) .arms__fork path { animation: fork 600ms steps(7, jump-end) forwards; }
+  @keyframes fork { to { stroke-dashoffset: 0; } }
+
+  @media (prefers-reduced-motion: reduce) {
+    .arm, .arm__arrow { transition: box-shadow .2s ease; }
+    .arm:hover, .arm:active, .arm:hover .arm__arrow { translate: none; }
+    :global(.js) .arm--digital:global(.is-in) .screen,
+    :global(.js) .arm--live:global(.is-in) .pulse path { animation: none; }
+    :global(.js) .arms__fork path { stroke-dashoffset: 0; }
+    .pulse path { stroke-dasharray: none; }
+  }
+</style>
+
+<script>
+  /* Fork the line once the section comes into view. */
+  const arms = document.querySelector('[data-arms]');
+  if (arms) {
+    new IntersectionObserver((entries, io) => {
+      if (entries[0].isIntersecting) {
+        arms.classList.add('is-forked');
+        io.disconnect();
+      }
+    }, { threshold: 0.2 }).observe(arms);
+  }
+</script>
