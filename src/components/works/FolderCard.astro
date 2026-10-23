@@ -16,7 +16,7 @@ const multi = sheets.length > 1;
     {folder.line && <p class="fold__line">{folder.line}</p>}
     <ul class={`fold__sheets${multi ? ' fold__sheets--multi' : ''}`}>
       {sheets.map((w) => (
-        <li>
+        <li data-pop>
           <a class="sheet" href={`/works/${w.slug}`} data-sheet>
             <span class="sheet__paper"><Sketch kind={w.sketch} /></span>
             <span class="sheet__text">

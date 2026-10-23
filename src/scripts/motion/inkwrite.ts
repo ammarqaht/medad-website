@@ -6,6 +6,7 @@
    Timing is in 12fps steps and scales with each line's length. */
 import { frames } from './steps';
 import { reducedMotion } from './reduced';
+import { REVEAL_MARGIN } from './pop';
 
 const PER_CHAR = 0.05; // seconds of writing per character
 const MIN_LINE = 0.4;
@@ -104,7 +105,7 @@ export function initInkWrite(root: ParentNode = document): void {
         io.unobserve(e.target);
       });
     },
-    { threshold: 0, rootMargin: '0px 0px -10% 0px' },
+    { threshold: 0, rootMargin: REVEAL_MARGIN },
   );
   byParent.forEach((_, parent) => io.observe(parent));
 }

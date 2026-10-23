@@ -2,6 +2,7 @@
    screens open one at a time (cycling until the visitor picks one), and the
    live card holds a one-question quiz. */
 import { reducedMotion } from '../motion/reduced';
+import { REVEAL_MARGIN } from '../motion/pop';
 
 const CYCLE_MS = 2400;
 
@@ -40,7 +41,7 @@ export function initArms(): void {
         io.disconnect();
       }
     },
-    { threshold: 0 },
+    { threshold: 0, rootMargin: REVEAL_MARGIN },
   ).observe(arms);
 
   // Screens: one open at a time.
