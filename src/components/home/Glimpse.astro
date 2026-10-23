@@ -1,19 +1,17 @@
 ---
-/* A glimpse of the archive (FR-08): three printed files, fanned on the desk.
-   Each opens its work; the button opens the whole archive. */
+/* A glimpse of the archive (FR-08): three works, each opening its page,
+   and a button to the whole archive. Desktop: three cards side by side with
+   a one-line description. Phone: names only, centred, in compact tiles. */
 import Button from '../Button.astro';
 import { site } from '../../content/site';
 const { glimpse } = site.home;
 ---
 <section class="glimpse" aria-labelledby="glimpse-title">
-  <div class="glimpse__head">
-    <h2 class="glimpse__title display" id="glimpse-title" data-ink>{glimpse.title}</h2>
-    <p class="glimpse__line">{glimpse.line}</p>
-  </div>
+  <h2 class="glimpse__title display" id="glimpse-title" data-ink>{glimpse.title}</h2>
 
   <ul class="files">
     {glimpse.items.map((f, i) => (
-      <li class={`file file--${i + 1}`} data-pop={String(i * 0.1)}>
+      <li class={`file file--${i + 1}`} data-pop>
         <a class="file__body" href={f.href}>
           <span class="file__name display">{f.name}</span>
           <span class="file__line">{f.line}</span>
@@ -32,80 +30,79 @@ const { glimpse } = site.home;
     margin-inline: auto;
     padding: clamp(32px, 6vw, 80px) var(--gutter) clamp(56px, 8vw, 112px);
     display: grid;
-    gap: clamp(28px, 4vw, 48px);
+    gap: clamp(24px, 4vw, 44px);
   }
-  .glimpse__head { display: grid; gap: 12px; }
   .glimpse__title { font-size: clamp(40px, 6vw, 88px); line-height: 1.15; justify-self: start; }
-  .glimpse__line { font-size: clamp(19px, 1.7vw, 23px); line-height: 1.6; max-inline-size: 40ch; }
 
-  .files { display: grid; gap: 40px; padding-block-start: 24px; }
-  .file { position: relative; transition: translate var(--snap), rotate var(--snap); }
-  /* the folder tab */
-  .file::before {
-    content: "";
-    position: absolute;
-    inset-block-end: 100%;
-    inset-inline-start: 18px;
-    inline-size: 42%;
-    block-size: 26px;
-    border: var(--bw) solid var(--ink);
-    border-block-end: 0;
-    clip-path: polygon(0 100%, 8% 0, 92% 0, 100% 100%);
-    background-color: var(--file-bg);
-  }
-  .file--1 { --file-bg: var(--white); rotate: -2deg; }
-  .file--2 { --file-bg: var(--green-500); rotate: 1.5deg; }
-  .file--3 { --file-bg: var(--green-300); rotate: -1deg; }
+  .files { display: grid; gap: 28px; grid-template-columns: repeat(3, 1fr); align-items: stretch; }
+  .file { display: grid; }
+  .file--1 { --file-bg: var(--white); }
+  .file--2 { --file-bg: var(--green-500); }
+  .file--3 { --file-bg: var(--green-300); }
+
+  /* A sheet with a folder tab on its top edge; presses into its shadow like a button */
   .file__body {
+    position: relative;
     display: grid;
-    gap: 8px;
-    min-block-size: 220px;
     align-content: start;
-    padding: 26px 24px 28px;
+    gap: 10px;
+    padding: 30px 24px 24px;
     background: var(--file-bg);
     border: var(--bw) solid var(--ink);
     box-shadow: var(--shadow);
     color: var(--ink);
     text-decoration: none;
-    transition: box-shadow var(--snap);
+    transition: translate var(--snap), box-shadow var(--snap);
   }
-  .file__name { font-size: clamp(36px, 3.6vw, 52px); line-height: 1.15; }
+  .file__body::before {
+    content: "";
+    position: absolute;
+    inset-block-end: 100%;
+    inset-inline-start: 18px;
+    inline-size: 38%;
+    block-size: 18px;
+    background: var(--file-bg);
+    border: var(--bw) solid var(--ink);
+    border-block-end: 0;
+    clip-path: polygon(0 100%, 10% 0, 90% 0, 100% 100%);
+    margin-block-end: calc(var(--bw) * -1);
+  }
+  .file__body:hover { translate: calc(var(--off) / -2) calc(var(--off) / 2); box-shadow: calc(var(--sx) / 2) calc(var(--off) / 2) 0 0 var(--ink); }
+  .file__body:active { translate: var(--sx) var(--off); box-shadow: none; }
+  .file__name { font-size: clamp(34px, 3.4vw, 50px); line-height: 1.15; }
   .file__line { font-size: 19px; line-height: 1.6; font-weight: 700; }
   .file__open {
     justify-self: end;
-    margin-block-start: 8px;
-    inline-size: 34px;
-    block-size: 34px;
+    align-self: end;
+    margin-block-start: 6px;
+    inline-size: 30px;
+    block-size: 30px;
     background: var(--ink);
     clip-path: polygon(0 50%, 55% 0, 55% 30%, 100% 30%, 100% 70%, 55% 70%, 55% 100%);
+    transition: translate var(--snap);
   }
-  .file:hover { translate: 0 -14px; rotate: 0deg; z-index: 3; }
-  .file:hover .file__body { box-shadow: calc(var(--sx) * 2) calc(var(--off) * 2) 0 0 var(--ink); }
+  .file__body:hover .file__open { translate: -6px 0; }
+  .glimpse__cta { justify-self: start; }
 
+  /* Tablet: two columns would orphan the third, so stack */
+  @media (max-width: 899px) {
+    .files { grid-template-columns: 1fr; gap: 24px; }
+  }
+
+  /* Phone: names only, centred, compact tiles */
   @media (max-width: 599px) {
-    .glimpse { gap: 24px; padding-block: 32px 56px; }
-    .files { gap: 0; }
-    .file + .file { margin-block-start: -18px; }
-    .file__body { min-block-size: 0; padding: 22px 20px 20px; gap: 6px; }
-    .file__name { font-size: 34px; }
-    .file__open { inline-size: 28px; block-size: 28px; margin-block-start: 0; }
+    .glimpse { gap: 22px; padding-block: 32px 56px; }
+    .glimpse__title { justify-self: center; text-align: center; }
+    .files { gap: 22px; }
+    .file__body { justify-items: center; text-align: center; padding: 22px 16px 18px; }
+    .file__body::before { inset-inline-start: 50%; translate: 50% 0; inline-size: 34%; }
+    .file__line, .file__open { display: none; }
+    .file__name { font-size: 32px; }
+    .glimpse__cta { justify-self: center; }
   }
-  @media (min-width: 900px) {
-    .files { grid-template-columns: repeat(3, 1fr); gap: 0; }
-    .file + .file { margin-inline-start: -24px; }
-    .file--2 { margin-block-start: 40px; }
-  }
-  /* Touch screens have no hover: the files lift out on their own, in turn */
-  @media (hover: none) and (prefers-reduced-motion: no-preference) {
-    :global(.js) .file:global(.is-in) { animation: lift 4.5s steps(3, jump-none) infinite; }
-    :global(.js) .file--2:global(.is-in) { animation-delay: 1.5s; }
-    :global(.js) .file--3:global(.is-in) { animation-delay: 3s; }
-    :global(.js) .file__open { animation: poke 1.2s steps(2, jump-none) infinite; }
-  }
-  @keyframes lift { 0%, 30%, 100% { translate: 0 0; } 10%, 22% { translate: 0 -14px; } }
-  @keyframes poke { 50% { translate: -6px 0; } }
+
   @media (prefers-reduced-motion: reduce) {
-    .file { transition: none; }
-    .file:hover { translate: none; }
+    .file__body, .file__open { transition: box-shadow .2s ease; }
+    .file__body:hover, .file__body:active, .file__body:hover .file__open { translate: none; }
   }
 </style>

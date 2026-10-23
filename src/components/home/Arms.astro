@@ -4,6 +4,7 @@
    Live experiences: a one-question quiz to play right here. */
 import { site } from '../../content/site';
 import { html } from '../../content/brand';
+import Button from '../Button.astro';
 const { arms } = site.home;
 const { digital, live } = arms;
 ---
@@ -47,6 +48,7 @@ const { digital, live } = arms;
       <a class="arm__cta" href={live.href}>{live.cta}<span class="arm__arrow" aria-hidden="true"></span></a>
     </article>
   </div>
+  <div class="arms__all"><Button href="/works" variant="paper">{arms.all}</Button></div>
 </section>
 
 <style>
@@ -64,6 +66,7 @@ const { digital, live } = arms;
   .arms__fork path { fill: none; stroke: var(--ink); stroke-width: 6; stroke-linecap: square; }
   .arms__grid { position: relative; z-index: 1; inline-size: 100%; display: grid; gap: 32px; margin-block-start: 28px; }
 
+  .arms__all { margin-block-start: clamp(36px, 5vw, 56px); }
   .arm { display: grid; gap: 18px; align-content: start; padding: clamp(22px, 3vw, 40px); }
   .arm--digital { rotate: -1deg; }
   .arm--live { background: var(--ink); color: var(--paper); box-shadow: var(--sx) var(--off) 0 0 var(--green-500); rotate: .8deg; }

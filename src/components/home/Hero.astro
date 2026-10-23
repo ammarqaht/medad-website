@@ -1,6 +1,7 @@
 ---
 /* Hero: the ink opener stage, the brand word written out of the ink, and the
    headline stamped in word by word (last word boxed in green). */
+import Button from '../Button.astro';
 import { site } from '../../content/site';
 import { text } from '../../content/brand';
 
@@ -28,10 +29,14 @@ const words = hero.headline.split(' ');
   </h1>
   <p class="hero__line box">{hero.line}</p>
 
-  <a class="hero__cue" href="#story">
-    <span>{hero.scroll}</span>
-    <span class="hero__arrow" aria-hidden="true"></span>
-  </a>
+  <!-- Two paths from the first screen: the works, or the story below -->
+  <div class="hero__go">
+    <Button href="/works">{hero.works}</Button>
+    <a class="hero__cue" href="#story">
+      <span>{hero.scroll}</span>
+      <span class="hero__arrow" aria-hidden="true"></span>
+    </a>
+  </div>
 </section>
 
 <style>
@@ -98,6 +103,13 @@ const words = hero.headline.split(' ');
     rotate: .6deg;
   }
 
+  .hero__go {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: 16px 28px;
+  }
   .hero__cue {
     display: inline-flex;
     align-items: center;
@@ -131,14 +143,14 @@ const words = hero.headline.split(' ');
 
   :global(html.opening) .w,
   :global(html.opening) .hero__line,
-  :global(html.opening) .hero__cue { opacity: 0; }
+  :global(html.opening) .hero__go { opacity: 0; }
   :global(html.opening) .hero:global(.is-titling) .w { animation: stamp 250ms steps(3, jump-end) forwards; }
   :global(html.opening) .hero:global(.is-titling) .w:nth-child(2) { animation-delay: 170ms; }
   :global(html.opening) .hero:global(.is-titling) .w:nth-child(3) { animation-delay: 340ms; }
   :global(html.opening) .hero:global(.is-titling) .w:nth-child(4) { animation-delay: 510ms; }
   :global(html.opening) .hero:global(.is-titling) .w:nth-child(5) { animation-delay: 680ms; }
   :global(html.opening) .hero:global(.is-titling) .hero__line { animation: stamp 250ms steps(3, jump-end) 850ms forwards; }
-  :global(html.opening) .hero:global(.is-titling) .hero__cue { animation: stamp 250ms steps(3, jump-end) 1050ms forwards; }
+  :global(html.opening) .hero:global(.is-titling) .hero__go { animation: stamp 250ms steps(3, jump-end) 1050ms forwards; }
   @keyframes stamp {
     0% { opacity: 1; scale: 1.35; }
     60% { opacity: 1; scale: .94; }
