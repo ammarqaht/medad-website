@@ -82,6 +82,11 @@ const numerals = site.home.numerals;
   .chapter--2 .chapter__card { background: var(--green-300); rotate: .8deg; }
   .chapter--3 .chapter__card { background: var(--green-500); rotate: -.6deg; }
 
+  @media (max-width: 599px) {
+    .story { row-gap: 44px; padding-block: 40px 56px; }
+    .ill { display: none; }
+    .chapter__card { padding: 20px 18px; gap: 10px; }
+  }
   @media (min-width: 900px) {
     .story { grid-template-columns: repeat(12, 1fr); padding-inline-start: var(--gutter); }
     /* zigzag balanced around the centre line */

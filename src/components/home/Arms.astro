@@ -180,6 +180,15 @@ const { digital, live } = arms;
   @keyframes shake { 0%, 100% { translate: 0 0; } 25% { translate: 6px 0; } 50% { translate: -6px 0; } 75% { translate: 4px 0; } }
   @keyframes stamp-in { 0% { scale: 1.25; } 60% { scale: .94; } 100% { scale: 1; } }
 
+  @media (max-width: 599px) {
+    .arms { padding-block: 24px 56px; }
+    .arms__grid { gap: 28px; margin-block-start: 20px; }
+    .arm { gap: 14px; padding: 20px 18px; }
+    .screens { block-size: 112px; gap: 8px; }
+    .quiz { padding: 20px 16px 14px; }
+    .quiz__q { font-size: 24px; }
+    .quiz__opt { padding: 8px 16px; }
+  }
   @media (hover: none) and (prefers-reduced-motion: no-preference) {
     .arm__arrow { animation: poke 1.2s steps(2, jump-none) infinite; }
   }

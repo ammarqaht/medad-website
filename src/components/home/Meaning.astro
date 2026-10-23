@@ -48,6 +48,10 @@ const { meaning } = site.home;
     rotate: 8deg;
   }
   .meaning__drop path { fill: var(--ink); stroke: var(--ink); stroke-width: 3; }
+  @media (max-width: 599px) {
+    .meaning { padding-block: 32px 40px; gap: 20px; }
+    .meaning__entry { padding: 20px 18px; padding-inline-end: 56px; }
+  }
   @media (min-width: 900px) {
     .meaning { grid-template-columns: repeat(12, 1fr); align-items: start; }
     .meaning__title { grid-column: 1 / span 6; margin-block-start: 8px; }
