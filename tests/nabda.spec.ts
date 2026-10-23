@@ -28,7 +28,7 @@ async function open(page: Page) {
   return demo;
 }
 
-const yourSecs = (page: Page) => page.locator('.nb-team.is-you .nb-team__secs').getAttribute('aria-label');
+const yourSecs = (page: Page) => page.locator('.nb-team.is-you .nb-team__secs .nb-sr').textContent();
 
 test.describe('Nabda demo', () => {
   test('should play a round to its end, pause the clocks, and touch no network or storage', async ({ page }) => {
@@ -60,14 +60,14 @@ test.describe('Nabda demo', () => {
     expect(touched).toEqual([]);
   });
 
-  test('should lose the round at about twenty five seconds when nobody answers for you', async ({ page }) => {
+  test('should drain your pulse by the real seconds played', async ({ page }) => {
     const demo = await open(page);
     await demo.getByRole('button', { name: 'ابدأ الجولة' }).click();
     await page.clock.runFor(3000 + 10_500);
     expect(await yourSecs(page)).toBe('١٥ ثانية');
   });
 
-  test('should offer the three cards with their prices and refuse what points cannot pay', async ({ page }) => {
+  test('should offer the three cards and say why a card cannot be bought yet', async ({ page }) => {
     const demo = await open(page);
     await demo.getByRole('button', { name: 'ابدأ الجولة' }).click();
     await page.clock.runFor(3000 + 26_000);
@@ -78,7 +78,7 @@ test.describe('Nabda demo', () => {
     await expect(cards.nth(1)).toContainText('تجميد');
     await expect(cards.nth(2)).toContainText('مضاعفة');
     // freeze needs a team first
-    await expect(cards.nth(1).getByRole('button', { name: 'اشتر' })).toBeDisabled();
+    await expect(cards.nth(1).getByRole('button', { name: 'اشتر' })).toHaveAttribute('aria-disabled', 'true');
     await expect(cards.nth(1)).toContainText('اختر فريقا');
 
     await demo.getByRole('button', { name: 'جولة أخرى' }).click();

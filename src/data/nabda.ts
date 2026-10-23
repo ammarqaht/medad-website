@@ -29,7 +29,8 @@ export const RULES = {
   startMs: 25_000,
   correctMs: 5_000,
   wrongMs: 3_000,
-  maxMs: 60_000,
+  /** Room for the start plus four extra-time cards (25 + 4 × 10 s). */
+  maxMs: 65_000,
   countdownMs: 3_000,
   /** How long the right answer stays shown before the next question. */
   revealMs: 650,
@@ -115,6 +116,7 @@ export const ui = {
   pausedSaid: 'أوقفت الجولة.',
   resumedSaid: 'استؤنفت الجولة.',
   autoPaused: 'أوقفت الجولة لأنك غادرت الصفحة.',
+  scrollPaused: 'أوقفت الجولة لأنها خرجت من الشاشة.',
   frozen: 'مجمد',
   stopped: 'توقف',
   right: 'صحيحة',

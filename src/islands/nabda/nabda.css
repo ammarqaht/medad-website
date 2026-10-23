@@ -18,7 +18,7 @@
   font-weight: 700;
   line-height: 1.45;
 }
-.nb :where(h3, p, ul, ol) { margin: 0; }
+.nb :where(h2, h3, p, ul, ol) { margin: 0; }
 .nb :where(ul, ol) { list-style: none; padding: 0; }
 :where(.nb) button { font: inherit; color: inherit; cursor: pointer; -webkit-tap-highlight-color: transparent; }
 .nb :focus-visible { outline: 3px solid var(--ink); outline-offset: 3px; }
@@ -169,11 +169,11 @@
   box-shadow: var(--nb-shadow);
   transition: translate var(--snap), box-shadow var(--snap), background-color var(--snap);
 }
-.nb-btn:hover:not(:disabled) { translate: calc(var(--nb-sx) / 2) calc(var(--nb-off) / 2); box-shadow: calc(var(--nb-sx) / 2) calc(var(--nb-off) / 2) 0 0 var(--ink); }
-.nb-btn:active:not(:disabled) { translate: var(--nb-sx) var(--nb-off); box-shadow: none; }
+.nb-btn:hover:not([aria-disabled]) { translate: calc(var(--nb-sx) / 2) calc(var(--nb-off) / 2); box-shadow: calc(var(--nb-sx) / 2) calc(var(--nb-off) / 2) 0 0 var(--ink); }
+.nb-btn:active:not([aria-disabled]) { translate: var(--nb-sx) var(--nb-off); box-shadow: none; }
 .nb-btn--go { inline-size: 100%; font-size: 19px; background: var(--green-500); }
 .nb-btn--sm { min-block-size: 44px; padding: 4px 16px; font-size: 15px; }
-.nb-btn:disabled { background: var(--paper); color: var(--ink-muted); box-shadow: none; cursor: not-allowed; }
+.nb-btn[aria-disabled] { background: var(--paper); color: var(--ink-muted); box-shadow: none; cursor: not-allowed; }
 
 /* ---------- Question ---------- */
 .nb-q { align-content: start; }

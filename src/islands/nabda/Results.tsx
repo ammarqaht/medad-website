@@ -37,7 +37,7 @@ export function Results({ game: g, head, onAgain, onChange, onSay }: Props) {
   return (
     <div class="nb-res">
       <section class="nb-card" aria-labelledby="nb-res-h">
-        <h3 class="nb-h" id="nb-res-h" tabIndex={-1} ref={head}>{s.title(ar(g.round))}</h3>
+        <h2 class="nb-h" id="nb-res-h" tabIndex={-1} ref={head}>{s.title(ar(g.round))}</h2>
         <p class="nb-res__by">{g.endedBy === 'you' ? s.endedByYou : s.endedBy(g.endedBy)}</p>
         <ol class="nb-rank">
           {g.awards.map((a) => (
@@ -61,7 +61,7 @@ export function Results({ game: g, head, onAgain, onChange, onSay }: Props) {
       </section>
 
       <section class="nb-card nb-shop" aria-labelledby="nb-shop-h">
-        <h3 class="nb-h nb-h--sm" id="nb-shop-h">{shop.title}</h3>
+        <h2 class="nb-h nb-h--sm" id="nb-shop-h">{shop.title}</h2>
         <p class="nb-shop__line">{shop.line}</p>
         <ul class="nb-cards">
           {CARD_IDS.map((id) => {
@@ -98,9 +98,9 @@ export function Results({ game: g, head, onAgain, onChange, onSay }: Props) {
                   <button
                     type="button"
                     class="nb-btn nb-btn--sm"
-                    disabled={!!why}
+                    aria-disabled={why ? 'true' : undefined}
                     aria-describedby={why ? reasonId : undefined}
-                    onClick={() => buy(id)}
+                    onClick={() => !why && buy(id)}
                   >
                     {shop.buy}
                   </button>

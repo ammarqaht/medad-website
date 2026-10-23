@@ -59,6 +59,18 @@ export default function NabdaDemo() {
   // after an answer, read the next question once it is served
   const pendingRead = useRef('');
 
+  /** Pauses a running round. Anything the last tick produced (even the end of
+      the round) is announced now, never carried into the next round. */
+  const pauseNow = (text: string) => {
+    const g = game.current!;
+    if ((g.phase !== 'countdown' && g.phase !== 'play') || g.paused) return;
+    g.pause(now());
+    const ev = g.drainEvents();
+    if (ev.length) announce(ev);
+    if (g.paused) setSaid(text);
+    redraw();
+  };
+
   useEffect(() => {
     const mq = window.matchMedia('(prefers-reduced-motion: reduce)');
     const setMq = () => {
@@ -68,10 +80,31 @@ export default function NabdaDemo() {
     setMq();
     mq.addEventListener('change', setMq);
 
+    const onHide = () => {
+      if (document.hidden) pauseNow(ui.autoPaused);
+    };
+    document.addEventListener('visibilitychange', onHide);
+
+    // a round does not run while the demo is scrolled out of sight
+    const io = new IntersectionObserver(([e]) => {
+      if (!e.isIntersecting) pauseNow(ui.scrollPaused);
+    });
+    if (root.current) io.observe(root.current);
+
+    return () => {
+      mq.removeEventListener('change', setMq);
+      document.removeEventListener('visibilitychange', onHide);
+      io.disconnect();
+    };
+  }, []);
+
+  // the 12 fps clock runs only while a round is running
+  const running = (g.phase === 'countdown' || g.phase === 'play') && !g.paused;
+  useEffect(() => {
+    if (!running) return;
     const id = window.setInterval(() => {
       const g = game.current!;
-      const running = (g.phase === 'countdown' || g.phase === 'play') && !g.paused;
-      if (!running) return;
+      if ((g.phase !== 'countdown' && g.phase !== 'play') || g.paused) return;
       g.tick(now());
       if (!stillRef.current) g.stepBeats();
       const ev = g.drainEvents();
@@ -82,31 +115,23 @@ export default function NabdaDemo() {
       }
       redraw();
     }, RULES.frameMs);
+    return () => window.clearInterval(id);
+  }, [running]);
 
-    const onHide = () => {
-      const g = game.current!;
-      if (document.hidden && (g.phase === 'countdown' || g.phase === 'play') && !g.paused) {
-        g.pause(now());
-        setSaid(ui.autoPaused);
-        redraw();
-      }
-    };
-    document.addEventListener('visibilitychange', onHide);
-    return () => {
-      window.clearInterval(id);
-      mq.removeEventListener('change', setMq);
-      document.removeEventListener('visibilitychange', onHide);
-    };
-  }, []);
+  /** Move focus only when the visitor is not using another control. */
+  const mayFocus = () => {
+    const a = document.activeElement;
+    return !a || a === document.body || !!root.current?.contains(a);
+  };
 
   // focus follows the phase so keyboard users land on what changed
   useEffect(() => {
     if (lastPhase.current === g.phase) return;
     lastPhase.current = g.phase;
-    if (g.phase === 'play') qHead.current?.focus();
+    if (g.phase === 'play' && mayFocus()) qHead.current?.focus();
     if (g.phase === 'results') {
       scrollTop();
-      resHead.current?.focus();
+      if (mayFocus()) resHead.current?.focus();
     }
   });
 
@@ -123,11 +148,10 @@ export default function NabdaDemo() {
     if (g.paused) {
       g.resume(now());
       setSaid(ui.resumedSaid);
+      redraw();
     } else {
-      g.pause(now());
-      setSaid(ui.pausedSaid);
+      pauseNow(ui.pausedSaid);
     }
-    redraw();
   };
 
   const reset = () => {
@@ -157,7 +181,7 @@ export default function NabdaDemo() {
         {g.round > 0 && <span class="nb-bar__round">{ui.round(ar(g.round))}</span>}
         <div class="nb-bar__tools">
           {live && (
-            <button type="button" class="nb-tool" aria-pressed={g.paused} onClick={togglePause}>
+            <button type="button" class="nb-tool" onClick={togglePause}>
               <span class={`nb-tool__icon ${g.paused ? 'is-play' : 'is-pause'}`} aria-hidden="true"></span>
               {g.paused ? ui.resume : ui.pause}
             </button>
@@ -183,9 +207,10 @@ export default function NabdaDemo() {
                 <li key={t.id} class={`nb-team ${state}${t.you ? ' is-you' : ''}${frozen ? ' is-frozen' : ''}`}>
                   <span class="nb-team__name">{t.name}</span>
                   <Pulse team={t} strength={g.strength(t)} still={still} />
-                  <span class="nb-team__secs" aria-label={secondsText(s)}>
+                  <span class="nb-team__secs">
                     {frozen ? <span class="nb-team__flag">{ui.frozen}</span> : null}
-                    <Num n={s} />
+                    <span aria-hidden="true"><Num n={s} /></span>
+                    <span class="nb-sr">{secondsText(s)}</span>
                   </span>
                 </li>
               );
@@ -194,7 +219,7 @@ export default function NabdaDemo() {
 
           {g.phase === 'intro' ? (
             <section class="nb-card nb-intro" aria-labelledby="nb-intro-h">
-              <h3 class="nb-h" id="nb-intro-h">{ui.intro.title}</h3>
+              <h2 class="nb-h" id="nb-intro-h">{ui.intro.title}</h2>
               <ul class="nb-rules">
                 {ui.intro.rules.map((r) => <li key={r}>{r}</li>)}
               </ul>
@@ -204,14 +229,14 @@ export default function NabdaDemo() {
             <section class="nb-card nb-q" aria-labelledby="nb-q-h">
               {g.phase === 'countdown' ? (
                 <>
-                  <h3 class="nb-h nb-q__text" id="nb-q-h" tabIndex={-1} ref={qHead}>{ui.ready}</h3>
+                  <h2 class="nb-h nb-q__text" id="nb-q-h" tabIndex={-1} ref={qHead}>{ui.ready}</h2>
                   <p class="nb-count" aria-hidden="true">
                     <Num n={Math.max(1, Math.ceil(g.countdownLeft / 1000))} />
                   </p>
                 </>
               ) : (
                 <>
-                  <h3 class="nb-h nb-q__text" id="nb-q-h" tabIndex={-1} ref={qHead}>{g.current?.q}</h3>
+                  <h2 class="nb-h nb-q__text" id="nb-q-h" tabIndex={-1} ref={qHead}>{g.current?.q}</h2>
                   <div class="nb-opts" role="group" aria-label={ui.optionsLabel}>
                     {g.current?.options.map((o, i) => {
                       const r = g.reveal;

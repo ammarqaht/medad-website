@@ -132,6 +132,7 @@ export class Game {
     this.warned = false;
     this.endedBy = '';
     this.awards = [];
+    this.events = [];
     const p = this.pending;
     for (const t of this.teams) {
       t.alive = true;
@@ -157,7 +158,8 @@ export class Game {
   pause(now: number) {
     if (this.phase !== 'countdown' && this.phase !== 'play') return;
     this.tick(now);
-    this.paused = true;
+    // the tick may have ended the round; only a running round can pause
+    if (this.phase === 'countdown' || this.phase === 'play') this.paused = true;
   }
 
   resume(now: number) {
@@ -238,6 +240,7 @@ export class Game {
   }
 
   private thawCheck() {
+    if (this.phase !== 'play') return;
     for (const t of this.teams) {
       if (t.frozenUntil > 0 && this.elapsed >= t.frozenUntil) {
         t.frozenUntil = 0;
