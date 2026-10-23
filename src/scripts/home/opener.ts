@@ -3,7 +3,8 @@
    2. Drops fall one by one, right to left (the writing direction); each one
       splashes onto the word and dyes its part of the logo with ink.
    3. Once the word is full, a blot bursts out behind it with a hard green
-      shadow and two ink rings, the word turns to paper and is stamped down.
+      shadow and straight impact strokes, splashing irregular ink around it;
+      the word turns to paper and is stamped down.
    4. The headline stamps in word by word.
    The text is in the HTML from the start; this only animates its reveal.
    Any input skips to the end. Later visits in the session, reduced motion
@@ -20,7 +21,7 @@ const GAP = 3; // frames between drops
 const BURST_AT = (DROPS - 1) * GAP + FALL + 2;
 const SPREAD = [0.18, 0.42, 0.68, 0.9, 1.06, 0.97, 1];
 const SHADOW_AT = BURST_AT + 4;
-const RINGS = 6; // frames the rings fly out
+const STROKES = 5; // frames the impact strokes fly out
 const END = BURST_AT + SPREAD.length + 1;
 
 /* Canvas reaches past the stage so splatter is never cut at its edges. */
@@ -48,7 +49,7 @@ function makeShape(): Shape {
     // Keep splatter out of the lower sector, where the headline sits.
     let a = r() * Math.PI * 2;
     if (a > Math.PI * 0.2 && a < Math.PI * 0.8) a += Math.PI;
-    drops.push({ a, d: 1.06 + r() * 0.16, r: 0.008 + r() * 0.016, at: BURST_AT + 2 + Math.floor(r() * 3) });
+    drops.push({ a, d: 1.08 + r() * 0.16, r: 0.007 + r() * 0.012, at: BURST_AT + 2 + Math.floor(r() * 3) });
   }
   return { waves, drops };
 }
@@ -119,12 +120,15 @@ export function initOpener(): void {
     const cx = bx + sw / 2 + dx;
     const cy = by + sh / 2 + dy;
     blob(cx, cy, sw * 0.4 * scale, sh * 0.37 * scale, color);
+    // Splashes: irregular, stretched away from the blot like flung ink, never round dots.
     for (const d of shape.drops) {
       if (d.at > upTo) continue;
       const k = Math.max(scale, 0.9) * d.d;
-      ctx.beginPath();
-      ctx.arc(cx + Math.cos(d.a) * sw * 0.4 * k, cy + Math.sin(d.a) * sh * 0.37 * k, sw * d.r, 0, Math.PI * 2);
-      ctx.fill();
+      ctx.save();
+      ctx.translate(cx + Math.cos(d.a) * sw * 0.4 * k, cy + Math.sin(d.a) * sh * 0.37 * k);
+      ctx.rotate(d.a);
+      blob(0, 0, sw * d.r * 2.2, sw * d.r * 0.9, color);
+      ctx.restore();
     }
   };
 
@@ -156,19 +160,25 @@ export function initOpener(): void {
     blob(x, y, r * 1.2, r * 0.8, INK);
   };
 
-  const rings = (f: number) => {
-    if (!ctx || f < 0 || f >= RINGS) return;
+  /* Impact: short straight strokes fly out from the blot's edge, like a stamp
+     hitting paper. Kept out of the lower sector, where the headline sits. */
+  const IMPACT = [-2.6, -2.1, -1.57, -1.05, -0.5, 0.05, 3.09, 3.65];
+  const strokes = (f: number) => {
+    if (!ctx || f < 0 || f >= STROKES) return;
     const cx = bx + sw / 2;
     const cy = by + sh / 2;
+    const t = f / (STROKES - 1);
     ctx.strokeStyle = INK;
-    ctx.lineWidth = Math.max(3, sw * 0.005);
-    [0, 2].forEach((lag) => {
-      const t = (f - lag) / (RINGS - 1);
-      if (t <= 0 || t > 1) return;
+    ctx.lineCap = 'square';
+    ctx.lineWidth = Math.max(4, sw * 0.007);
+    for (const a of IMPACT) {
+      const from = 1.08 + t * 0.12;
+      const to = from + 0.1 - t * 0.06;
       ctx.beginPath();
-      ctx.ellipse(cx, cy, sw * (0.42 + t * 0.12), sh * (0.4 + t * 0.12), 0, 0, Math.PI * 2);
+      ctx.moveTo(cx + Math.cos(a) * sw * 0.4 * from, cy + Math.sin(a) * sh * 0.37 * from);
+      ctx.lineTo(cx + Math.cos(a) * sw * 0.4 * to, cy + Math.sin(a) * sh * 0.37 * to);
       ctx.stroke();
-    });
+    }
   };
 
   const shadowOffset = () => [-Math.max(8, sw * 0.018), Math.max(8, sw * 0.022)] as const;
@@ -191,7 +201,7 @@ export function initOpener(): void {
         blot(1, dx, dy, GREEN, frame);
       }
       blot(SPREAD[Math.min(i, SPREAD.length - 1)], 0, 0, INK, frame);
-      rings(i - 3);
+      strokes(i - 3);
     }
     // Drops falling and the splats they leave on the word (until the burst covers them).
     for (let d = 0; d < DROPS; d++) {
