@@ -11,6 +11,7 @@
    and a missing canvas all show the final state at once. */
 import { reducedMotion } from '../motion/reduced';
 import { FPS } from '../motion/steps';
+import { FLOOD_DRAIN_MS, FLOOD_HOLD_MS } from '../transition';
 
 const SEEN = 'medad-opened';
 const FRAME = 1000 / FPS;
@@ -259,10 +260,12 @@ export function initOpener(): void {
   // Seen as soon as it starts: leaving mid-opener does not replay it.
   seen();
   hero.classList.add('is-dyeing');
-  // Arriving under the ink flood: wait for the drain before the first drop.
-  const wait = root.hasAttribute('data-flood') ? 480 : 150;
-  // Never hold the page longer than the requirement allows.
-  window.setTimeout(finish, 4800);
+  // Arriving under the ink flood: wait for its fixed hold and drain before the first drop.
+  const wait = root.hasAttribute('data-flood')
+    ? Math.max(0, FLOOD_HOLD_MS - performance.now()) + FLOOD_DRAIN_MS + 60
+    : 150;
+  // Never hold the page longer than the requirement allows (counted from when it is uncovered).
+  window.setTimeout(finish, wait + 4650);
 
   const tick = () => {
     if (done) return;

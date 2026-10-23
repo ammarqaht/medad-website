@@ -13,19 +13,20 @@ test('should cover, then drain the ink when going from / to /works', async ({ pa
   const t0 = Date.now();
   await page.locator(WORKS_LINK).click();
   await page.waitForURL('**/works');
-  await expect(page.locator('html')).not.toHaveAttribute('data-flood', /.*/, { timeout: 1500 });
-  await expect.poll(() => floodIsHidden(page), { timeout: 1500 }).toBe(true);
+  await expect(page.locator('html')).not.toHaveAttribute('data-flood', /.*/, { timeout: 2500 });
+  await expect.poll(() => floodIsHidden(page), { timeout: 2500 }).toBe(true);
   const total = Date.now() - t0;
 
   expect(log.some((l) => l.startsWith('FLOOD:cover @/'))).toBe(true);
   expect(log.some((l) => l.startsWith('FLOOD:arrive-covered @/works'))).toBe(true);
   expect(log.some((l) => l.startsWith('FLOOD:recede @/works'))).toBe(true);
-  // FR-03: total transition (click -> ink fully drained) under 1.2s, measured in-page.
-  await expect.poll(() => log.find((l) => l.startsWith('FLOOD:done')), { timeout: 1500 }).toBeTruthy();
+  // FR-03 (owner, revised): a fixed-length transition, cover 420ms + hold until 600ms
+  // into the new page + drain 420ms, about 1.4s, whatever the load speed. Measured in-page.
+  await expect.poll(() => log.find((l) => l.startsWith('FLOOD:done')), { timeout: 2500 }).toBeTruthy();
   const inPage = Number(/FLOOD:done (\d+)/.exec(log.find((l) => l.startsWith('FLOOD:done'))!)![1]);
   test.info().annotations.push({ type: 'flood ms', description: `in-page ${inPage}, wall-clock incl. test polling ${total}` });
-  expect(inPage).toBeGreaterThan(0);
-  expect(inPage).toBeLessThan(1200);
+  expect(inPage).toBeGreaterThan(1300);
+  expect(inPage).toBeLessThan(1800);
 
   // Page is usable: the topmost element at the centre is page content, not ink.
   const top = await page.evaluate(() => document.elementFromPoint(innerWidth / 2, innerHeight / 2)?.closest('.flood'));
@@ -38,11 +39,11 @@ test('should also flood from the hero /works button and from works back to home 
   await page.goto('/');
   await page.locator('main a.btn[href="/works"]').click();
   await page.waitForURL('**/works');
-  await expect.poll(() => floodIsHidden(page), { timeout: 1500 }).toBe(true);
+  await expect.poll(() => floodIsHidden(page), { timeout: 2500 }).toBe(true);
   await page.locator('a.topbar__logo').click();
   await page.waitForURL((u) => u.pathname === '/');
-  await expect(page.locator('html')).not.toHaveAttribute('data-flood', /.*/, { timeout: 1500 });
-  await expect.poll(() => floodIsHidden(page), { timeout: 1500 }).toBe(true);
+  await expect(page.locator('html')).not.toHaveAttribute('data-flood', /.*/, { timeout: 2500 });
+  await expect.poll(() => floodIsHidden(page), { timeout: 2500 }).toBe(true);
   expect(log.filter((l) => l.startsWith('FLOOD:cover')).length).toBe(2);
 });
 
@@ -50,12 +51,12 @@ test('should return to a usable, uncovered page with the back button', async ({ 
   await page.goto('/');
   await page.locator(WORKS_LINK).click();
   await page.waitForURL('**/works');
-  await expect.poll(() => floodIsHidden(page), { timeout: 1500 }).toBe(true);
+  await expect.poll(() => floodIsHidden(page), { timeout: 2500 }).toBe(true);
 
   await page.goBack();
   await page.waitForURL((u) => u.pathname === '/');
-  await expect(page.locator('html')).not.toHaveAttribute('data-flood', /.*/, { timeout: 1500 });
-  await expect.poll(() => floodIsHidden(page), { timeout: 1500 }).toBe(true);
+  await expect(page.locator('html')).not.toHaveAttribute('data-flood', /.*/, { timeout: 2500 });
+  await expect.poll(() => floodIsHidden(page), { timeout: 2500 }).toBe(true);
   await expect(page.locator('.flood')).not.toHaveClass(/is-covering/);
   const top = await page.evaluate(() => document.elementFromPoint(innerWidth / 2, innerHeight / 2)?.closest('.flood'));
   expect(top).toBeNull();
@@ -63,11 +64,11 @@ test('should return to a usable, uncovered page with the back button', async ({ 
   // Still navigable after coming back.
   await page.locator(WORKS_LINK).click();
   await page.waitForURL('**/works');
-  await expect.poll(() => floodIsHidden(page), { timeout: 1500 }).toBe(true);
+  await expect.poll(() => floodIsHidden(page), { timeout: 2500 }).toBe(true);
 
   await page.goForward().catch(() => undefined);
   await page.goBack();
-  await expect.poll(() => floodIsHidden(page), { timeout: 1500 }).toBe(true);
+  await expect.poll(() => floodIsHidden(page), { timeout: 2500 }).toBe(true);
 });
 
 test('should restore the scroll position when going back', async ({ page }) => {

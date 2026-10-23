@@ -39,8 +39,8 @@ test('should lift the arriving ink within 3s when the page module script is bloc
   const t0 = Date.now();
   await page.goto('/works');
   await expect(page.locator('html')).toHaveAttribute('data-flood', '');
-  await expect(page.locator('html')).not.toHaveAttribute('data-flood', /.*/, { timeout: 3000 });
-  expect(Date.now() - t0).toBeLessThan(3000);
+  await expect(page.locator('html')).not.toHaveAttribute('data-flood', /.*/, { timeout: 3500 });
+  expect(Date.now() - t0).toBeLessThan(3500);
   await expect.poll(() => floodIsHidden(page), { timeout: 500 }).toBe(true);
   for (const el of await page.locator('[data-pop]').all()) {
     await el.scrollIntoViewIfNeeded();

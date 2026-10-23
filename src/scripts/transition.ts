@@ -1,11 +1,17 @@
 /* Ink flood between pages (FR-03). On an internal link, ink spreads from the
    click point in stepped frames and covers the screen; the next page opens
-   still covered (boot.js) and the ink drains away. Total animation < 1s.
+   still covered (boot.js), holds the brand word for a fixed time, then the
+   ink drains away. The timing is fixed, not tied to how fast the next page
+   loads: cover 420ms, hold until 600ms after the new page starts, drain 420ms
+   (about 1.4s in all).
    Reduced motion, modified clicks and file links: plain navigation. */
 import { reducedMotion } from './motion/reduced';
 
 const KEY = 'medad-flood';
 const COVER_MS = 420;
+/** The arriving page stays covered, word showing, until this long after it starts. */
+export const FLOOD_HOLD_MS = 600;
+export const FLOOD_DRAIN_MS = 420;
 const STUCK_MS = 4000;
 
 const clean = (path: string) => path.replace(/\/+$/, '') || '/';
@@ -47,7 +53,9 @@ export function initFlood(): void {
     return;
   }
 
+  let hold = 0;
   const reset = () => {
+    window.clearTimeout(hold);
     flood.classList.remove('is-covering', 'is-receding');
     root.removeAttribute('data-flood');
     try {
@@ -64,11 +72,32 @@ export function initFlood(): void {
     flood.addEventListener('animationend', () => flood.classList.remove('is-receding'), { once: true });
   };
 
-  if (root.hasAttribute('data-flood')) recede();
+  /* Hold the cover (brand word showing) until `at` ms on this page's clock, then drain. */
+  const holdThenRecede = (at: number) => {
+    window.clearTimeout(hold);
+    hold = window.setTimeout(recede, Math.max(0, at - performance.now()));
+  };
 
-  // Back/forward cache restores the old page mid-cover: clear it.
+  // performance.now() counts from the start of this navigation, so a fast load
+  // still shows the word for the full hold and a slow one drains at once.
+  if (root.hasAttribute('data-flood')) holdThenRecede(FLOOD_HOLD_MS);
+
+  // Back/forward cache: boot.js does not run on a restore. The browser's own
+  // back button restores the page uncovered; the back control (history.back()
+  // after the cover) arrives under the same curtain as any other link.
   window.addEventListener('pageshow', (e) => {
-    if (e.persisted) reset();
+    if (!e.persisted) return;
+    let arriving = false;
+    try {
+      arriving = sessionStorage.getItem(KEY) === '1';
+    } catch {
+      /* storage blocked */
+    }
+    reset();
+    if (arriving && !reducedMotion()) {
+      root.setAttribute('data-flood', '');
+      holdThenRecede(performance.now() + FLOOD_HOLD_MS);
+    }
   });
 
   document.addEventListener('click', (e) => {

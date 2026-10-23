@@ -31,7 +31,9 @@ import { BRAND } from '../content/brand';
     pointer-events: auto;
     animation: flood-in 420ms steps(5, jump-end) forwards;
   }
-  .flood:global(.is-covering) .flood__word { animation: word-in 420ms steps(1, end) forwards; }
+  /* The word stamps in once the ink is full (the 4th of 5 frames covers the
+     screen), so it is already up when the next page takes over. */
+  .flood:global(.is-covering) .flood__word { animation: word-in 420ms linear forwards; }
 
   /* Arrive covered (set by /boot.js before first paint). */
   :global(html[data-flood]) .flood { visibility: visible; }
@@ -48,9 +50,12 @@ import { BRAND } from '../content/brand';
     from { clip-path: circle(0 at var(--fx) var(--fy)); }
     to   { clip-path: circle(150vmax at var(--fx) var(--fy)); }
   }
+  /* Hard frames written as paired stops (no tween between them). */
   @keyframes word-in {
-    0%, 70% { opacity: 0; }
-    100% { opacity: 1; }
+    0%, 79.9% { opacity: 0; scale: 1.25; }
+    80%, 89.9% { opacity: 1; scale: 1.25; }
+    90%, 99.9% { opacity: 1; scale: .94; }
+    100% { opacity: 1; scale: 1; }
   }
   @keyframes flood-out {
     from { clip-path: inset(0 0 0 0); }
