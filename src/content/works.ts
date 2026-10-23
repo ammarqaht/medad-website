@@ -93,7 +93,7 @@ export const works: Work[] = [
     short: 'نبضة',
     line: 'مسابقة جماعية حية، لكل فريق نبض يطول بالإجابة الصحيحة ويقصر بالخاطئة.',
     frame: 'phone',
-    demo: false,
+    demo: true,
     sketch: 'pulse',
   },
   {
@@ -157,5 +157,6 @@ export const worksCopy = {
   /** What a visitor should try first, per demo. */
   howTo: {
     halqah: 'بدّل الدور من أعلى التجربة: سجّل حضور طالب وتسميعه بصفتك معلماً، ثم انظر إليه بعين المشرف والطالب.',
+    nabda: 'ابدأ الجولة وأجب بسرعة: كل إجابة صحيحة تطيل نبض فريقك، وأول نبض يتوقف ينهي الجولة. بعدها اشتر بطاقة بنقاطك والعب جولة أخرى.',
   } as Partial<Record<Slug, string>>,
 };

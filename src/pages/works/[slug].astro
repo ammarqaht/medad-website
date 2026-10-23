@@ -7,6 +7,7 @@ import Button from '../../components/Button.astro';
 import DeviceFrame from '../../components/works/DeviceFrame.astro';
 import DemoPending from '../../components/works/DemoPending.astro';
 import HalqahDemo from '../../islands/halqah/HalqahDemo';
+import NabdaDemo from '../../islands/nabda/NabdaDemo';
 import { works, worksCopy, type Work } from '../../content/works';
 import { WHATSAPP } from '../../content/site';
 import '../../styles/works.css';
@@ -20,7 +21,7 @@ const { work } = Astro.props;
 const p = worksCopy.page;
 const howTo = worksCopy.howTo[work.slug];
 const label = `${p.demoLabel} ${work.name}`;
-const live = work.demo && work.slug === 'halqah';
+const live = work.demo && (work.slug === 'halqah' || work.slug === 'nabda');
 ---
 <BaseLayout title={work.name} description={work.line}>
   <article class="wk wrap">
@@ -35,7 +36,7 @@ const live = work.demo && work.slug === 'halqah';
     <section class="wk__demo" aria-label={label}>
       {live ? (
         <DeviceFrame kind={work.frame} adaptive scroll label={label}>
-          <HalqahDemo client:visible />
+          {work.slug === 'nabda' ? <NabdaDemo client:visible /> : <HalqahDemo client:visible />}
           <noscript><p class="pend__line">{p.noscript}</p></noscript>
         </DeviceFrame>
       ) : (
