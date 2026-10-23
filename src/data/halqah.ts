@@ -39,6 +39,8 @@ export interface Student {
 
 /** Sunday to Thursday. */
 export const DAYS = ['الأحد', 'الاثنين', 'الثلاثاء', 'الأربعاء', 'الخميس'] as const;
+/** Short day names for phone widths. */
+export const DAYS_SHORT = ['أحد', 'اثنين', 'ثلاثاء', 'أربعاء', 'خميس'] as const;
 /** The demo's "today" sits mid week so there are past and future days. */
 export const TODAY = 2;
 /** Week 0 is this week; 1 and 2 are the weeks before it. */
@@ -180,6 +182,9 @@ export const ui = {
   roleNow: 'أنت الآن في بوابة',
   att: { present: 'حاضر', late: 'متأخر', absent: 'غائب' } as Record<Att, string>,
   lines: { kubra: 'المراجعة الكبرى', sughra: 'المراجعة الصغرى', dars: 'الدرس' } as Record<LineKey, string>,
+  linesShort: { kubra: 'الكبرى', sughra: 'الصغرى', dars: 'الدرس' } as Record<LineKey, string>,
+  showAll: 'عرض الكل',
+  showLess: 'عرض أقل',
   tracks: { silver: 'المسار الفضي', golden: 'المسار الذهبي' } as Record<Track, string>,
   level: 'المستوى',
   today: 'اليوم',
@@ -192,6 +197,7 @@ export const ui = {
   points: 'نقطة',
   admin: {
     nav: { follow: 'المتابعة', students: 'الطلاب', plans: 'الخطط والاختبارات' },
+    navShort: { follow: 'المتابعة', students: 'الطلاب', plans: 'الخطط' },
     navLabel: 'أقسام بوابة المشرف',
     followTitle: 'تقدم الحلقات اليوم',
     tally: 'حصيلة اليوم',
@@ -204,6 +210,7 @@ export const ui = {
     future: 'هذا اليوم لم يأتِ بعد.',
     studentsTitle: 'الطلاب والحلقات',
     allCircles: 'كل الحلقات',
+    allShort: 'الكل',
     circlesLabel: 'تصفية الطلاب بالحلقة',
     plansTitle: 'الخطط المصدرة',
     examsTitle: 'آخر الاختبارات',

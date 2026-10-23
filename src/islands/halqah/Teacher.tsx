@@ -4,7 +4,7 @@
    are refused with a clear alert. */
 import { useRef, useState } from 'preact/hooks';
 import { LINES, TEACHER_CIRCLE, TODAY, emptyLine, key, ui, type Att, type Entry, type LineKey, type Student } from '../../data/halqah';
-import { DayPicker, Num } from './parts';
+import { DayPicker, Mark, Num } from './parts';
 import { ar, circleById, isFuture, studentsOf, tally, type Action, type State } from './store';
 
 const T = ui.teacher;
@@ -37,8 +37,8 @@ export function Teacher({ entries, dispatch }: { entries: State['entries']; disp
         label={T.daysLabel}
         value={day}
         onPick={pick}
-        dense
         sub={(d) => (isFuture(0, d) ? ui.notYet : '')}
+        subShort={(d) => (isFuture(0, d) ? <Mark label={ui.notYet} empty /> : '')}
       />
       <div class="hq-alert-slot" role="alert">
         {refused > 0 && <p class="hq-alert" key={refused}>{T.future}</p>}
@@ -98,11 +98,23 @@ function StudentCard({ student, day, entry, teacher, onSave }: CardProps) {
     setStatus('saved');
   };
 
+  const saveBtn = (
+    <button type="button" class="hq-btn hq-card__save" onClick={save}>
+      {T.save}<span class="hq-sr"> {student.name}</span>
+    </button>
+  );
+
   return (
     <li class={`hq-card is-${status}`}>
       <div class="hq-card__top">
-        <h4 class="hq-card__name" id={`${id}-name`}>{student.name}</h4>
-        <span class="hq-card__level">{ui.level} {ar(student.level)}</span>
+        <div class="hq-card__who">
+          <h4 class="hq-card__name" id={`${id}-name`}>{student.name}</h4>
+          <span class="hq-card__level">{ui.level} {ar(student.level)}</span>
+        </div>
+        <span class="hq-status" aria-live="polite">
+          {status === 'saved' && <span class="hq-stamp">{T.saved}</span>}
+          {status === 'dirty' && <span class="hq-dirty">{T.dirty}</span>}
+        </span>
       </div>
 
       <fieldset class="hq-attpick" aria-describedby={error ? `${id}-err` : undefined}>
@@ -127,10 +139,10 @@ function StudentCard({ student, day, entry, teacher, onSave }: CardProps) {
       </fieldset>
       {error && <p class="hq-error" id={`${id}-err`} role="alert">{T.pickAtt}</p>}
 
-      {att === 'absent' ? (
-        <p class="hq-muted">{T.absentNote}</p>
-      ) : (
-        <>
+      <div class="hq-card__row">
+        {att === 'absent' ? (
+          <p class="hq-muted">{T.absentNote}</p>
+        ) : (
           <button
             type="button"
             class="hq-toggle"
@@ -140,10 +152,16 @@ function StudentCard({ student, day, entry, teacher, onSave }: CardProps) {
           >
             {T.recitation}<span class="hq-sr"> {student.name}</span>
           </button>
-          <div class="hq-lines-edit" id={`${id}-lines`} hidden={!open}>
-            {LINES.map((k) => (
-              <fieldset class="hq-ledit" key={k}>
-                <legend class="hq-ledit__name">{ui.lines[k]}</legend>
+        )}
+        {(!open || att === 'absent') && saveBtn}
+      </div>
+
+      {att !== 'absent' && (
+        <div class="hq-lines-edit" id={`${id}-lines`} hidden={!open}>
+          {LINES.map((k) => (
+            <fieldset class="hq-ledit" key={k}>
+              <legend class="hq-ledit__name">{ui.lines[k]}</legend>
+              <div class="hq-ledit__row">
                 <label class="hq-check">
                   <input type="checkbox" checked={lines[k].done} onChange={(e) => setLine(k, { done: e.currentTarget.checked })} />
                   <span>{ui.recited}</span>
@@ -170,25 +188,16 @@ function StudentCard({ student, day, entry, teacher, onSave }: CardProps) {
                     <span class="hq-plus" aria-hidden="true"></span>
                   </button>
                 </div>
-                <label class="hq-field">
-                  <span>{T.note}</span>
-                  <input type="text" value={lines[k].note} maxLength={60} onInput={(e) => setLine(k, { note: e.currentTarget.value })} />
-                </label>
-              </fieldset>
-            ))}
-          </div>
-        </>
+              </div>
+              <label class="hq-field">
+                <span>{T.note}</span>
+                <input type="text" value={lines[k].note} maxLength={60} onInput={(e) => setLine(k, { note: e.currentTarget.value })} />
+              </label>
+            </fieldset>
+          ))}
+          {open && <div class="hq-card__row hq-card__row--end">{saveBtn}</div>}
+        </div>
       )}
-
-      <div class="hq-card__foot">
-        <button type="button" class="hq-btn" onClick={save}>
-          {T.save}<span class="hq-sr"> {student.name}</span>
-        </button>
-        <span class="hq-status" aria-live="polite">
-          {status === 'saved' && <span class="hq-stamp">{T.saved}</span>}
-          {status === 'dirty' && <span class="hq-dirty">{T.dirty}</span>}
-        </span>
-      </div>
     </li>
   );
 }

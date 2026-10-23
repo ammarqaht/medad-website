@@ -97,7 +97,7 @@ test.describe('opener (FR-04)', () => {
     expect(await page.evaluate(() => sessionStorage.getItem('medad-opened'))).toBe('1');
   });
 
-  const skips: Record<string, (page: Page) => Promise<void>> = {
+  const skips: Record<string, (page: Page) => Promise<unknown>> = {
     'a wheel': (p) => p.mouse.wheel(0, 200),
     'a key press': (p) => p.keyboard.press('Escape'),
     'a touch': (p) => p.evaluate(() => window.dispatchEvent(new Event('touchstart'))),

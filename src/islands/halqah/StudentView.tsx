@@ -3,7 +3,7 @@
    plan, and recent point movements. Read only; no store, no code redemption. */
 import { useState } from 'preact/hooks';
 import { DAYS, LINES, STUDENT_ID, TODAY, WEEKS, key, pastMoves, plan, ui } from '../../data/halqah';
-import { AttChip, DayPicker, LinesView, Num } from './parts';
+import { AttChip, DayPicker, LinesView, Mark, Num } from './parts';
 import { ar, balance, circleById, earned, isFuture, studentById, type State } from './store';
 
 const S = ui.student;
@@ -59,11 +59,15 @@ export function StudentView({ entries }: { entries: State['entries'] }) {
           value={day}
           week={week}
           onPick={setDay}
-          dense
           sub={(d) => {
             if (isFuture(week, d)) return ui.notYet;
             const x = entries[key(week, d, me.id)];
             return x ? ui.att[x.att] : ui.notRecorded;
+          }}
+          subShort={(d) => {
+            if (isFuture(week, d)) return <Mark label={ui.notYet} empty />;
+            const x = entries[key(week, d, me.id)];
+            return x ? ui.att[x.att] : <Mark label={ui.notRecorded} empty />;
           }}
         />
         <div class="hq-dayview hq-enter" key={`${week}:${day}`}>
@@ -110,7 +114,7 @@ export function StudentView({ entries }: { entries: State['entries'] }) {
 
         <section class="hq-panel" aria-labelledby="hq-moves">
           <h3 class="hq-h hq-h--sm" id="hq-moves">{S.moves}</h3>
-          <ul class="hq-moves">
+          <ul class="hq-moves hq-clip hq-clip--3">
             {recent.map((m, i) => (
               <li key={i}>
                 <span>

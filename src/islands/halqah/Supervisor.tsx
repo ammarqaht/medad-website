@@ -1,13 +1,17 @@
 /* Supervisor portal: circles follow-up (today's tally and the five-day strip),
    a circle's students with their recorded lines, the roster, and plans and
-   exams. Reads the shared entries the teacher writes. */
+   exams. Reads the shared entries the teacher writes. On phone widths long
+   lists show their first items with a "show all" toggle (CSS clips, the
+   toggle reveals), and labels switch to short forms. */
 import { useEffect, useRef, useState } from 'preact/hooks';
-import { DAYS, TODAY, circles, exams, key, plans, students, ui } from '../../data/halqah';
-import { AttChip, DayPicker, LinesView, Num } from './parts';
+import { DAYS, DAYS_SHORT, TODAY, circles, exams, key, plans, students, ui } from '../../data/halqah';
+import { AttChip, DayPicker, Dual, LinesView, Mark, More, Num } from './parts';
 import { ar, balance, circleById, isFuture, studentById, studentsOf, tally, type State } from './store';
 
 type Section = 'follow' | 'students' | 'plans';
 const A = ui.admin;
+/** "حلقة النور" → "النور" for the compact chips. */
+const bare = (name: string) => name.replace(/^حلقة\s+/, '');
 
 export function Supervisor({ entries, onScrollTop }: { entries: State['entries']; onScrollTop: () => void }) {
   const [section, setSection] = useState<Section>('follow');
@@ -23,7 +27,7 @@ export function Supervisor({ entries, onScrollTop }: { entries: State['entries']
       <nav class="hq-rail" aria-label={A.navLabel}>
         {(Object.keys(A.nav) as Section[]).map((s) => (
           <button type="button" key={s} class="hq-rail__btn" aria-current={section === s ? 'page' : undefined} onClick={() => go(s)}>
-            {A.nav[s]}
+            <Dual long={A.nav[s]} short={A.navShort[s]} />
           </button>
         ))}
       </nav>
@@ -42,10 +46,11 @@ export function Supervisor({ entries, onScrollTop }: { entries: State['entries']
 }
 
 function Follow({ entries, onOpen }: { entries: State['entries']; onOpen: (id: string) => void }) {
+  const [all, setAll] = useState(false);
   return (
     <section aria-labelledby="hq-follow">
       <h3 class="hq-h" id="hq-follow">{A.followTitle}</h3>
-      <ul class="hq-circles">
+      <ul class={`hq-circles hq-clip hq-clip--2${all ? ' is-all' : ''}`} id="hq-circles">
         {circles.map((c) => {
           const t = tally(entries, c.id, 0, TODAY);
           return (
@@ -65,11 +70,12 @@ function Follow({ entries, onOpen }: { entries: State['entries']; onOpen: (id: s
                   const dt = tally(entries, c.id, 0, d);
                   const done = dt.total - dt.missing;
                   const state = isFuture(0, d) ? 'future' : done === 0 ? 'none' : done === dt.total ? 'full' : 'part';
+                  const long = state === 'future' ? ui.notYet : state === 'none' ? ui.notRecorded : `${ar(done)} ${A.of} ${ar(dt.total)}`;
                   return (
                     <li class={`hq-strip__day is-${state}`} key={d}>
-                      <span class="hq-strip__name">{name}</span>
+                      <span class="hq-strip__name"><Dual long={name} short={DAYS_SHORT[d]} /></span>
                       <span class="hq-strip__val">
-                        {state === 'future' ? ui.notYet : state === 'none' ? ui.notRecorded : `${ar(done)} ${A.of} ${ar(dt.total)}`}
+                        <Dual long={long} short={done ? ar(done) : <Mark label={long} empty />} />
                       </span>
                     </li>
                   );
@@ -82,6 +88,7 @@ function Follow({ entries, onOpen }: { entries: State['entries']; onOpen: (id: s
           );
         })}
       </ul>
+      <More open={all} onToggle={() => setAll(!all)} controls="hq-circles" />
     </section>
   );
 }
@@ -94,6 +101,10 @@ function CircleDetail({ id, entries, onBack }: { id: string; entries: State['ent
   const future = isFuture(0, day);
   const list = studentsOf(id);
   const any = list.some((s) => entries[key(0, day, s.id)]);
+  const count = (d: number) => {
+    const t = tally(entries, id, 0, d);
+    return { done: t.total - t.missing, total: t.total };
+  };
 
   return (
     <section aria-labelledby="hq-circle">
@@ -104,12 +115,15 @@ function CircleDetail({ id, entries, onBack }: { id: string; entries: State['ent
         label={A.daysLabel}
         value={day}
         onPick={setDay}
-        dense
         sub={(d) => {
           if (isFuture(0, d)) return ui.notYet;
-          const t = tally(entries, id, 0, d);
-          const done = t.total - t.missing;
-          return done ? `${ar(done)} ${A.of} ${ar(t.total)}` : ui.notRecorded;
+          const t = count(d);
+          return t.done ? `${ar(t.done)} ${A.of} ${ar(t.total)}` : ui.notRecorded;
+        }}
+        subShort={(d) => {
+          if (isFuture(0, d)) return <Mark label={ui.notYet} empty />;
+          const t = count(d);
+          return t.done ? ar(t.done) : <Mark label={ui.notRecorded} empty />;
         }}
       />
       {future || !any ? (
@@ -137,19 +151,22 @@ function CircleDetail({ id, entries, onBack }: { id: string; entries: State['ent
 
 function Roster({ entries }: { entries: State['entries'] }) {
   const [only, setOnly] = useState<string | null>(null);
+  const [all, setAll] = useState(false);
   const list = only ? studentsOf(only) : students;
   return (
     <section aria-labelledby="hq-roster">
       <h3 class="hq-h" id="hq-roster">{A.studentsTitle}</h3>
       <div class="hq-chips" role="group" aria-label={A.circlesLabel}>
-        <button type="button" class="hq-chip" aria-pressed={only === null} onClick={() => setOnly(null)}>{A.allCircles}</button>
+        <button type="button" class="hq-chip" aria-pressed={only === null} onClick={() => setOnly(null)}>
+          <Dual long={A.allCircles} short={A.allShort} />
+        </button>
         {circles.map((c) => (
           <button type="button" key={c.id} class="hq-chip" aria-pressed={only === c.id} onClick={() => setOnly(only === c.id ? null : c.id)}>
-            {c.name}
+            <Dual long={c.name} short={bare(c.name)} />
           </button>
         ))}
       </div>
-      <ul class="hq-roster">
+      <ul class={`hq-roster hq-clip hq-clip--6${all ? ' is-all' : ''}`} id="hq-roster-list">
         {list.map((s) => (
           <li class="hq-person" key={s.id}>
             <span class="hq-person__name">{s.name}</span>
@@ -158,31 +175,35 @@ function Roster({ entries }: { entries: State['entries'] }) {
           </li>
         ))}
       </ul>
+      {list.length > 6 && <More open={all} onToggle={() => setAll(!all)} controls="hq-roster-list" />}
     </section>
   );
 }
 
 function PlansExams() {
+  const [allPlans, setAllPlans] = useState(false);
+  const [allExams, setAllExams] = useState(false);
   return (
     <div class="hq-two">
       <section aria-labelledby="hq-plans">
         <h3 class="hq-h" id="hq-plans">{A.plansTitle}</h3>
-        <ul class="hq-roster">
+        <ul class={`hq-roster hq-clip hq-clip--3${allPlans ? ' is-all' : ''}`} id="hq-plans-list">
           {plans.map((p) => {
             const s = studentById(p.student);
             return (
               <li class="hq-person" key={p.student}>
                 <span class="hq-person__name">{s.name}</span>
                 <span class="hq-person__meta">{ui.tracks[s.track]}، {ui.level} {ar(p.level)}، {A.issued} {p.issued}</span>
-                <span class="hq-person__pts">{A.planDay} {ar(p.day)} {A.of} {ar(24)}</span>
+                <span class="hq-person__pts">{A.planDay} {ar(p.day)}</span>
               </li>
             );
           })}
         </ul>
+        <More open={allPlans} onToggle={() => setAllPlans(!allPlans)} controls="hq-plans-list" />
       </section>
       <section aria-labelledby="hq-exams">
         <h3 class="hq-h" id="hq-exams">{A.examsTitle}</h3>
-        <ul class="hq-roster">
+        <ul class={`hq-roster hq-clip hq-clip--3${allExams ? ' is-all' : ''}`} id="hq-exams-list">
           {exams.map((x) => {
             const s = studentById(x.student);
             return (
@@ -196,6 +217,7 @@ function PlansExams() {
             );
           })}
         </ul>
+        <More open={allExams} onToggle={() => setAllExams(!allExams)} controls="hq-exams-list" />
       </section>
     </div>
   );

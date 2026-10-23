@@ -434,6 +434,53 @@
 }
 .wk__all:hover { background: var(--ink); color: var(--green-400); }
 
+/* ---------- Phones: tighter archive, a small sketch beside the name ---------- */
+@media (max-width: 599px) {
+  .gal { padding-block: 24px 56px; }
+  .gal__head { gap: 14px; margin-block-end: 24px; }
+  .gal__title { font-size: 48px; }
+  .gal__line { padding: 12px 14px 14px; font-size: 19px; }
+  .arc__filters { gap: 10px; margin-block-end: 12px; }
+  .chip { min-block-size: 44px; padding: 8px 14px; font-size: 16px; }
+  .shelf { gap: 16px; padding-block: 18px 22px; }
+  .shelf__head { gap: 8px; }
+  .shelf__title { padding: 2px 16px 10px; font-size: 32px; }
+  .shelf__line { margin-block-start: 4px; padding: 8px 12px 10px; font-size: 19px; }
+  .fold { padding-block-start: 46px; }
+  .fold + .fold { margin-block-start: -8px; }
+  .fold__tab { min-block-size: 49px; padding: 2px 18px 8px; font-size: 26px; }
+  .fold__body { gap: 12px; padding: 12px; }
+  .fold__line { font-size: 19px; }
+  .fold__sheets { gap: 14px; }
+  .sheet {
+    grid-template-columns: 76px minmax(0, 1fr);
+    align-items: center;
+    gap: 10px 12px;
+    padding: 12px;
+  }
+  .sheet__text { display: contents; }
+  .sheet .sk { aspect-ratio: 1 / 1; }
+  .sheet .sk__bar { padding: 3px 5px; gap: 3px; }
+  .sheet .sk__bar span { inline-size: 5px; block-size: 5px; }
+  .sheet .sk__screen { gap: 4px; padding: 5px; }
+  .sheet .sk__cells span { inline-size: 9px; block-size: 8px; }
+  .sheet .sk__row:nth-child(n+4) { display: none; }
+  .sheet__name { font-size: 28px; }
+  .fold__sheets--multi .sheet__line { grid-column: 1 / -1; }
+  .sheet__open { grid-column: 1 / -1; justify-self: start; font-size: 16px; padding: 6px 14px; }
+
+  .wk { padding-block: 24px 56px; }
+  .wk__head { gap: 14px; margin-block-end: 24px; }
+  .wk__title { font-size: 44px; }
+  .wk__line { padding: 12px 14px 14px; font-size: 19px; }
+  .wk__how { margin-block-start: 8px; padding-block-start: 8px; font-size: 17px; }
+  .wk__demo { margin-block-end: 48px; }
+  .wk__close { gap: 14px; padding: 22px 18px; }
+  .wk__close-title { font-size: 38px; }
+  .wk__close-line { font-size: 19px; }
+  .pend { gap: 14px; padding: 24px 16px 28px; }
+}
+
 /* ---------- Reduced motion: fades and colour only ---------- */
 @media (prefers-reduced-motion: reduce) {
   .fold__body.is-in .sheet__paper, .fold__body.is-in .sk__pulse, .fold__body.is-in .sheet__open::after,
