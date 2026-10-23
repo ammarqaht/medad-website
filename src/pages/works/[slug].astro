@@ -1,0 +1,57 @@
+---
+/* One page per work (FR-13). The demo sits inside a brutalist device frame;
+   works whose demo is still being built show the printing sheet instead.
+   Contact is at the bottom only (the header carries the back control). */
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Button from '../../components/Button.astro';
+import DeviceFrame from '../../components/works/DeviceFrame.astro';
+import DemoPending from '../../components/works/DemoPending.astro';
+import HalqahDemo from '../../islands/halqah/HalqahDemo';
+import { works, worksCopy, type Work } from '../../content/works';
+import { WHATSAPP } from '../../content/site';
+import '../../styles/works.css';
+
+export function getStaticPaths() {
+  return works.map((work) => ({ params: { slug: work.slug }, props: { work } }));
+}
+
+interface Props { work: Work }
+const { work } = Astro.props;
+const p = worksCopy.page;
+const howTo = worksCopy.howTo[work.slug];
+const label = `${p.demoLabel} ${work.name}`;
+const live = work.demo && work.slug === 'halqah';
+---
+<BaseLayout title={work.name} description={work.line}>
+  <article class="wk wrap">
+    <header class="wk__head">
+      <h1 class="wk__title display box" data-pop><span data-ink>{work.name}</span></h1>
+      <p class="wk__line box" data-pop="0.2">
+        {work.line}
+        {live && howTo && <span class="wk__how">{howTo}</span>}
+      </p>
+    </header>
+
+    <section class="wk__demo" aria-label={label}>
+      {live ? (
+        <DeviceFrame kind={work.frame} adaptive scroll label={label}>
+          <HalqahDemo client:visible />
+          <noscript><p class="pend__line">{p.noscript}</p></noscript>
+        </DeviceFrame>
+      ) : (
+        <DeviceFrame kind={work.frame}>
+          <DemoPending work={work} />
+        </DeviceFrame>
+      )}
+    </section>
+
+    <section class="wk__close" aria-labelledby="wk-close">
+      <h2 class="wk__close-title display" id="wk-close"><span data-ink>{p.closing.headline}</span></h2>
+      <p class="wk__close-line">{p.closing.line}</p>
+      <div class="wk__close-cta">
+        <Button href={WHATSAPP} variant="paper">{p.closing.cta}</Button>
+        <a class="wk__all" href="/works">{p.closing.all}</a>
+      </div>
+    </section>
+  </article>
+</BaseLayout>

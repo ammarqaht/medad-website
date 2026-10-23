@@ -1,0 +1,29 @@
+---
+/* Decorative miniature of a work's screen, drawn with flat blocks only.
+   No text inside, so nothing small sits near Arabic words. */
+import type { Sketch } from '../../content/works';
+interface Props { kind: Sketch }
+const { kind } = Astro.props;
+---
+<span class={`sk sk--${kind}`} aria-hidden="true">
+  <span class="sk__bar"><span></span><span></span><span></span></span>
+  <span class="sk__screen">
+    {kind === 'rows' && [0, 1, 2, 3].map((i) => (
+      <span class="sk__row"><span class={`sk__name sk__name--${i}`}></span><span class="sk__cells"><span class={i === 2 ? 'is-off' : ''}></span><span></span><span class={i === 1 ? 'is-off' : ''}></span></span></span>
+    ))}
+    {kind === 'form' && (
+      <Fragment>
+        <span class="sk__field"></span><span class="sk__field"></span><span class="sk__field sk__field--half"></span><span class="sk__go"></span>
+      </Fragment>
+    )}
+    {kind === 'ledger' && [0, 1, 2].map((i) => (
+      <span class="sk__row"><span class={`sk__name sk__name--${i}`}></span><span class={`sk__delta${i === 1 ? ' is-minus' : ''}`}></span></span>
+    ))}
+    {kind === 'board' && [0, 1, 2, 3].map((i) => <span class={`sk__rank sk__rank--${i}`}></span>)}
+    {kind === 'pulse' && (
+      <svg class="sk__pulse" viewBox="0 0 200 60" preserveAspectRatio="none">
+        <polyline points="0,32 52,32 64,32 74,8 86,54 98,20 108,32 200,32" fill="none" stroke="currentColor" stroke-width="6" stroke-linejoin="miter" />
+      </svg>
+    )}
+  </span>
+</span>

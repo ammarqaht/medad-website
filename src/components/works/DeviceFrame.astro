@@ -1,0 +1,32 @@
+---
+/* Brutalist device frame (DESIGN.md §9): ink border, a 3px title bar with
+   three square dots, hard shadow, flat (no perspective). `adaptive` turns a
+   browser frame into a phone frame on small screens. The screen scrolls
+   vertically only. */
+interface Props {
+  kind: 'browser' | 'phone';
+  adaptive?: boolean;
+  /** Accessible name of the scrolling screen (when it scrolls). */
+  label?: string;
+  /** Fixed-height scrolling screen (demos) or content height (pending sheet). */
+  scroll?: boolean;
+}
+const { kind, adaptive = false, label, scroll = false } = Astro.props;
+const cls = ['frame', `frame--${kind}`, adaptive && 'frame--adaptive', scroll && 'frame--scroll'].filter(Boolean).join(' ');
+---
+<div class={cls}>
+  <div class="frame__bar" aria-hidden="true">
+    <span class="frame__dots"><span></span><span></span><span></span></span>
+    <span class="frame__addr"></span>
+    <span class="frame__speaker"></span>
+  </div>
+  <div
+    class="frame__screen"
+    data-screen
+    tabindex={scroll ? 0 : undefined}
+    role={scroll ? 'region' : undefined}
+    aria-label={scroll ? label : undefined}
+  >
+    <slot />
+  </div>
+</div>

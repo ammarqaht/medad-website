@@ -1,0 +1,442 @@
+/* ============================================================
+   Works section: archive, folders, device frame, pending sheet,
+   work page, and the ink-writing effect. Imported only by the
+   /works pages. Neo-Brutalism (DESIGN.md §5, §9): ink borders,
+   hard shadows to the inline end, stepped motion, no radius.
+   ============================================================ */
+
+.works-sr {
+  position: absolute;
+  inline-size: 1px;
+  block-size: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/* ---------- Gallery head ---------- */
+.gal { padding-block: clamp(32px, 6vw, 80px) clamp(64px, 9vw, 120px); }
+.gal__head {
+  position: relative;
+  display: grid;
+  gap: clamp(18px, 2.4vw, 28px);
+  justify-items: start;
+  margin-block-end: clamp(32px, 5vw, 64px);
+}
+.gal__title {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: .05em .3em;
+  font-size: clamp(56px, 9.4vw, 140px);
+  line-height: 1.12;
+}
+.gal__hl {
+  display: inline-block;
+  padding: 0 .2em .1em;
+  background: var(--green-500);
+  rotate: -2deg;
+}
+.gal__line {
+  padding: 16px 22px 18px;
+  max-inline-size: 44ch;
+  font-size: clamp(21px, 2.3vw, 30px);
+  line-height: 1.6;
+  rotate: .6deg;
+}
+.gal__tape {
+  display: none;
+  position: absolute;
+  inset-block-start: 8px;
+  inset-inline-end: 0;
+  inline-size: 150px;
+  block-size: 64px;
+  border: var(--bw) solid var(--ink);
+  background: repeating-linear-gradient(90deg, var(--ink) 0 8px, var(--white) 8px 14px, var(--ink) 14px 17px, var(--white) 17px 26px);
+  box-shadow: var(--shadow);
+  rotate: 4deg;
+}
+@media (min-width: 1000px) { .gal__tape { display: block; } }
+
+/* ---------- Filters (DESIGN.md §9: chips, active = pressed) ---------- */
+.arc__filters { display: flex; flex-wrap: wrap; gap: 14px; margin-block-end: clamp(24px, 3.4vw, 40px); }
+.arc__filters[hidden] { display: none; }
+.chip {
+  display: inline-flex;
+  align-items: center;
+  min-block-size: 48px;
+  padding: 10px 22px;
+  border: var(--bw) solid var(--ink);
+  background: var(--ink);
+  color: var(--paper);
+  font-family: var(--font-body);
+  font-size: 18px;
+  font-weight: 900;
+  line-height: 1;
+  cursor: pointer;
+  box-shadow: var(--sx) var(--off) 0 0 var(--green-500);
+  transition: translate var(--snap), box-shadow var(--snap), background-color var(--snap), color var(--snap);
+  -webkit-tap-highlight-color: transparent;
+}
+.chip:hover { background: var(--green-800); translate: calc(var(--off) / -2) calc(var(--off) / 2); box-shadow: calc(var(--sx) / 2) calc(var(--off) / 2) 0 0 var(--green-500); }
+.chip[aria-pressed="true"] { background: var(--green-300); color: var(--ink); translate: var(--sx) var(--off); box-shadow: 0 0 0 0 var(--green-500); }
+
+/* ---------- Shelves: one per arm ---------- */
+.shelf { display: grid; gap: 28px; padding-block: clamp(24px, 4vw, 56px); }
+.shelf + .shelf { border-block-start: var(--bw) solid var(--ink); }
+.shelf[hidden] { display: none; }
+.shelf.is-restamp { animation: shelf-stamp var(--stamp) both; }
+@keyframes shelf-stamp { from { scale: 1.04; opacity: 0; } to { scale: 1; opacity: 1; } }
+.shelf__head { display: grid; gap: 16px; justify-items: start; align-content: start; }
+.shelf__title {
+  padding: 6px 22px 14px;
+  background: var(--green-300);
+  font-size: clamp(36px, 4.6vw, 64px);
+  line-height: 1.2;
+  rotate: -2deg;
+}
+.shelf--live .shelf__title { background: var(--green-500); rotate: 1.5deg; }
+.shelf__line {
+  padding: 12px 18px 14px;
+  max-inline-size: 30ch;
+  font-size: clamp(19px, 1.6vw, 22px);
+  line-height: 1.6;
+  rotate: .6deg;
+  margin-block-start: 10px;
+}
+@media (min-width: 960px) {
+  .shelf { grid-template-columns: repeat(12, minmax(0, 1fr)); align-items: start; column-gap: 24px; }
+  .shelf__head { grid-column: 1 / span 4; position: sticky; inset-block-start: 110px; }
+  .stack { grid-column: 5 / -1; }
+}
+
+/* ---------- Folders, stacked ---------- */
+.stack { display: grid; list-style: none; margin: 0; padding: 0; }
+.fold {
+  --fill: var(--white);
+  --text: var(--ink);
+  --tab: 0%;
+  position: relative;
+  padding-block-start: 56px;
+  rotate: -.5deg;
+}
+.fold + .fold { margin-block-start: -12px; }
+.fold--n1 { --tab: 24%; rotate: .5deg; }
+.fold--n2 { --tab: 48%; rotate: -.3deg; }
+.fold--soft { --fill: var(--green-300); }
+.fold--green { --fill: var(--green-500); }
+.fold--ink { --fill: var(--ink); --text: var(--paper); }
+.fold__tab {
+  position: absolute;
+  z-index: 2;
+  inset-block-start: 0;
+  inset-inline-start: var(--tab);
+  margin: 0;
+  min-block-size: 59px;
+  padding: 4px 26px 12px;
+  border: var(--bw) solid var(--ink);
+  border-block-end: 0;
+  background: var(--fill);
+  color: var(--text);
+  font-size: clamp(28px, 3.2vw, 40px);
+  line-height: 1.25;
+  box-shadow: var(--sx) 0 0 0 var(--ink);
+}
+.fold__body {
+  position: relative;
+  z-index: 1;
+  container-type: inline-size;
+  display: grid;
+  gap: 18px;
+  padding: clamp(16px, 2.4vw, 26px);
+  border: var(--bw) solid var(--ink);
+  background: var(--fill);
+  color: var(--text);
+  box-shadow: var(--shadow);
+}
+.fold--ink .fold__body, .fold--ink .fold__tab { box-shadow: var(--sx) var(--off) 0 0 var(--green-500); }
+.fold--ink .fold__tab { box-shadow: var(--sx) 0 0 0 var(--green-500); }
+.fold__line { margin: 0; font-size: clamp(19px, 1.6vw, 22px); line-height: 1.6; }
+.fold__sheets { display: grid; gap: 22px; list-style: none; margin: 0; padding: 0; }
+@container (min-width: 640px) { .fold__sheets--multi { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+
+/* A sheet: white paper in the folder, the link to the work */
+.sheet {
+  position: relative;
+  display: grid;
+  gap: 16px;
+  padding: 16px;
+  border: var(--bw) solid var(--ink);
+  background: var(--white);
+  color: var(--ink);
+  text-decoration: none;
+  box-shadow: var(--shadow);
+  transition: translate var(--snap), box-shadow var(--snap);
+  -webkit-tap-highlight-color: transparent;
+}
+.fold--ink .sheet { box-shadow: var(--sx) var(--off) 0 0 var(--green-500); }
+.fold--ink .sheet:focus-visible { outline-color: var(--green-400); }
+.sheet:hover { translate: calc(var(--off) / -2) calc(var(--off) / 2); box-shadow: calc(var(--sx) / 2) calc(var(--off) / 2) 0 0 var(--ink); }
+.fold--ink .sheet:hover { box-shadow: calc(var(--sx) / 2) calc(var(--off) / 2) 0 0 var(--green-500); }
+.sheet__paper { display: block; transition: translate var(--snap); }
+.sheet:hover .sheet__paper, .sheet:focus-visible .sheet__paper { translate: 0 -6px; }
+.sheet__text { display: grid; gap: 10px; justify-items: start; align-content: center; }
+.sheet__name { font-size: clamp(28px, 3vw, 40px); line-height: 1.2; }
+.sheet__line { font-size: clamp(19px, 1.6vw, 22px); line-height: 1.6; }
+.sheet__open {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  min-block-size: 44px;
+  padding: 8px 16px;
+  border: var(--bw) solid var(--ink);
+  background: var(--ink);
+  color: var(--paper);
+  font-size: 17px;
+  font-weight: 900;
+  line-height: 1;
+}
+.sheet__open::after {
+  content: "";
+  inline-size: .9em;
+  block-size: .9em;
+  background: currentColor;
+  clip-path: polygon(0 50%, 55% 0, 55% 30%, 100% 30%, 100% 70%, 55% 70%, 55% 100%);
+  transition: translate var(--snap);
+}
+.sheet:hover .sheet__open::after { translate: -4px 0; }
+@container (min-width: 560px) {
+  .fold__sheets:not(.fold__sheets--multi) .sheet {
+    grid-template-columns: minmax(0, 1fr) minmax(180px, 40%);
+    align-items: center;
+    gap: 24px;
+    padding: 20px;
+  }
+  .fold__sheets:not(.fold__sheets--multi) .sheet__paper { order: 2; }
+}
+
+/* Pull: the sheet comes out of the folder toward the viewer, the rest is pushed back */
+.sheet.is-pulled { z-index: 5; animation: sheet-pull 500ms steps(6, jump-end) forwards; }
+.sheet.is-pulled .sheet__paper { animation: paper-open 500ms steps(6, jump-end) forwards; }
+.fold.is-open { z-index: 4; }
+.arc.is-pulling .fold:not(.is-open) .fold__body,
+.arc.is-pulling .fold:not(.is-open) .fold__tab { translate: 0 8px; box-shadow: none; transition: translate var(--snap), box-shadow var(--snap); }
+@keyframes sheet-pull {
+  0% { translate: 0 0; scale: 1; rotate: 0deg; }
+  35% { translate: 0 -34px; scale: 1.02; rotate: -1.5deg; box-shadow: -10px 10px 0 0 var(--ink); }
+  100% { translate: 0 -22px; scale: 1.06; rotate: 0deg; box-shadow: -14px 14px 0 0 var(--ink); }
+}
+@keyframes paper-open {
+  from { scale: 1; }
+  to { scale: 1.12; }
+}
+
+/* ---------- Sketches: flat miniature screens ---------- */
+.sk {
+  display: grid;
+  border: var(--bw) solid var(--ink);
+  background: var(--paper);
+  color: var(--ink);
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+}
+.sk__bar { display: flex; gap: 5px; padding: 5px 8px; border-block-end: var(--bw) solid var(--ink); background: var(--white); }
+.sk__bar span { inline-size: 8px; block-size: 8px; background: var(--ink); }
+.sk__screen { display: grid; align-content: start; gap: 6px; padding: 8px 10px; }
+.sk__row { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.sk__name { block-size: 10px; background: var(--ink); inline-size: 46%; }
+.sk__name--1 { inline-size: 38%; } .sk__name--2 { inline-size: 52%; } .sk__name--3 { inline-size: 32%; }
+.sk__cells { display: flex; gap: 4px; }
+.sk__cells span { inline-size: 18px; block-size: 14px; border: 2px solid var(--ink); background: var(--green-300); }
+.sk__cells span.is-off { background: var(--ink); }
+.sk__field { block-size: 16px; border: 2px solid var(--ink); background: var(--white); }
+.sk__field--half { inline-size: 55%; }
+.sk__go { justify-self: start; inline-size: 34%; block-size: 18px; border: 2px solid var(--ink); background: var(--green-500); }
+.sk__delta { inline-size: 26px; block-size: 14px; border: 2px solid var(--ink); background: var(--green-300); }
+.sk__delta.is-minus { background: var(--white); }
+.sk__rank { block-size: 13px; border: 2px solid var(--ink); background: var(--green-300); inline-size: 92%; }
+.sk__rank--0 { background: var(--green-500); }
+.sk__rank--1 { inline-size: 74%; } .sk__rank--2 { inline-size: 58%; } .sk__rank--3 { inline-size: 40%; background: var(--white); }
+.sk__pulse { inline-size: 100%; block-size: 70%; align-self: center; color: var(--green-500); stroke-dasharray: 260; stroke-dashoffset: 0; }
+.sk--pulse .sk__screen { align-content: center; block-size: 100%; }
+.sheet:hover .sk__pulse, .pend .sk__pulse { animation: pulse-draw 1.2s steps(10, jump-end) infinite; }
+@keyframes pulse-draw { from { stroke-dashoffset: 260; } to { stroke-dashoffset: 0; } }
+
+/* Touch screens have no hover: the sheets move by themselves once their
+   folder lands. The paper peeks out of the folder and the pulse keeps beating. */
+@media (hover: none) {
+  .fold__body.is-in .sheet__paper { animation: paper-peek 2.4s steps(1, end) infinite; }
+  .fold__sheets li:nth-child(2) .sheet__paper { animation-delay: 1.2s; }
+  .fold__body.is-in .sk__pulse { animation: pulse-draw 1.2s steps(10, jump-end) infinite; }
+  .fold__body.is-in .sheet__open::after { animation: open-nudge 1.2s steps(1, end) infinite; }
+}
+@keyframes paper-peek {
+  0%, 60% { translate: 0 0; }
+  70% { translate: 0 -4px; }
+  80% { translate: 0 -8px; }
+  90% { translate: 0 -4px; }
+}
+@keyframes open-nudge {
+  0%, 50% { translate: 0 0; }
+  60% { translate: -4px 0; }
+}
+
+/* ---------- Device frame (DESIGN.md §9) ---------- */
+.frame {
+  display: flex;
+  flex-direction: column;
+  border: var(--bw) solid var(--ink);
+  background: var(--white);
+  box-shadow: var(--shadow);
+}
+.frame__bar {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 10px 14px;
+  border-block-end: var(--bw) solid var(--ink);
+  background: var(--white);
+}
+.frame__dots { display: flex; gap: 8px; }
+.frame__dots span { inline-size: 14px; block-size: 14px; border: var(--bw) solid var(--ink); background: var(--green-300); }
+.frame__dots span:nth-child(2) { background: var(--white); }
+.frame__dots span:nth-child(3) { background: var(--ink); }
+.frame__addr { flex: 1; max-inline-size: 420px; block-size: 26px; border: var(--bw) solid var(--ink); background: var(--paper); }
+.frame__speaker { display: none; }
+.frame__screen { position: relative; background: var(--paper); overflow-x: hidden; }
+.frame--scroll .frame__screen { block-size: clamp(560px, 80dvh, 860px); overflow-y: auto; }
+.frame__screen:focus-visible { outline: 3px solid var(--ink); outline-offset: -6px; }
+
+.frame--phone {
+  inline-size: min(100%, 420px);
+  margin-inline: auto;
+  padding: 0 10px 10px;
+  background: var(--ink);
+  box-shadow: var(--sx) var(--off) 0 0 var(--green-500);
+}
+.frame--phone .frame__bar { justify-content: center; padding: 10px 0; background: var(--ink); border-block-end: 0; }
+.frame--phone .frame__dots, .frame--phone .frame__addr { display: none; }
+.frame--phone .frame__speaker { display: block; inline-size: 72px; block-size: 10px; background: var(--paper); }
+.frame--phone .frame__screen { border: var(--bw) solid var(--paper); }
+.frame--phone.frame--scroll .frame__screen { block-size: clamp(520px, 76dvh, 760px); }
+
+/* A browser on wide screens, a phone in the hand */
+@media (max-width: 639px) {
+  .frame--adaptive {
+    padding: 0 8px 8px;
+    background: var(--ink);
+    box-shadow: var(--sx) var(--off) 0 0 var(--green-500);
+  }
+  .frame--adaptive .frame__bar { justify-content: center; padding: 9px 0; background: var(--ink); border-block-end: 0; }
+  .frame--adaptive .frame__dots, .frame--adaptive .frame__addr { display: none; }
+  .frame--adaptive .frame__speaker { display: block; inline-size: 64px; block-size: 9px; background: var(--paper); }
+  .frame--adaptive .frame__screen { border: var(--bw) solid var(--paper); }
+  .frame--adaptive.frame--scroll .frame__screen { block-size: clamp(520px, 78dvh, 760px); }
+}
+
+/* ---------- Pending sheet ---------- */
+.pend {
+  display: grid;
+  justify-items: center;
+  gap: 18px;
+  padding: clamp(28px, 5vw, 56px) clamp(18px, 4vw, 48px) clamp(32px, 5vw, 60px);
+  text-align: center;
+}
+.pend__printer { display: grid; justify-items: center; inline-size: min(100%, 340px); }
+.pend__slot { inline-size: 100%; block-size: 22px; background: var(--ink); border: var(--bw) solid var(--ink); box-shadow: var(--shadow); position: relative; z-index: 1; }
+.pend__tray { display: block; inline-size: 82%; overflow: hidden; padding-inline: 8px; padding-block-end: 10px; }
+.pend__paper {
+  display: block;
+  padding: 10px;
+  background: var(--white);
+  border: var(--bw) solid var(--ink);
+  border-block-start: 0;
+  box-shadow: var(--shadow);
+  animation: print-out 3.2s steps(1, end) infinite;
+}
+@keyframes print-out {
+  0% { translate: 0 -100%; }
+  10% { translate: 0 -82%; }
+  20% { translate: 0 -64%; }
+  30% { translate: 0 -46%; }
+  40% { translate: 0 -28%; }
+  50% { translate: 0 -12%; }
+  60%, 88% { translate: 0 0; }
+  94% { translate: 0 -100%; }
+}
+.pend__title { margin: 0; font-size: clamp(32px, 4.4vw, 56px); line-height: 1.2; text-wrap: balance; }
+.pend__line { margin: 0; max-inline-size: 36ch; font-size: clamp(19px, 1.6vw, 22px); line-height: 1.6; }
+.pend--phone .pend__title { font-size: clamp(30px, 8vw, 40px); }
+
+/* ---------- Work page ---------- */
+.wk { padding-block: clamp(28px, 5vw, 72px) clamp(64px, 9vw, 120px); }
+.wk__head { display: grid; gap: 20px; justify-items: start; margin-block-end: clamp(32px, 5vw, 64px); }
+.wk__title {
+  margin: 0;
+  padding: .04em .32em .16em;
+  background: var(--green-300);
+  font-size: clamp(56px, 8vw, 120px);
+  line-height: 1.12;
+  text-wrap: balance;
+  rotate: -2deg;
+}
+.wk__line {
+  position: relative;
+  z-index: 1;
+  margin: 0;
+  padding: 16px 22px 18px;
+  max-inline-size: 40ch;
+  font-size: clamp(21px, 2.3vw, 30px);
+  line-height: 1.6;
+  rotate: .6deg;
+}
+.wk__how {
+  display: block;
+  margin-block-start: 12px;
+  padding-block-start: 12px;
+  border-block-start: var(--bw) solid var(--ink);
+  font-size: clamp(19px, 1.6vw, 22px);
+}
+@media (min-width: 960px) {
+  .wk__head { grid-template-columns: repeat(12, minmax(0, 1fr)); align-items: end; column-gap: 0; }
+  .wk__title { grid-column: 1 / span 7; grid-row: 1; }
+  .wk__line { grid-column: 7 / -1; grid-row: 1; margin-block-end: -24px; }
+}
+.wk__demo { margin-block-end: clamp(56px, 8vw, 112px); }
+
+.wk__close {
+  display: grid;
+  gap: 20px;
+  justify-items: start;
+  padding: clamp(28px, 5vw, 64px);
+  background: var(--green-500);
+  border: var(--bw) solid var(--ink);
+  box-shadow: calc(var(--sx) * 2) calc(var(--off) * 2) 0 0 var(--ink);
+}
+.wk__close-title { margin: 0; font-size: clamp(42px, 6.4vw, 96px); line-height: 1.12; text-wrap: balance; }
+.wk__close-line { margin: 0; max-inline-size: 34ch; font-size: clamp(21px, 2.3vw, 30px); line-height: 1.6; }
+.wk__close-cta { display: flex; flex-wrap: wrap; align-items: center; gap: 18px 28px; margin-block-start: 6px; }
+.wk__all {
+  display: inline-flex;
+  align-items: center;
+  min-block-size: 44px;
+  font-size: 20px;
+  font-weight: 900;
+  color: var(--ink);
+  text-decoration: none;
+  border-block-end: var(--bw) solid var(--ink);
+  transition: background-color var(--snap), color var(--snap);
+}
+.wk__all:hover { background: var(--ink); color: var(--green-400); }
+
+/* ---------- Reduced motion: fades and colour only ---------- */
+@media (prefers-reduced-motion: reduce) {
+  .fold__body.is-in .sheet__paper, .fold__body.is-in .sk__pulse, .fold__body.is-in .sheet__open::after,
+  .shelf.is-restamp, .sheet.is-pulled, .sheet.is-pulled .sheet__paper,
+  .pend__paper, .sheet:hover .sk__pulse, .pend .sk__pulse { animation: none; }
+  .chip, .sheet, .sheet__paper, .sheet__open::after { transition: background-color .2s ease, color .2s ease; }
+  .chip:hover, .chip[aria-pressed="true"], .sheet:hover, .sheet:hover .sheet__paper,
+  .sheet:focus-visible .sheet__paper, .sheet:hover .sheet__open::after { translate: none; }
+  .sheet:hover { box-shadow: var(--shadow); outline: 3px solid var(--green-500); }
+  .chip[aria-pressed="true"] { box-shadow: 0 0 0 0 var(--green-500); }
+}

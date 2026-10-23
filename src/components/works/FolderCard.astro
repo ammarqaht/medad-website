@@ -1,0 +1,32 @@
+---
+/* One printed folder in the archive. The tab carries the folder's name; the
+   sheets inside link to the works. Choosing a sheet pulls it out of the
+   folder (archive.ts), then the ink flood carries the visitor to its page. */
+import Sketch from './Sketch.astro';
+import { workBySlug, worksCopy, type Folder } from '../../content/works';
+
+interface Props { folder: Folder; index: number }
+const { folder, index } = Astro.props;
+const sheets = folder.works.map(workBySlug);
+const multi = sheets.length > 1;
+---
+<li class={`fold fold--${folder.fill} fold--n${index % 3}`} data-folder>
+  <h3 class="fold__tab display"><span data-ink>{folder.name}</span></h3>
+  <div class="fold__body" data-pop={String(index * 0.08)}>
+    {folder.line && <p class="fold__line">{folder.line}</p>}
+    <ul class={`fold__sheets${multi ? ' fold__sheets--multi' : ''}`}>
+      {sheets.map((w) => (
+        <li>
+          <a class="sheet" href={`/works/${w.slug}`} data-sheet>
+            <span class="sheet__paper"><Sketch kind={w.sketch} /></span>
+            <span class="sheet__text">
+              {multi ? <span class="sheet__name display">{w.short}</span> : <span class="works-sr">{w.name}</span>}
+              <span class="sheet__line">{w.line}</span>
+              <span class="sheet__open">{worksCopy.gallery.open}</span>
+            </span>
+          </a>
+        </li>
+      ))}
+    </ul>
+  </div>
+</li>

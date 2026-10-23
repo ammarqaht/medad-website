@@ -1,0 +1,38 @@
+---
+/* The works archive (FR-10 to FR-12): two shelves, one per arm, each a stack
+   of printed folders. Arm filters are buttons (no reload); `?arm=digital`
+   or `?arm=live` preselects one. Without JS every folder simply shows. */
+import FolderCard from './FolderCard.astro';
+import { arms, foldersIn, worksCopy } from '../../content/works';
+const g = worksCopy.gallery;
+---
+<div class="arc" data-archive>
+  <div class="arc__filters" role="group" aria-label={g.filtersLabel} data-filters hidden>
+    <button type="button" class="chip" data-filter="all" data-name={g.all} aria-pressed="true">{g.all}</button>
+    {arms.map((a) => (
+      <button type="button" class="chip" data-filter={a.id} data-name={a.name} aria-pressed="false">{a.name}</button>
+    ))}
+  </div>
+  <p class="works-sr" aria-live="polite" data-filter-status data-label={g.showing}></p>
+
+  {arms.map((arm) => (
+    <section class={`shelf shelf--${arm.id}`} data-arm={arm.id} aria-labelledby={`shelf-${arm.id}`}>
+      <div class="shelf__head">
+        <h2 class="shelf__title display box" id={`shelf-${arm.id}`} data-pop><span data-ink>{arm.name}</span></h2>
+        <p class="shelf__line box" data-pop="0.1">{arm.line}</p>
+      </div>
+      <ul class="stack">
+        {foldersIn(arm.id).map((f, i) => <FolderCard folder={f} index={i} />)}
+      </ul>
+    </section>
+  ))}
+</div>
+
+<script>
+  import { initArchive } from './archive';
+  try {
+    initArchive();
+  } catch (err) {
+    console.error(err);
+  }
+</script>

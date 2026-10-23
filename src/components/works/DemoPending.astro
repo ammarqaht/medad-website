@@ -1,0 +1,19 @@
+---
+/* Shown inside the device frame while a work's live demo is still being
+   built: a sheet printing out of a slot, in stepped frames. No claims. */
+import Button from '../Button.astro';
+import Sketch from './Sketch.astro';
+import { worksCopy, type Work } from '../../content/works';
+interface Props { work: Work }
+const { work } = Astro.props;
+const p = worksCopy.page.pending;
+---
+<div class={`pend pend--${work.frame}`}>
+  <div class="pend__printer" aria-hidden="true">
+    <span class="pend__slot"></span>
+    <span class="pend__tray"><span class="pend__paper"><Sketch kind={work.sketch} /></span></span>
+  </div>
+  <h2 class="pend__title display"><span data-ink>{p.title}</span></h2>
+  <p class="pend__line">{p.line}</p>
+  <Button href="/works">{p.cta}</Button>
+</div>
