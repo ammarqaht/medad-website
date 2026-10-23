@@ -35,11 +35,23 @@ function splitLines(el: HTMLElement): string[] {
 }
 
 function write(el: HTMLElement): void {
+  const original = el.textContent || '';
+  try {
+    build(el, original);
+  } catch (err) {
+    // Never lose the heading: put the text back and show it.
+    console.error(err);
+    el.textContent = original;
+    el.classList.remove('is-writing');
+    el.classList.add('is-written');
+  }
+}
+
+function build(el: HTMLElement, original: string): void {
   if (reducedMotion()) {
     el.classList.add('is-written');
     return;
   }
-  const original = el.textContent || '';
   const lines = splitLines(el);
   el.textContent = '';
   let delay = 0;
@@ -92,7 +104,7 @@ export function initInkWrite(root: ParentNode = document): void {
         io.unobserve(e.target);
       });
     },
-    { threshold: 0.25, rootMargin: '0px 0px -10% 0px' },
+    { threshold: 0, rootMargin: '0px 0px -10% 0px' },
   );
   byParent.forEach((_, parent) => io.observe(parent));
 }

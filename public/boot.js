@@ -19,7 +19,7 @@
     if (location.pathname === '/' && !sessionStorage.getItem('medad-opened') &&
         !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
       root.classList.add('opening');
-      boot.opening = setTimeout(function () { root.classList.remove('opening'); }, 6000);
+      boot.opening = setTimeout(function () { root.classList.remove('opening'); }, 5000);
     }
   } catch (e) { /* storage blocked: plain navigation */ }
 })();

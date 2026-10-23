@@ -15,7 +15,6 @@ const { glimpse } = site.home;
     {glimpse.items.map((f, i) => (
       <li class={`file file--${i + 1}`} data-pop={String(i * 0.1)}>
         <a class="file__body" href={f.href}>
-          <span class="file__kind">{f.kind}</span>
           <span class="file__name display">{f.name}</span>
           <span class="file__line">{f.line}</span>
           <span class="file__open" aria-hidden="true"></span>
@@ -49,7 +48,6 @@ const { glimpse } = site.home;
     inset-inline-start: 18px;
     inline-size: 42%;
     block-size: 26px;
-    background: inherit;
     border: var(--bw) solid var(--ink);
     border-block-end: 0;
     clip-path: polygon(0 100%, 8% 0, 92% 0, 100% 100%);
@@ -71,7 +69,6 @@ const { glimpse } = site.home;
     text-decoration: none;
     transition: box-shadow var(--snap);
   }
-  .file__kind { font-size: 19px; font-weight: 900; }
   .file__name { font-size: clamp(36px, 3.6vw, 52px); line-height: 1.15; }
   .file__line { font-size: 19px; line-height: 1.6; font-weight: 700; }
   .file__open {

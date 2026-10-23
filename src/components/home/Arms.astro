@@ -1,9 +1,11 @@
 ---
-/* The two worlds (FR-07): the ink line forks. One branch builds screens
-   (digital solutions), the other beats like a pulse (live experiences).
-   Each arm opens the works archive filtered to it. */
+/* What we write (FR-07): the ink line forks into two worlds. Digital
+   solutions: three screens the visitor can open (site, system, platform).
+   Live experiences: a one-question quiz to play right here. */
 import { site } from '../../content/site';
+import { html } from '../../content/brand';
 const { arms } = site.home;
+const { digital, live } = arms;
 ---
 <section class="arms" aria-labelledby="arms-title" data-arms>
   <h2 class="arms__title display" id="arms-title" data-ink>{arms.title}</h2>
@@ -14,23 +16,38 @@ const { arms } = site.home;
   </svg>
 
   <div class="arms__grid">
-    <a class="arm arm--digital box" href={arms.digital.href} data-pop>
-      <h3 class="arm__title display">{arms.digital.title}</h3>
-      <p class="arm__text">{arms.digital.text}</p>
-      <div class="screens" aria-hidden="true">
-        <span class="screen"></span><span class="screen"></span><span class="screen"></span>
+    <article class="arm arm--digital box" data-pop>
+      <h3 class="arm__title display">{digital.title}</h3>
+      <p class="arm__text">{digital.text}</p>
+      <div class="screens" role="group" aria-label={digital.screensLabel} data-screens>
+        {digital.screens.map((label, i) => (
+          <button class={`screen screen--${i + 1}`} type="button" aria-label={label} aria-pressed={i === 1 ? 'true' : 'false'}>
+            <span class="screen__bar" aria-hidden="true"></span>
+            <span class="screen__ui" aria-hidden="true">
+              {i === 0 && (<><b class="ui-hero"></b><i></i><i></i><b class="ui-btn"></b></>)}
+              {i === 1 && (<><i class="ui-row"></i><i class="ui-row"></i><i class="ui-row"></i><i class="ui-row"></i></>)}
+              {i === 2 && (<><i class="ui-bar"></i><i class="ui-bar"></i><i class="ui-bar"></i></>)}
+            </span>
+          </button>
+        ))}
       </div>
-      <span class="arm__cta">{arms.digital.cta}<span class="arm__arrow" aria-hidden="true"></span></span>
-    </a>
+      <a class="arm__cta" href={digital.href}>{digital.cta}<span class="arm__arrow" aria-hidden="true"></span></a>
+    </article>
 
-    <a class="arm arm--live box" href={arms.live.href} data-pop="0.12">
-      <h3 class="arm__title display">{arms.live.title}</h3>
-      <p class="arm__text">{arms.live.text}</p>
-      <svg class="pulse" viewBox="0 0 300 80" preserveAspectRatio="none" aria-hidden="true">
-        <path d="M0 50 H70 L85 50 L100 12 L118 72 L132 30 L142 50 H200 L212 50 L224 22 L238 64 L248 50 H300" />
-      </svg>
-      <span class="arm__cta">{arms.live.cta}<span class="arm__arrow" aria-hidden="true"></span></span>
-    </a>
+    <article class="arm arm--live box" data-pop="0.12">
+      <h3 class="arm__title display">{live.title}</h3>
+      <p class="arm__text">{live.text}</p>
+      <div class="quiz" data-quiz data-answer={String(live.quiz.answer)} data-right={live.quiz.right} data-wrong={live.quiz.wrong}>
+        <p class="quiz__q" set:html={html(live.quiz.question)} />
+        <div class="quiz__options">
+          {live.quiz.options.map((o, i) => (
+            <button class="quiz__opt" type="button" data-i={String(i)}>{o}</button>
+          ))}
+        </div>
+        <p class="quiz__say" aria-live="polite"></p>
+      </div>
+      <a class="arm__cta" href={live.href}>{live.cta}<span class="arm__arrow" aria-hidden="true"></span></a>
+    </article>
   </div>
 </section>
 
@@ -47,46 +64,89 @@ const { arms } = site.home;
   .arms__fork path { fill: none; stroke: var(--ink); stroke-width: 6; stroke-linecap: square; vector-effect: non-scaling-stroke; }
   .arms__grid { inline-size: 100%; display: grid; gap: 32px; margin-block-start: 28px; }
 
-  .arm {
-    display: grid;
-    gap: 16px;
-    align-content: start;
-    padding: clamp(22px, 3vw, 40px);
-    text-decoration: none;
-    color: inherit;
-    transition: translate var(--snap), box-shadow var(--snap);
-  }
-  .arm:hover { translate: calc(var(--off) / -2) calc(var(--off) / 2); box-shadow: calc(var(--sx) / 2) calc(var(--off) / 2) 0 0 var(--ink); }
-  .arm:active { translate: var(--sx) var(--off); box-shadow: none; }
+  .arm { display: grid; gap: 18px; align-content: start; padding: clamp(22px, 3vw, 40px); }
   .arm--digital { rotate: -1deg; }
   .arm--live { background: var(--ink); color: var(--paper); box-shadow: var(--sx) var(--off) 0 0 var(--green-500); rotate: .8deg; }
-  .arm--live:hover { box-shadow: calc(var(--sx) / 2) calc(var(--off) / 2) 0 0 var(--green-500); }
-  .arm--live:focus-visible { outline-color: var(--green-400); }
   .arm__title { font-size: clamp(34px, 4vw, 56px); line-height: 1.2; }
   .arm__text { font-size: clamp(19px, 1.7vw, 22px); line-height: 1.6; max-inline-size: 36ch; }
 
-
-  .arm__cta { display: inline-flex; align-items: center; gap: 12px; font-weight: 900; font-size: clamp(19px, 1.8vw, 22px); }
+  .arm__cta {
+    justify-self: start;
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    min-block-size: 44px;
+    font-weight: 900;
+    font-size: clamp(19px, 1.8vw, 22px);
+    text-decoration: none;
+    border-block-end: var(--bw) solid currentColor;
+  }
+  .arm--live .arm__cta:focus-visible { outline-color: var(--green-400); }
   .arm__arrow { inline-size: .9em; block-size: .9em; background: currentColor; clip-path: polygon(0 50%, 55% 0, 55% 30%, 100% 30%, 100% 70%, 55% 70%, 55% 100%); transition: translate var(--snap); }
-  .arm:hover .arm__arrow { translate: -6px 0; }
+  .arm__cta:hover .arm__arrow { translate: -6px 0; }
 
-  /* Digital: three screens stamped one after the other */
-  .screens { display: flex; gap: 12px; block-size: 92px; align-items: end; }
-  .screen { flex: 1; border: var(--bw) solid var(--ink); background: var(--white); box-shadow: var(--shadow); position: relative; }
-  .screen::before { content: ""; position: absolute; inset-inline: 0; inset-block-start: 0; block-size: 12px; background: var(--ink); }
-  .screen:nth-child(1) { block-size: 70%; }
-  .screen:nth-child(2) { block-size: 100%; background: var(--green-500); }
-  .screen:nth-child(3) { block-size: 55%; }
-  :global(.js) .arm--digital:global(.is-in) .screen { animation: rise 360ms steps(4, jump-end) both; }
-  :global(.js) .arm--digital:global(.is-in) .screen:nth-child(2) { animation-delay: 240ms; }
-  :global(.js) .arm--digital:global(.is-in) .screen:nth-child(3) { animation-delay: 480ms; }
-  @keyframes rise { from { clip-path: inset(100% 0 0 0); } to { clip-path: inset(0 0 0 0); } }
+  /* ---------- Digital: three screens, one open at a time ---------- */
+  .screens { display: flex; gap: 12px; block-size: 150px; align-items: end; }
+  .screen {
+    position: relative;
+    flex: 1;
+    block-size: 60%;
+    min-inline-size: 0;
+    padding: 0;
+    display: grid;
+    grid-template-rows: auto 1fr;
+    border: var(--bw) solid var(--ink);
+    background: var(--white);
+    box-shadow: var(--shadow);
+    cursor: pointer;
+    overflow: hidden;
+    transition: flex-grow var(--stamp), block-size var(--stamp), background-color var(--snap), translate var(--snap), box-shadow var(--snap);
+  }
+  .screen:hover { translate: calc(var(--off) / -2) calc(var(--off) / 2); box-shadow: calc(var(--sx) / 2) calc(var(--off) / 2) 0 0 var(--ink); }
+  .screen[aria-pressed="true"] { flex-grow: 2.4; block-size: 100%; background: var(--green-300); }
+  .screen__bar { block-size: 14px; background: var(--ink); }
+  .screen__ui { display: grid; align-content: start; gap: 7px; padding: 10px; visibility: hidden; }
+  .screen[aria-pressed="true"] .screen__ui { visibility: visible; }
+  .screen__ui i, .screen__ui b { display: block; background: var(--ink); block-size: 8px; }
+  .ui-hero { block-size: 30px !important; background: var(--green-500) !important; border: 2px solid var(--ink); }
+  .screen__ui i:nth-of-type(2) { inline-size: 70%; }
+  .ui-btn { inline-size: 40%; block-size: 14px !important; }
+  .ui-row { block-size: 14px !important; background: var(--white) !important; border: 2px solid var(--ink); }
+  .ui-row:first-child { background: var(--ink) !important; }
+  .ui-bar { block-size: 16px !important; border: 2px solid var(--ink); background: var(--white) !important; position: relative; }
+  .ui-bar::after { content: ""; position: absolute; inset-block: 0; inset-inline-start: 0; inline-size: 70%; background: var(--green-500); }
+  .ui-bar:nth-child(2)::after { inline-size: 45%; }
+  .ui-bar:nth-child(3)::after { inline-size: 90%; }
+  /* the opened screen draws its interface frame by frame */
+  .screen[aria-pressed="true"] .screen__ui > * { animation: ui-in 360ms steps(4, jump-end) both; }
+  .screen[aria-pressed="true"] .screen__ui > :nth-child(2) { animation-delay: 90ms; }
+  .screen[aria-pressed="true"] .screen__ui > :nth-child(3) { animation-delay: 180ms; }
+  .screen[aria-pressed="true"] .screen__ui > :nth-child(4) { animation-delay: 270ms; }
+  @keyframes ui-in { from { clip-path: inset(0 0 0 100%); } to { clip-path: inset(0 0 0 0); } }
 
-  /* Live: the pulse line, travelling in hard frames */
-  .pulse { inline-size: 100%; block-size: 80px; max-inline-size: none; }
-  .pulse path { fill: none; stroke: var(--green-400); stroke-width: 5; stroke-linejoin: miter; vector-effect: non-scaling-stroke; stroke-dasharray: 120 600; }
-  :global(.js) .arm--live:global(.is-in) .pulse path { animation: beat 1.6s steps(16, jump-none) infinite; }
-  @keyframes beat { from { stroke-dashoffset: 720; } to { stroke-dashoffset: 0; } }
+  /* ---------- Live: a one-question quiz ---------- */
+  .quiz { display: grid; gap: 14px; padding: 18px; border: var(--bw) solid var(--paper); background: var(--green-950); }
+  .quiz__q { font-family: var(--font-display); font-weight: 900; font-size: clamp(24px, 2.6vw, 34px); line-height: 1.3; }
+  .quiz__options { display: flex; flex-wrap: wrap; gap: 12px; }
+  .quiz__opt {
+    min-block-size: 48px;
+    padding: 8px 20px;
+    border: var(--bw) solid var(--paper);
+    background: var(--paper);
+    color: var(--ink);
+    font-weight: 900;
+    font-size: 19px;
+    cursor: pointer;
+    box-shadow: var(--sx) var(--off) 0 0 var(--green-500);
+    transition: translate var(--snap), box-shadow var(--snap), background-color var(--snap);
+  }
+  .quiz__opt:hover { translate: calc(var(--off) / -2) calc(var(--off) / 2); box-shadow: calc(var(--sx) / 2) calc(var(--off) / 2) 0 0 var(--green-500); }
+  .quiz__opt:focus-visible { outline-color: var(--green-400); }
+  .quiz__opt:global(.is-right) { background: var(--green-400); translate: var(--sx) var(--off); box-shadow: none; animation: stamp-in 300ms steps(3, jump-end); }
+  .quiz__opt:global(.is-wrong) { background: var(--gray); animation: shake 360ms steps(6, jump-none); }
+  .quiz__say { min-block-size: 1.6em; font-size: 19px; color: var(--green-400); }
+  @keyframes shake { 0%, 100% { translate: 0 0; } 25% { translate: 6px 0; } 50% { translate: -6px 0; } 75% { translate: 4px 0; } }
+  @keyframes stamp-in { 0% { scale: 1.25; } 60% { scale: .94; } 100% { scale: 1; } }
 
   @media (min-width: 900px) {
     .arms__fork { display: block; }
@@ -98,24 +158,14 @@ const { arms } = site.home;
   @keyframes fork { to { stroke-dashoffset: 0; } }
 
   @media (prefers-reduced-motion: reduce) {
-    .arm, .arm__arrow { transition: box-shadow .2s ease; }
-    .arm:hover, .arm:active, .arm:hover .arm__arrow { translate: none; }
-    :global(.js) .arm--digital:global(.is-in) .screen,
-    :global(.js) .arm--live:global(.is-in) .pulse path { animation: none; }
+    .screen, .quiz__opt, .arm__arrow { transition: background-color .2s ease; }
+    .screen:hover, .quiz__opt:hover, .arm__cta:hover .arm__arrow { translate: none; }
+    .screen[aria-pressed="true"] .screen__ui > *, .quiz__opt:global(.is-right), .quiz__opt:global(.is-wrong) { animation: none; }
     :global(.js) .arms__fork path { stroke-dashoffset: 0; }
-    .pulse path { stroke-dasharray: none; }
   }
 </style>
 
 <script>
-  /* Fork the line once the section comes into view. */
-  const arms = document.querySelector('[data-arms]');
-  if (arms) {
-    new IntersectionObserver((entries, io) => {
-      if (entries[0].isIntersecting) {
-        arms.classList.add('is-forked');
-        io.disconnect();
-      }
-    }, { threshold: 0.2 }).observe(arms);
-  }
+  import { initArms } from '../../scripts/home/arms';
+  initArms();
 </script>

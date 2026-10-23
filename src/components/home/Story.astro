@@ -4,9 +4,9 @@
    is stamped onto the page (FR-06). */
 import { site } from '../../content/site';
 const chapters = site.home.story;
-const numerals = ['١', '٢', '٣'];
+const numerals = site.home.numerals;
 ---
-<section class="story" id="story" aria-label="القصة" data-story>
+<section class="story" id="story" aria-label={site.home.storyLabel} data-story>
   <svg class="story__line" aria-hidden="true"><path class="story__ink" /></svg>
 
   {chapters.map((c, i) => (

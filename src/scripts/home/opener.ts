@@ -209,31 +209,50 @@ export function initOpener(): void {
     word.style.setProperty('--dyed', `${(landed / DROPS) * 100}%`);
   };
 
-  const finish = () => {
-    if (done) return;
-    done = true;
-    window.clearTimeout(timer);
-    final = true;
-    draw();
-    word.style.removeProperty('--dyed');
-    hero.classList.remove('is-dyeing', 'is-burst', 'is-titling');
-    root.classList.remove('opening');
+  const seen = () => {
     try {
       sessionStorage.setItem(SEEN, '1');
     } catch {
       /* storage blocked: the opener simply plays again next time */
     }
-    ['wheel', 'touchstart', 'keydown'].forEach((ev) => window.removeEventListener(ev, finish));
   };
 
-  size();
-  new ResizeObserver(() => {
+  /* Lift every hidden state first, then draw: a canvas failure must never
+     leave the hero hidden. */
+  const finish = () => {
+    if (done) return;
+    done = true;
+    window.clearTimeout(timer);
+    const hadFocus = hero.contains(document.activeElement) && document.activeElement?.matches('[data-skip]');
+    root.classList.remove('opening');
+    hero.classList.remove('is-dyeing', 'is-burst', 'is-titling');
+    word.style.removeProperty('--dyed');
+    try {
+      final = true;
+      draw();
+      hero.classList.add('has-blot');
+    } catch (err) {
+      console.error(err);
+      stage.classList.add('no-canvas');
+    }
+    seen();
+    ['wheel', 'touchstart', 'keydown'].forEach((ev) => window.removeEventListener(ev, finish));
+    // The skip button disappears: hand focus to the headline.
+    if (hadFocus) hero.querySelector<HTMLElement>('h1')?.focus();
+  };
+
+  const redraw = () => {
     size();
     draw();
-  }).observe(stage);
+  };
+  size();
+  new ResizeObserver(redraw).observe(stage);
+  // The word's box changes when the display font arrives.
+  document.fonts?.ready.then(redraw);
 
   if (!ctx) {
     stage.classList.add('no-canvas');
+    window.clearTimeout(window.__medadBoot?.opening);
     finish();
     return;
   }
@@ -249,24 +268,31 @@ export function initOpener(): void {
   stage.addEventListener('pointerdown', finish, { once: true });
   hero.querySelector('[data-skip]')?.addEventListener('click', finish);
 
+  // Seen as soon as it starts: leaving mid-opener does not replay it.
+  seen();
   hero.classList.add('is-dyeing');
-  const tick = () => {
-    if (done) return;
-    frame++;
-    draw();
-    dye();
-    if (frame === BURST_AT + 3) hero.classList.add('is-burst');
-    if (frame === END) {
-      hero.classList.add('is-titling');
-      timer = window.setTimeout(finish, 1500);
-      return;
-    }
-    timer = window.setTimeout(tick, FRAME);
-  };
-
   // Arriving under the ink flood: wait for the drain before the first drop.
   const wait = root.hasAttribute('data-flood') ? 480 : 150;
-  timer = window.setTimeout(tick, wait);
   // Never hold the page longer than the requirement allows.
-  window.setTimeout(finish, 4800 + wait);
+  window.setTimeout(finish, 4800);
+
+  const tick = () => {
+    if (done) return;
+    try {
+      frame++;
+      draw();
+      dye();
+      if (frame === BURST_AT + 3) hero.classList.add('is-burst', 'has-blot');
+      if (frame === END) {
+        hero.classList.add('is-titling');
+        timer = window.setTimeout(finish, 1500);
+        return;
+      }
+      timer = window.setTimeout(tick, FRAME);
+    } catch (err) {
+      console.error(err);
+      finish();
+    }
+  };
+  timer = window.setTimeout(tick, wait);
 }

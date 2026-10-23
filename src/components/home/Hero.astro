@@ -2,7 +2,9 @@
 /* Hero: the ink opener stage, the brand word written out of the ink, and the
    headline stamped in word by word (last word boxed in green). */
 import { site } from '../../content/site';
-import { BRAND } from '../../content/brand';
+import { BRAND, text } from '../../content/brand';
+
+const BRAND_LABEL = text('مداد');
 
 const { hero } = site.home;
 const words = hero.headline.split(' ');
@@ -10,13 +12,13 @@ const words = hero.headline.split(' ');
 <section class="hero" data-hero aria-labelledby="hero-title">
   <div class="hero__stage" data-stage>
     <canvas class="hero__ink" aria-hidden="true"></canvas>
-    <p class="hero__word" role="img" aria-label="مداد" data-word>
+    <p class="hero__word" role="img" aria-label={BRAND_LABEL} data-word>
       <span class="hero__outline brand-word" aria-hidden="true">{BRAND}</span>
       <span class="hero__fill brand-word" aria-hidden="true">{BRAND}</span>
     </p>
   </div>
 
-  <h1 class="hero__title display" id="hero-title">
+  <h1 class="hero__title display" id="hero-title" tabindex="-1">
     {words.map((w, i) => (
       <>
         <span class={i === words.length - 1 ? 'w hl' : 'w'}>{w}</span>{i < words.length - 1 ? ' ' : ''}
@@ -66,7 +68,10 @@ const words = hero.headline.split(' ');
   }
   .hero__outline,
   .hero__fill { grid-area: 1 / 1; }
-  .hero__fill { color: var(--paper); }
+  /* Ink on paper until the blot is drawn behind it, so the word never vanishes */
+  .hero__fill { color: var(--ink); }
+  .hero:global(.has-blot) .hero__fill,
+  .hero__stage:global(.no-canvas) .hero__fill { color: var(--paper); }
   .hero__outline { visibility: hidden; color: transparent; -webkit-text-stroke: max(2px, .012em) var(--ink); }
   /* No canvas: a flat ink slab stands in for the blot */
   .hero__stage:global(.no-canvas) { background: var(--ink); border: var(--bw) solid var(--ink); box-shadow: var(--sx) var(--off) 0 0 var(--green-500); }
@@ -88,7 +93,7 @@ const words = hero.headline.split(' ');
   .hero__line {
     max-inline-size: 46ch;
     padding: 14px 20px;
-    font-size: clamp(18px, 1.7vw, 23px);
+    font-size: clamp(19px, 1.7vw, 23px);
     line-height: 1.6;
     rotate: .6deg;
   }

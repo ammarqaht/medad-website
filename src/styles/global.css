@@ -134,7 +134,10 @@ main:focus-visible { outline: none; } /* skip-link target, not interactive */
     box-shadow var(--snap);
 }
 .js [data-pop].is-in { opacity: 1; scale: 1; }
-@media print { .js [data-pop] { opacity: 1 !important; scale: 1 !important; } }
+@media print {
+  .js [data-pop] { opacity: 1 !important; scale: 1 !important; }
+  .js [data-ink] { clip-path: none !important; }
+}
 
 /* ---------- Reduced motion: fades only ---------- */
 @media (prefers-reduced-motion: reduce) {
@@ -187,4 +190,5 @@ main:focus-visible { outline: none; } /* skip-link target, not interactive */
 @media (prefers-reduced-motion: reduce) {
   .js [data-ink]:not(.is-writing, .is-written) { clip-path: none; opacity: 0; }
   .js [data-ink].is-written { animation: page-fade .5s ease both; }
+  .hero__title:focus-visible { outline: none; }
 }

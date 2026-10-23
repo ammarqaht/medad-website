@@ -12,10 +12,10 @@ const back = onWork
   : { href: '/', label: site.nav.backHome };
 ---
 <header class="topbar">
-  <a class="topbar__logo" href="/" aria-label="مداد، الرئيسية">
+  <a class="topbar__logo" href="/" aria-label={site.nav.logo}>
     <img src="/logo/medad-mark-ink.png" alt="" width="808" height="267" />
   </a>
-  <nav class="topbar__nav" aria-label="التنقل">
+  <nav class="topbar__nav" aria-label={site.nav.label}>
     {inWorks ? (
       <a class="back" href={back.href} data-back data-label-home={site.nav.backHome} data-label-works={site.nav.backWorks}>
         <span class="back__arrow" aria-hidden="true"></span>

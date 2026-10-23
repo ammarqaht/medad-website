@@ -16,3 +16,12 @@ for (const init of [initPop, initInkWrite, initFlood, initBack, initPress]) {
 // Every reveal is wired: cancel boot.js's fail-open timer. If anything failed,
 // the timer lifts .js and all hidden content shows in its final state.
 if (ok) window.clearTimeout(window.__medadBoot?.js);
+
+// Safety net: whatever an observer missed is revealed in its final state.
+window.setTimeout(() => {
+  document.querySelectorAll('[data-pop]:not(.is-in)').forEach((el) => el.classList.add('is-in'));
+  document.querySelectorAll('[data-ink]:not(.is-writing, .is-written)').forEach((el) => {
+    const r = el.getBoundingClientRect();
+    if (r.top < window.innerHeight && r.bottom > 0) el.classList.add('is-written');
+  });
+}, 8000);
