@@ -6,3 +6,9 @@ docs
 reference
 assets
 *.md
+.env*
+.banned-words
+tests
+.shots
+test-results
+playwright-report
