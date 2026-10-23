@@ -4,7 +4,7 @@
 import { useState } from 'preact/hooks';
 import { DEFAULT_STUDENT, FIRST_NO, seedMembers, ui } from '../../data/tahfeez';
 import { Moves, More, Num } from './parts';
-import { ar, balance, byNo, pointsText, type Action, type State } from './store';
+import { balance, byNo, pointsText, type Action, type State } from './store';
 
 const S = ui.student;
 /** A pending member from the seed, so the waiting page can be seen without signing up. */
@@ -23,7 +23,7 @@ export function Student({ state, dispatch }: { state: State; dispatch: (a: Actio
         <span class="tf-who__label" aria-hidden="true">{S.whoLabel}</span>
         {who.map((no) => (
           <button type="button" key={no} class="tf-chip tf-chip--s" aria-pressed={me.no === no} onClick={() => dispatch({ type: 'view', no })}>
-            {ar(no)}
+            <Num n={no} />
           </button>
         ))}
       </div>
@@ -31,10 +31,11 @@ export function Student({ state, dispatch }: { state: State; dispatch: (a: Actio
       <div class="tf-card tf-me">
         <div>
           <h3 class="tf-h" id="tf-st-h">{S.hello} {me.name}</h3>
-          <p class="tf-row__meta">{ui.admin.no} {ar(me.no)}، {me.stage}</p>
+          <p class="tf-row__meta">{ui.admin.no} <Num n={me.no} />، {me.stage}</p>
         </div>
         {me.status === 'active' && (
-          <div class="tf-bal" aria-label={`${S.balance}: ${pointsText(total)}`}>
+          <div class="tf-bal">
+            <span class="tf-sr">{`${S.balance}: ${pointsText(total)}`}</span>
             <span class="tf-bal__label" aria-hidden="true">{S.balance}</span>
             <span class="tf-bal__num" aria-hidden="true"><Num n={total} /></span>
           </div>

@@ -56,7 +56,7 @@ export function RegForm({ head, onBack, onDone, onSay }: Props) {
   const stage = stages.find((s) => s.key === form.stage);
   const err = (k: Field) => errors[k];
   const described = (k: Field) => (errors[k] ? `tj-${k}-err` : undefined);
-  const Msg = ({ k }: { k: Field }) =>
+  const msg = (k: Field) =>
     errors[k] ? <p class="tj-err" id={`tj-${k}-err`}>{errors[k]}</p> : null;
 
   const text = (k: 'name' | 'nid' | 'phone' | 'district' | 'allergyText', numeric = false) => (
@@ -76,7 +76,7 @@ export function RegForm({ head, onBack, onDone, onSay }: Props) {
         aria-describedby={described(k)}
         onInput={(e) => set({ [k]: (e.currentTarget as HTMLInputElement).value } as Partial<Form>)}
       />
-      <Msg k={k} />
+      {msg(k)}
     </div>
   );
 
@@ -111,7 +111,7 @@ export function RegForm({ head, onBack, onDone, onSay }: Props) {
               </label>
             ))}
           </div>
-          <Msg k="stage" />
+          {msg('stage')}
         </fieldset>
 
         <fieldset class={`tj-group${err('grade') ? ' is-bad' : ''}`} aria-describedby={described('grade')} disabled={!stage}>
@@ -134,7 +134,7 @@ export function RegForm({ head, onBack, onDone, onSay }: Props) {
           ) : (
             <p class="tj-hint">{F.gradeFirst}</p>
           )}
-          <Msg k="grade" />
+          {msg('grade')}
         </fieldset>
 
         {text('district')}
@@ -155,7 +155,7 @@ export function RegForm({ head, onBack, onDone, onSay }: Props) {
               </label>
             ))}
           </div>
-          <Msg k="allergy" />
+          {msg('allergy')}
         </fieldset>
         {form.allergy === 'yes' && text('allergyText')}
 

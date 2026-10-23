@@ -33,7 +33,8 @@ const AR = '٠١٢٣٤٥٦٧٨٩';
 /** Arabic-Indic digits for display. */
 export const ar = (n: number | string): string => String(n).replace(/\d/g, (d) => AR[Number(d)]);
 /** Latin digits for checking (visitors type either kind). */
-export const latin = (s: string): string => s.replace(/[٠-٩]/g, (d) => String(d.charCodeAt(0) - 0x660));
+export const latin = (s: string): string =>
+  s.replace(/[\u0660-\u0669\u06F0-\u06F9]/g, (d) => String(d.charCodeAt(0) % 16));
 const digits = (s: string): string => latin(s).replace(/[\s-]/g, '');
 
 const ARABIC_NAME = /^[ء-يـ\s]+$/;

@@ -4,7 +4,7 @@
 import { useEffect, useRef, useState } from 'preact/hooks';
 import { ME, subKey, tasks, ui, type Task } from '../../data/injaz';
 import { Board, More, Num, StatusChip } from './parts';
-import { ar, personById, pointsText, standings, type Action, type State } from './store';
+import { personById, pointsText, standings, type Action, type State } from './store';
 
 const M = ui.member;
 type Tab = 'tasks' | 'board';
@@ -43,11 +43,11 @@ export function Member({ state, dispatch, onSay, onScrollTop }: Props) {
         <dl class="ij-me__stats">
           <div class="ij-stat">
             <dt>{M.myPoints}</dt>
-            <dd aria-label={pointsText(me.points)}>{ar(me.points)}</dd>
+            <dd><Num n={me.points} /></dd>
           </div>
           <div class="ij-stat ij-stat--ink">
             <dt>{M.myRank}</dt>
-            <dd>{ar(me.rank)}</dd>
+            <dd><Num n={me.rank} /></dd>
           </div>
         </dl>
       </div>
@@ -89,9 +89,9 @@ export function Member({ state, dispatch, onSay, onScrollTop }: Props) {
                           <StatusChip status={s?.status ?? 'none'} />
                           <span class="ij-item__pts">
                             {s?.status === 'approved' ? (
-                              <><Num n={s.grade} /> {ui.of} {ar(t.max)}</>
+                              <><Num n={s.grade} /> {ui.of} <Num n={t.max} /></>
                             ) : (
-                              <>{M.maxPts} {ar(t.max)}</>
+                              <>{M.maxPts} <Num n={t.max} /></>
                             )}
                           </span>
                         </span>
@@ -156,7 +156,7 @@ function TaskPage({ task, state, dispatch, onSay, onBack }: TaskProps) {
           {sub.status === 'approved' && (
             <p class="ij-grade">
               <span class="ij-grade__label">{M.grade}</span>
-              <span class="ij-grade__num"><Num n={sub.grade} /> <small>{ui.of} {ar(task.max)}</small></span>
+              <span class="ij-grade__num"><Num n={sub.grade} /> <small>{ui.of} <Num n={task.max} /></small></span>
             </p>
           )}
           {sub.feedback && (

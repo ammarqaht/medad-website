@@ -5,7 +5,8 @@
    follows the real product: participants submit a text answer per task (one
    submission per participant per task, updated in place), supervisors review
    it with a grade and feedback or ask for a redo, and the leaderboard ranks by
-   points. A submission can be sent again only after a redo request. */
+   points. A submission can be sent again only after a redo request. Shown
+   values are zero-free on purpose (DESIGN.md §8). */
 
 export type Role = 'member' | 'admin';
 export type SubStatus = 'pending' | 'approved' | 'returned';
@@ -37,19 +38,19 @@ export interface Submission {
 export const ME = 'p1';
 
 export const tasks: Task[] = [
-  { id: 't1', title: 'عرّف بنفسك', brief: 'اكتب فقرة قصيرة عن نفسك وما تريد أن تتعلمه في البرنامج.', max: 10, due: 'انتهى موعدها' },
+  { id: 't1', title: 'عرّف بنفسك', brief: 'اكتب فقرة قصيرة عن نفسك وما تريد أن تتعلمه في البرنامج.', max: 12, due: 'انتهى موعدها' },
   { id: 't2', title: 'خطة الأسبوع', brief: 'ضع ثلاثة أهداف لهذا الأسبوع، وكيف ستقيس كل هدف.', max: 15, due: 'تنتهي الخميس' },
-  { id: 't3', title: 'ملخص كتاب', brief: 'لخّص فكرة كتاب قرأته في خمسة أسطر، واذكر ما ستطبقه منه.', max: 20, due: 'تنتهي الأحد' },
-  { id: 't4', title: 'فكرة مبادرة', brief: 'اقترح مبادرة صغيرة تخدم مدرستك أو حيّك، ومن يشاركك فيها.', max: 10, due: 'تنتهي بعد أسبوع' },
+  { id: 't3', title: 'ملخص كتاب', brief: 'لخّص فكرة كتاب قرأته في خمسة أسطر، واذكر ما ستطبقه منه.', max: 25, due: 'تنتهي الأحد' },
+  { id: 't4', title: 'فكرة مبادرة', brief: 'اقترح مبادرة صغيرة تخدم مدرستك أو حيّك، ومن يشاركك فيها.', max: 14, due: 'تنتهي بعد أسبوع' },
 ];
 
 export const people: Person[] = [
-  { id: 'p1', name: 'أنس رائد', base: 52, doneBefore: 5 },
-  { id: 'p2', name: 'يزن عادل', base: 61, doneBefore: 6 },
+  { id: 'p1', name: 'أنس رائد', base: 56, doneBefore: 5 },
+  { id: 'p2', name: 'يزن عادل', base: 63, doneBefore: 6 },
   { id: 'p3', name: 'قصي ماهر', base: 47, doneBefore: 5 },
   { id: 'p4', name: 'جواد هاني', base: 66, doneBefore: 7 },
   { id: 'p5', name: 'معتز فيصل', base: 39, doneBefore: 4 },
-  { id: 'p6', name: 'غيث سامر', base: 55, doneBefore: 6 },
+  { id: 'p6', name: 'غيث سامر', base: 59, doneBefore: 6 },
   { id: 'p7', name: 'ليث مراد', base: 33, doneBefore: 4 },
 ];
 
@@ -59,16 +60,16 @@ export const subKey = (person: string, task: string): string => `${person}:${tas
 export function seedSubs(): Record<string, Submission> {
   const s = (text: string, status: SubStatus, grade = 0, feedback = ''): Submission => ({ text, status, grade, feedback, sent: 1 });
   return {
-    [subKey('p1', 't1')]: s('أحب البرمجة والقراءة، وأريد أن أتعلم كيف أدير وقتي وأعرض أفكاري بثقة.', 'approved', 8, 'بداية موفقة، أضف مثالاً في المرة القادمة.'),
+    [subKey('p1', 't1')]: s('أحب البرمجة والقراءة، وأريد أن أتعلم كيف أدير وقتي وأعرض أفكاري بثقة.', 'approved', 9, 'بداية موفقة، أضف مثالاً في المرة القادمة.'),
     [subKey('p1', 't2')]: s('أقرأ عشرين صفحة كل يوم، وأنهي واجباتي قبل المغرب، وأمشي ثلاث مرات.', 'pending'),
     [subKey('p1', 't3')]: s('كتاب عن العادات الصغيرة.', 'returned', 0, 'الملخص قصير جداً، اذكر الفكرة وما ستطبقه.'),
-    [subKey('p2', 't1')]: s('أنا مهتم بالتصميم، وأريد أن أتعلم العمل في فريق.', 'approved', 9, 'جميل.'),
+    [subKey('p2', 't1')]: s('أنا مهتم بالتصميم، وأريد أن أتعلم العمل في فريق.', 'approved', 11, 'جميل.'),
     [subKey('p2', 't2')]: s('هدفي الأول حفظ صفحتين، والثاني تمرين يومي، والثالث ترتيب غرفتي.', 'pending'),
     [subKey('p3', 't3')]: s('قرأت كتاباً عن التفكير الناقد: نسأل قبل أن نصدق، ونبحث عن الدليل، وسأطبق ذلك في قراءة الأخبار.', 'pending'),
-    [subKey('p4', 't1')]: s('أحب الرياضة والعلوم، وأريد أن أتعلم الخطابة.', 'approved', 10, 'ممتاز.'),
+    [subKey('p4', 't1')]: s('أحب الرياضة والعلوم، وأريد أن أتعلم الخطابة.', 'approved', 12, 'ممتاز.'),
     [subKey('p4', 't4')]: s('مكتبة صغيرة في فناء المدرسة يتبادل فيها الطلاب الكتب، ويشاركني فيها صفي.', 'pending'),
     [subKey('p5', 't2')]: s('أنام مبكراً، وأقرأ كل يوم، وأساعد أخي في دروسه.', 'pending'),
-    [subKey('p6', 't1')]: s('أحب الرسم، وأريد أن أتعلم إدارة المشاريع.', 'approved', 7, 'أحسنت.'),
+    [subKey('p6', 't1')]: s('أحب الرسم، وأريد أن أتعلم إدارة المشاريع.', 'approved', 8, 'أحسنت.'),
   };
 }
 

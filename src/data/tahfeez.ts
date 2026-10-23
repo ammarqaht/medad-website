@@ -3,7 +3,7 @@
    are kept: the short sign-up form asks for an example ID that is checked for
    shape and then dropped. The state lives in memory only and is rebuilt from
    this file on reset or reload. Structure follows the real product: sign-up
-   issues a membership number from 1001 at once, the registration waits for a
+   issues the next membership number at once, the registration waits for a
    supervisor's approval, the supervisor grants or deducts points with a
    reason, and the student sees the balance and the latest moves. */
 
@@ -23,54 +23,56 @@ export interface Member {
   moves: Move[];
 }
 
-/** Membership numbers start at 1001 (the product's sequence). */
-export const FIRST_NO = 1001;
+/** Membership numbers run in sequence like the product's (which starts at
+    1001), here from a zero-free start; issued numbers skip any with a zero
+    digit (a lone Arabic-Indic zero reads as a letter dot, DESIGN.md §8). */
+export const FIRST_NO = 1211;
 
 export const STAGES = ['ابتدائي', 'متوسط', 'ثانوي'] as const;
 
 /** The supervisor picks an amount from these. */
-export const AMOUNTS = [5, 10, 20, -5, -10] as const;
+export const AMOUNTS = [5, 15, 25, -5, -15] as const;
 
 /** Reasons offered as one tap fills; the field stays free text. */
 export const REASONS = ['مشاركة في نشاط', 'حضور مبكر', 'مساعدة زميل'] as const;
 
 /** The student portal opens on this active member until someone signs up. */
-export const DEFAULT_STUDENT = 1003;
+export const DEFAULT_STUDENT = 1213;
 
 export function seedMembers(): Member[] {
   return [
     {
-      no: 1001,
+      no: 1211,
       name: 'ماجد سلطان',
       stage: 'متوسط',
       status: 'active',
       moves: [
-        { delta: 20, reason: 'فوز في مسابقة', when: 'قبل أسبوع' },
-        { delta: 15, reason: 'حضور الأسبوع كاملاً', when: 'قبل أيام' },
+        { delta: 25, reason: 'فوز في مسابقة', when: 'قبل أسبوع' },
+        { delta: 17, reason: 'حضور الأسبوع كاملاً', when: 'قبل أيام' },
       ],
     },
-    { no: 1002, name: 'هشام وليد', stage: 'ثانوي', status: 'rejected', moves: [] },
+    { no: 1212, name: 'هشام وليد', stage: 'ثانوي', status: 'rejected', moves: [] },
     {
-      no: 1003,
+      no: 1213,
       name: 'سلمان عمار',
       stage: 'متوسط',
       status: 'active',
       moves: [
         { delta: 25, reason: 'نقاط الترحيب', when: 'قبل أسبوعين' },
-        { delta: 10, reason: 'مشاركة في نشاط', when: 'قبل أسبوع' },
+        { delta: 15, reason: 'مشاركة في نشاط', when: 'قبل أسبوع' },
         { delta: -5, reason: 'تأخر عن الموعد', when: 'قبل أيام' },
-        { delta: 15, reason: 'حضور الأسبوع كاملاً', when: 'أمس' },
+        { delta: 17, reason: 'حضور الأسبوع كاملاً', when: 'أمس' },
       ],
     },
     {
-      no: 1004,
+      no: 1214,
       name: 'نواف بسام',
       stage: 'ابتدائي',
       status: 'active',
-      moves: [{ delta: 30, reason: 'إتمام مشروع', when: 'قبل أيام' }],
+      moves: [{ delta: 37, reason: 'إتمام مشروع', when: 'قبل أيام' }],
     },
-    { no: 1005, name: 'عمر ياسر', stage: 'ثانوي', status: 'pending', moves: [] },
-    { no: 1006, name: 'طلال مهدي', stage: 'ابتدائي', status: 'pending', moves: [] },
+    { no: 1215, name: 'عمر ياسر', stage: 'ثانوي', status: 'pending', moves: [] },
+    { no: 1216, name: 'طلال مهدي', stage: 'ابتدائي', status: 'pending', moves: [] },
   ];
 }
 

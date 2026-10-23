@@ -22,14 +22,18 @@ export function reducer(state: State, action: Action): State {
       // one record per participant per task: update it in place (upsert)
       const k = subKey(action.person, action.task);
       const old = state.subs[k];
+      // a submission is sent once, and again only after a redo request
+      if (old && old.status !== 'returned') return state;
       const next: Submission = { text: action.text, status: 'pending', grade: 0, feedback: '', sent: (old?.sent ?? 0) + 1 };
       return { ...state, subs: { ...state.subs, [k]: next } };
     }
     case 'review': {
       const old = state.subs[action.key];
-      if (!old) return state;
+      if (!old || old.status !== 'pending') return state;
+      const max = taskById(action.key.split(':')[1]).max;
+      const grade = Math.min(max, Math.max(0, Math.round(action.grade)));
       const next: Submission = action.ok
-        ? { ...old, status: 'approved', grade: action.grade, feedback: action.feedback }
+        ? { ...old, status: 'approved', grade, feedback: action.feedback }
         : { ...old, status: 'returned', grade: 0, feedback: action.feedback };
       return { ...state, subs: { ...state.subs, [action.key]: next } };
     }

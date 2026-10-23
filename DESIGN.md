@@ -408,6 +408,8 @@ try/catch so one failure cannot block the others. A reload resets scroll to the 
   (a bead above «تعمل» read as «تغمل»). Stickers live on corners and edges, away from words. Around the opener
   blot there are **no dots or circles** (only straight impact strokes). The Arabic-Indic **zero** is a lone dot, so
   in the demos zero is drawn as an empty square (5.12). Never put a visible "٠" in a table or counter.
+  The rule covers zeros **inside** numbers too (١٠ or ١٢٠٤ show a dot between digits): demo data uses zero-free
+  values, and computed values draw every zero digit as the square.
 - **Never split Arabic words into per-letter spans** (breaks joining). Animate whole words or whole lines only
   (ink writing splits by word and measures lines by `offsetTop`; the hero stamps words).
 - **A fully clipped element never intersects an observer.** Ink headings are hidden with `clip-path`, so the

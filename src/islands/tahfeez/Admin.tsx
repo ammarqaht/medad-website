@@ -58,6 +58,8 @@ export function Admin({ state, dispatch, onSay, onScrollTop }: Props) {
     const m = byNo(state.members, no)!;
     dispatch({ type: 'decide', no, ok });
     onSay(ok ? A.approved(m.name) : A.rejected(m.name));
+    // the clicked button leaves the DOM: keep focus inside the list
+    requestAnimationFrame(() => listHead.current?.focus());
   };
 
   return (
@@ -76,7 +78,7 @@ export function Admin({ state, dispatch, onSay, onScrollTop }: Props) {
             <li class={`tf-row tf-row--${m.status}`} key={m.no}>
               <div class="tf-row__who">
                 <span class="tf-row__name">{m.name}</span>
-                <span class="tf-row__meta">{A.no} {ar(m.no)}، {m.stage}</span>
+                <span class="tf-row__meta">{A.no} <Num n={m.no} />، {m.stage}</span>
               </div>
               <StatusChip status={m.status} />
               {m.status === 'pending' && (
@@ -91,7 +93,7 @@ export function Admin({ state, dispatch, onSay, onScrollTop }: Props) {
               )}
               {m.status === 'active' && (
                 <div class="tf-row__acts">
-                  <span class="tf-row__pts" aria-label={pointsText(balance(m))}><Num n={balance(m)} /> <small>{ui.points}</small></span>
+                  <span class="tf-row__pts"><Num n={balance(m)} /> <small>{ui.points}</small></span>
                   <button type="button" class="tf-btn tf-btn--sm" onClick={() => { setOpen(m.no); onScrollTop(); }}>
                     {A.points}<span class="tf-sr"> {m.name}</span>
                   </button>
@@ -156,11 +158,11 @@ function Points({ member, dispatch, onSay, onBack }: PointsProps) {
       <div class="tf-card tf-points__head">
         <div>
           <h3 class="tf-h" id="tf-pts-h" tabIndex={-1} ref={head}>{member.name}</h3>
-          <p class="tf-row__meta">{A.no} {ar(member.no)}، {member.stage}</p>
+          <p class="tf-row__meta">{A.no} <Num n={member.no} />، {member.stage}</p>
         </div>
         <div class="tf-bal tf-bal--sm">
           <span class="tf-bal__label">{A.balance}</span>
-          <span class="tf-bal__num" aria-live="polite"><Num n={total} /></span>
+          <span class="tf-bal__num"><Num n={total} /></span>
         </div>
       </div>
 

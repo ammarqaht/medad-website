@@ -408,3 +408,5 @@
   .tf-role[aria-pressed="true"], .tf-chip[aria-pressed="true"], .tf-btn:hover, .tf button:active,
   .tf-opt input:checked + span { translate: none; }
 }
+
+.tf-num { white-space: nowrap; }

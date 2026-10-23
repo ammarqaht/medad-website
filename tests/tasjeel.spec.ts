@@ -80,6 +80,20 @@ test.describe('Tasjeel demo', () => {
     expect(touched).toEqual([]);
   });
 
+  test('should accept a form typed by hand in Arabic-Indic and Persian digits', async ({ page }) => {
+    const demo = await open(page);
+    await demo.getByRole('button', { name: 'سجّل', exact: true }).click();
+    await demo.getByLabel('اسم الطالب الرباعي').fill('سامي فهد خالد المثالي');
+    await demo.getByLabel('رقم الهوية').fill('١١١١١١١١١١');
+    await demo.getByLabel('جوال ولي الأمر').fill('۵۵۵۵۵۵۵۵۵');
+    await demo.getByLabel('ثانوي').check();
+    await demo.getByLabel('الثالث').check();
+    await demo.getByLabel('الحي').fill('حي المثال');
+    await demo.getByLabel('لا', { exact: true }).check();
+    await demo.getByRole('button', { name: 'إتمام التسجيل' }).click();
+    await expect(demo.getByRole('heading', { name: 'تم التسجيل' })).toBeFocused();
+  });
+
   test('should fit a phone without horizontal scroll and keep text at 14px or more', async ({ page }) => {
     await page.setViewportSize({ width: 375, height: 760 });
     const demo = await open(page);

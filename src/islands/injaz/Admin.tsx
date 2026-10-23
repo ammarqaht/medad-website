@@ -87,7 +87,7 @@ export function Admin({ state, dispatch, onSay, onScrollTop }: Props) {
                           <span class="ij-sub__task">{task.title}</span>
                         </div>
                         {s.status === 'approved' ? (
-                          <span class="ij-sub__grade"><Num n={s.grade} /> <small>{ui.of} {ar(task.max)}</small></span>
+                          <span class="ij-sub__grade"><Num n={s.grade} /> <small>{ui.of} <Num n={task.max} /></small></span>
                         ) : s.status === 'pending' ? (
                           <button type="button" class="ij-btn ij-btn--sm" onClick={() => { setOpen(k); onScrollTop(); }}>
                             {A.review}<span class="ij-sr"> {person.name}، {task.title}</span>
@@ -124,7 +124,7 @@ function Review({ k, state, dispatch, onSay, onDone }: ReviewProps) {
   const [p, t] = k.split(':');
   const person = personById(p);
   const task = taskById(t);
-  const [grade, setGrade] = useState(Math.ceil(task.max * 0.8));
+  const [grade, setGrade] = useState(task.max - 3);
   const [feedback, setFeedback] = useState('');
   const [error, setError] = useState('');
   const head = useRef<HTMLHeadingElement>(null);
@@ -164,14 +164,14 @@ function Review({ k, state, dispatch, onSay, onDone }: ReviewProps) {
       <div class="ij-card ij-form">
         <div class="ij-stepper" role="group" aria-labelledby="ij-grade-l">
           <span class="ij-stepper__label" id="ij-grade-l">{A.grade}</span>
-          <button type="button" class="ij-stepper__btn" aria-label={A.less} disabled={grade <= 0} onClick={() => setGrade(grade - 1)}>
+          <button type="button" class="ij-stepper__btn" aria-label={A.less} aria-disabled={grade <= 0 ? 'true' : undefined} onClick={() => grade > 0 && setGrade(grade - 1)}>
             <span class="ij-minus" aria-hidden="true"></span>
           </button>
           <output class="ij-stepper__val" aria-live="polite"><Num n={grade} /></output>
-          <button type="button" class="ij-stepper__btn" aria-label={A.more} disabled={grade >= task.max} onClick={() => setGrade(grade + 1)}>
+          <button type="button" class="ij-stepper__btn" aria-label={A.more} aria-disabled={grade >= task.max ? 'true' : undefined} onClick={() => grade < task.max && setGrade(grade + 1)}>
             <span class="ij-plus" aria-hidden="true"></span>
           </button>
-          <span class="ij-stepper__of">{ui.of} {ar(task.max)}</span>
+          <span class="ij-stepper__of">{ui.of} <Num n={task.max} /></span>
         </div>
         <div class="ij-field">
           <label for="ij-fb">{A.feedback}</label>

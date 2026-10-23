@@ -12,6 +12,14 @@ import './tasjeel.css';
 export default function TasjeelDemo() {
   const [state, setState] = useState<State>(initial);
   const [said, setSaid] = useState('');
+  const sayTimer = useRef(0);
+  useEffect(() => () => window.clearTimeout(sayTimer.current), []);
+  /** Clear, then set, so the same message is announced again when repeated. */
+  const say = (m: string) => {
+    setSaid('');
+    window.clearTimeout(sayTimer.current);
+    sayTimer.current = window.setTimeout(() => setSaid(m), 60);
+  };
   const [epoch, setEpoch] = useState(0);
   const root = useRef<HTMLDivElement>(null);
   const head = useRef<HTMLHeadingElement>(null);
@@ -38,14 +46,15 @@ export default function TasjeelDemo() {
   const reset = () => {
     setState(initial());
     setEpoch((e) => e + 1);
-    setSaid(ui.resetDone);
+    say(ui.resetDone);
     scrollTop();
   };
 
   const submit = (first: string) => {
     const member = nextMember(state.issued);
     go('done', { issued: state.issued + 1, member, first });
-    setSaid(ui.done.said(ar(member)));
+    // the heading takes focus and reads «تم التسجيل»; the live region adds only the number
+    say(ui.done.said(ar(member)));
   };
 
   const D = ui.done;
@@ -93,7 +102,7 @@ export default function TasjeelDemo() {
         )}
 
         {state.step === 'form' && (
-          <RegForm head={head} onBack={() => go('intro')} onDone={submit} onSay={setSaid} />
+          <RegForm head={head} onBack={() => go('intro')} onDone={submit} onSay={say} />
         )}
 
         {state.step === 'done' && (

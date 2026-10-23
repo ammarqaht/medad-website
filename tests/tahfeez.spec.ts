@@ -38,7 +38,7 @@ test.describe('Tahfeez demo', () => {
 
     await demo.getByRole('button', { name: 'املأ بمثال' }).click();
     await demo.getByRole('button', { name: 'أرسل الطلب' }).click();
-    await expect(demo.locator('.tf-no__num')).toHaveText('١٠٠٧');
+    await expect(demo.locator('.tf-no__num')).toHaveText('١٢١٧');
     await expect(demo.getByRole('heading', { name: 'وصل طلبك' })).toBeFocused();
 
     // the student sees the waiting page
@@ -58,22 +58,23 @@ test.describe('Tahfeez demo', () => {
 
     await demo.getByRole('button', { name: 'سجّل الحركة' }).click();
     await expect(demo.getByText('اختر المقدار.')).toBeVisible();
-    await demo.getByRole('radio', { name: 'إضافة ٢٠ نقطة' }).check();
+    await demo.getByRole('radio', { name: 'إضافة ٢٥ نقطة' }).check();
     await demo.getByRole('button', { name: 'سجّل الحركة' }).click();
     await expect(demo.getByText('اكتب سبب الحركة.')).toBeVisible();
     await demo.getByRole('button', { name: 'حضور مبكر' }).click();
     await demo.getByRole('button', { name: 'سجّل الحركة' }).click();
-    await expect(demo.locator('.tf-bal__num')).toHaveText('٢٠');
+    await expect(demo.locator('.tf-bal__num')).toHaveText('٢٥');
 
-    // a deduction larger than the balance is refused
-    await demo.getByRole('radio', { name: 'خصم ١٠ نقاط' }).check();
+    // a deduction; the zero inside the new balance is drawn as a square
+    await demo.getByRole('radio', { name: 'خصم ١٥ نقطة' }).check();
     await demo.getByLabel('السبب').fill('تأخر');
     await demo.getByRole('button', { name: 'سجّل الحركة' }).click();
-    await expect(demo.locator('.tf-bal__num')).toHaveText('١٠');
+    await expect(demo.locator('.tf-bal__num .tf-num')).toHaveAttribute('aria-label', '١٠');
+    await expect(demo.locator('.tf-bal__num .tf-zero')).toHaveCount(1);
 
     // the student sees the new balance in the same session
     await role(demo, 'طالب').click();
-    await expect(demo.locator('.tf-bal')).toHaveAttribute('aria-label', 'رصيدي: ١٠ نقاط');
+    await expect(demo.locator('.tf-bal .tf-sr')).toHaveText('رصيدي: ١٠ نقاط');
     await expect(demo.locator('.tf-moves li')).toHaveCount(2);
 
     // reject a pending one
@@ -98,13 +99,13 @@ test.describe('Tahfeez demo', () => {
     const demo = await open(page);
     await role(demo, 'مشرف').click();
     await demo.locator('.tf-row', { hasText: 'نواف بسام' }).getByRole('button', { name: /النقاط/ }).click();
-    for (let i = 0; i < 4; i++) {
-      await demo.getByRole('radio', { name: 'خصم ١٠ نقاط' }).check();
+    for (let i = 0; i < 3; i++) {
+      await demo.getByRole('radio', { name: 'خصم ١٥ نقطة' }).check();
       await demo.getByLabel('السبب').fill('تأخر');
       await demo.getByRole('button', { name: 'سجّل الحركة' }).click();
     }
     await expect(demo.getByText('الرصيد لا يكفي لهذا الخصم.')).toBeVisible();
-    await expect(demo.locator('.tf-bal__num .tf-zero')).toHaveCount(1);
+    await expect(demo.locator('.tf-bal__num')).toHaveText('٧');
   });
 
   test('should clip long lists on a phone, with no horizontal scroll and no text under 14px', async ({ page }) => {

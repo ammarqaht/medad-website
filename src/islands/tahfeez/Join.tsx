@@ -5,6 +5,7 @@
 import type { RefObject } from 'preact';
 import { useRef, useState } from 'preact/hooks';
 import { STAGES, ui, type Role } from '../../data/tahfeez';
+import { Num } from './parts';
 import { ar, latin, nextNo, type Action, type State } from './store';
 
 const J = ui.join;
@@ -77,7 +78,7 @@ export function Join({ state, dispatch, head, onRole, onSay }: Props) {
         <h3 class="tf-h" id="tf-done-h" tabIndex={-1} ref={doneHead}>{J.doneTitle}</h3>
         <div class="tf-no">
           <span class="tf-no__label">{J.doneNo}</span>
-          <span class="tf-no__num">{ar(done)}</span>
+          <span class="tf-no__num"><Num n={done} /></span>
         </div>
         <p class="tf-done__line"><span class="tf-status tf-status--pending">{ui.status.pending}</span> {J.doneLine}</p>
         <div class="tf-actions">
@@ -90,7 +91,8 @@ export function Join({ state, dispatch, head, onRole, onSay }: Props) {
   }
 
   const bad = (k: Field) => (errors[k] ? { 'aria-invalid': 'true' as const, 'aria-describedby': `tf-${k}-err` } : {});
-  const Msg = ({ k }: { k: Field }) => (errors[k] ? <p class="tf-err" id={`tf-${k}-err`}>{errors[k]}</p> : null);
+  const msg = (k: Field) =>
+    (errors[k] ? <p class="tf-err" id={`tf-${k}-err`}>{errors[k]}</p> : null);
 
   return (
     <section class="tf-join" aria-labelledby="tf-join-h">
@@ -117,7 +119,7 @@ export function Join({ state, dispatch, head, onRole, onSay }: Props) {
               onInput={(e) => setName((e.currentTarget as HTMLInputElement).value)}
               {...bad('name')}
             />
-            <Msg k="name" />
+            {msg('name')}
           </div>
           <div class={`tf-field${errors.nid ? ' is-bad' : ''}`}>
             <label for="tf-nid">{J.nid}</label>
@@ -133,7 +135,7 @@ export function Join({ state, dispatch, head, onRole, onSay }: Props) {
               onInput={(e) => setNid((e.currentTarget as HTMLInputElement).value)}
               {...bad('nid')}
             />
-            <Msg k="nid" />
+            {msg('nid')}
           </div>
         </div>
         <fieldset class={`tf-group${errors.stage ? ' is-bad' : ''}`} aria-describedby={errors.stage ? 'tf-stage-err' : undefined}>
@@ -152,7 +154,7 @@ export function Join({ state, dispatch, head, onRole, onSay }: Props) {
               </label>
             ))}
           </div>
-          <Msg k="stage" />
+          {msg('stage')}
         </fieldset>
         <button type="submit" class="tf-btn tf-btn--go">{J.submit}</button>
       </form>

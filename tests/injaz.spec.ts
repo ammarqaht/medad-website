@@ -61,8 +61,12 @@ test.describe('Injaz demo', () => {
     await expect(demo.getByRole('heading', { name: 'أنس رائد' })).toBeFocused();
     await demo.getByRole('button', { name: 'طلب إعادة' }).click();
     await expect(demo.getByText('اكتب ملاحظة توضح المطلوب إعادته.')).toBeVisible();
-    for (let i = 0; i < 4; i++) await demo.getByRole('button', { name: 'زيادة التقييم' }).click();
-    await expect(demo.getByRole('button', { name: 'زيادة التقييم' })).toBeDisabled();
+    for (let i = 0; i < 3; i++) await demo.getByRole('button', { name: 'زيادة التقييم' }).click();
+    await expect(demo.getByRole('button', { name: 'زيادة التقييم' })).toHaveAttribute('aria-disabled', 'true');
+    // the guard keeps the grade at the task maximum even when clicked
+    await demo.getByRole('button', { name: 'زيادة التقييم' }).click({ force: true });
+    await expect(demo.locator('.ij-stepper__val')).toHaveText('٢٥');
+    await demo.getByRole('button', { name: 'إنقاص التقييم' }).click();
     await demo.getByRole('button', { name: 'قبول وتقييم' }).click();
     await expect(demo.getByRole('button', { name: /قيد المراجعة/ })).toContainText('٦');
 
@@ -74,7 +78,7 @@ test.describe('Injaz demo', () => {
 
     // participant: new grade, points and rank
     await role(demo, 'مشارك').click();
-    await expect(demo.locator('.ij-item', { hasText: 'ملخص كتاب' })).toContainText('٢٠ من ٢٠');
+    await expect(demo.locator('.ij-item', { hasText: 'ملخص كتاب' })).toContainText('٢٤ من ٢٥');
     await expect(demo.locator('.ij-stat--ink dd')).toHaveText('١');
     await demo.getByRole('button', { name: 'الصدارة' }).click();
     await expect(demo.locator('.ij-board__row').first()).toHaveClass(/is-me/);

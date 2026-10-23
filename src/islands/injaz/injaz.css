@@ -95,8 +95,8 @@
   background: currentColor;
   clip-path: polygon(0 0, 100% 0, 100% 100%, 30% 100%, 30% 70%, 70% 70%, 70% 30%, 30% 30%, 30% 50%, 0 25%);
 }
-.ij-tool:hover, .ij-chip:hover, .ij-back:hover, .ij-more:hover, .ij-stepper__btn:hover:not(:disabled) { background: var(--green-300); }
-.ij-tool:active, .ij-btn:active, .ij-chip:active, .ij-back:active, .ij-stepper__btn:active { translate: var(--ij-sx) var(--ij-off); box-shadow: none; }
+.ij-tool:hover, .ij-chip:hover, .ij-back:hover, .ij-more:hover, .ij-stepper__btn:hover:not([aria-disabled="true"]) { background: var(--green-300); }
+.ij-tool:active, .ij-btn:active, .ij-chip:active, .ij-back:active, .ij-stepper__btn:active:not([aria-disabled="true"]) { translate: var(--ij-sx) var(--ij-off); box-shadow: none; }
 @container (min-width: 560px) {
   .ij-bar { flex-wrap: nowrap; padding: 10px 14px; }
   .ij-bar__brand { margin-inline-end: 0; font-size: 24px; }
@@ -325,7 +325,7 @@
   background: var(--white);
   box-shadow: var(--ij-shadow-s);
 }
-.ij-stepper__btn:disabled { background: var(--paper); color: var(--ink-muted); box-shadow: none; cursor: not-allowed; }
+.ij-stepper__btn[aria-disabled="true"] { background: var(--paper); color: var(--ink-muted); box-shadow: none; cursor: not-allowed; }
 .ij-minus, .ij-plus { inline-size: 16px; block-size: 16px; background: currentColor; }
 .ij-minus { clip-path: polygon(0 38%, 100% 38%, 100% 62%, 0 62%); }
 .ij-plus { clip-path: polygon(38% 0, 62% 0, 62% 38%, 100% 38%, 100% 62%, 62% 62%, 62% 100%, 38% 100%, 38% 62%, 0 62%, 0 38%, 38% 38%); }
@@ -397,3 +397,5 @@
   .ij-role[aria-pressed="true"], .ij-chip[aria-pressed="true"], .ij-tab[aria-current="page"], .ij-btn:hover,
   .ij button:active { translate: none; }
 }
+
+.ij-num { white-space: nowrap; }

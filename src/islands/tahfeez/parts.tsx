@@ -2,17 +2,26 @@
 import { ui, type Move, type Status } from '../../data/tahfeez';
 import { ar, pointsText } from './store';
 
-/** A number for display. Zero is a flat square outline: the Arabic-Indic zero
-    is a lone dot and reads as a stray letter dot (DESIGN.md §8). */
+/** A number for display. Every zero digit, alone or inside a number, is a
+    flat square outline: the Arabic-Indic zero is a lone dot and reads as a
+    stray letter dot (DESIGN.md §8). The digits stay whole for assistive tech. */
 export function Num({ n }: { n: number }) {
-  return n === 0 ? <span class="tf-zero" role="img" aria-label="صفر"></span> : <>{ar(n)}</>;
+  if (n === 0) return <span class="tf-zero" role="img" aria-label="صفر"></span>;
+  const s = ar(n);
+  if (!s.includes('٠')) return <>{s}</>;
+  return (
+    <span class="tf-num" role="img" aria-label={s}>
+      {[...s].map((d, i) => (d === '٠' ? <span key={i} class="tf-zero" aria-hidden="true"></span> : d))}
+    </span>
+  );
 }
 
 /** A signed point move, read out in words. */
 export function Delta({ n }: { n: number }) {
   return (
-    <span class={`tf-delta ${n < 0 ? 'is-down' : 'is-up'}`} aria-label={`${n < 0 ? 'خصم' : 'إضافة'} ${pointsText(n)}`}>
-      <span aria-hidden="true" dir="ltr">{n < 0 ? '−' : '+'}{ar(Math.abs(n))}</span>
+    <span class={`tf-delta ${n < 0 ? 'is-down' : 'is-up'}`}>
+      <span class="tf-sr">{`${n < 0 ? 'خصم' : 'إضافة'} ${pointsText(n)}`}</span>
+      <span aria-hidden="true" dir="ltr">{n < 0 ? '−' : '+'}<Num n={Math.abs(n)} /></span>
     </span>
   );
 }

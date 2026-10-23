@@ -1,12 +1,20 @@
 /* Small shared pieces of the Injaz demo: numbers, status chip, leaderboard. */
 import { useState } from 'preact/hooks';
 import { ME, ui, type SubStatus } from '../../data/injaz';
-import { ar, pointsText, standings, type State } from './store';
+import { ar, standings, type State } from './store';
 
-/** A number for display. Zero is a flat square outline: the Arabic-Indic zero
-    is a lone dot and reads as a stray letter dot (DESIGN.md §8). */
+/** A number for display. Every zero digit, alone or inside a number, is a
+    flat square outline: the Arabic-Indic zero is a lone dot and reads as a
+    stray letter dot (DESIGN.md §8). The digits stay whole for assistive tech. */
 export function Num({ n }: { n: number }) {
-  return n === 0 ? <span class="ij-zero" role="img" aria-label="صفر"></span> : <>{ar(n)}</>;
+  if (n === 0) return <span class="ij-zero" role="img" aria-label="صفر"></span>;
+  const s = ar(n);
+  if (!s.includes('٠')) return <>{s}</>;
+  return (
+    <span class="ij-num" role="img" aria-label={s}>
+      {[...s].map((d, i) => (d === '٠' ? <span key={i} class="ij-zero" aria-hidden="true"></span> : d))}
+    </span>
+  );
 }
 
 export function StatusChip({ status }: { status: SubStatus | 'none' }) {
@@ -36,12 +44,12 @@ export function Board({ subs, mine = true }: { subs: State['subs']; mine?: boole
           const me = mine && r.person.id === ME;
           return (
             <li key={r.person.id} class={`ij-board__row${me ? ' is-me' : ''}${r.rank <= 3 ? ' is-top' : ''}`} aria-current={me ? 'true' : undefined}>
-              <span class="ij-board__rank" aria-label={`${B.rank} ${ar(r.rank)}`}>{ar(r.rank)}</span>
+              <span class="ij-board__rank"><Num n={r.rank} /></span>
               <span class="ij-board__who">
                 <span class="ij-board__name">{r.person.name}{me && <span class="ij-you">، {B.you}</span>}</span>
-                <span class="ij-board__done">{ar(r.done)} {B.tasks}</span>
+                <span class="ij-board__done"><Num n={r.done} /> {B.tasks}</span>
               </span>
-              <span class="ij-board__pts" aria-label={pointsText(r.points)}>{ar(r.points)}</span>
+              <span class="ij-board__pts"><Num n={r.points} /></span>
             </li>
           );
         })}
