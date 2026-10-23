@@ -1,5 +1,11 @@
 # Medad website: static Astro build served by nginx.
 # CranL sets $PORT; nginx's template step substitutes it at startup.
+# Preview hosts (*.cranl.net) must never be indexed; only medaad.tech is.
+map $host $robots_tag {
+  default "";
+  "~*cranl\.net$" "noindex, nofollow";
+}
+
 server {
   listen ${PORT};
   listen [::]:${PORT};

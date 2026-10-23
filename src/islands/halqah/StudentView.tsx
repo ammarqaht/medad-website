@@ -3,7 +3,7 @@
    plan, and recent point movements. Read only; no store, no code redemption. */
 import { useState } from 'preact/hooks';
 import { DAYS, LINES, STUDENT_ID, TODAY, WEEKS, key, pastMoves, plan, ui } from '../../data/halqah';
-import { AttChip, DayPicker, LinesView, Mark, Num } from './parts';
+import { AttChip, DayPicker, LinesView, Mark, More, Num } from './parts';
 import { ar, balance, circleById, earned, isFuture, studentById, type State } from './store';
 
 const S = ui.student;
@@ -13,6 +13,7 @@ export function StudentView({ entries }: { entries: State['entries'] }) {
   const circle = circleById(me.circle);
   const [week, setWeek] = useState(0);
   const [day, setDay] = useState(TODAY);
+  const [allMoves, setAllMoves] = useState(false);
   const e = entries[key(week, day, me.id)];
   const future = isFuture(week, day);
   const note = e && LINES.map((k) => e.lines[k].note).find(Boolean);
@@ -114,7 +115,7 @@ export function StudentView({ entries }: { entries: State['entries'] }) {
 
         <section class="hq-panel" aria-labelledby="hq-moves">
           <h3 class="hq-h hq-h--sm" id="hq-moves">{S.moves}</h3>
-          <ul class="hq-moves hq-clip hq-clip--3">
+          <ul class={`hq-moves hq-clip hq-clip--3${allMoves ? ' is-all' : ''}`} id="hq-moves-list">
             {recent.map((m, i) => (
               <li key={i}>
                 <span>
@@ -125,6 +126,7 @@ export function StudentView({ entries }: { entries: State['entries'] }) {
               </li>
             ))}
           </ul>
+          {recent.length > 3 && <More open={allMoves} onToggle={() => setAllMoves(!allMoves)} controls="hq-moves-list" />}
         </section>
       </div>
     </div>

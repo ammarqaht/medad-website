@@ -88,7 +88,7 @@ function Follow({ entries, onOpen }: { entries: State['entries']; onOpen: (id: s
           );
         })}
       </ul>
-      <More open={all} onToggle={() => setAll(!all)} controls="hq-circles" />
+      {circles.length > 2 && <More open={all} onToggle={() => setAll(!all)} controls="hq-circles" />}
     </section>
   );
 }
@@ -199,7 +199,7 @@ function PlansExams() {
             );
           })}
         </ul>
-        <More open={allPlans} onToggle={() => setAllPlans(!allPlans)} controls="hq-plans-list" />
+        {plans.length > 3 && <More open={allPlans} onToggle={() => setAllPlans(!allPlans)} controls="hq-plans-list" />}
       </section>
       <section aria-labelledby="hq-exams">
         <h3 class="hq-h" id="hq-exams">{A.examsTitle}</h3>
@@ -217,7 +217,7 @@ function PlansExams() {
             );
           })}
         </ul>
-        <More open={allExams} onToggle={() => setAllExams(!allExams)} controls="hq-exams-list" />
+        {exams.length > 3 && <More open={allExams} onToggle={() => setAllExams(!allExams)} controls="hq-exams-list" />}
       </section>
     </div>
   );
