@@ -3,6 +3,8 @@ import type { BrowserContext, Page, Route } from '@playwright/test';
 export const PAGES = ['/', '/works', '/404'] as const;
 export const WHATSAPP = 'https://wa.me/966535451898';
 export const BRAND = 'مـــــداد';
+/** The header works link (outside /works). Inside /works the header shows a `.back` control instead. */
+export const WORKS_LINK = 'header a.topbar__works[href="/works"]';
 
 /** Never let tests reach the real WhatsApp site: answer with a stub page. */
 export async function stubExternal(context: BrowserContext): Promise<void> {

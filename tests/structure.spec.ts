@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-import { PAGES, WHATSAPP, BRAND, stubExternal } from './helpers';
+import { PAGES, WHATSAPP, BRAND, WORKS_LINK, stubExternal } from './helpers';
 
 /* FR-01, FR-02, NFR-01, NFR-02, NFR-09 (targets), NFR-10 */
 
@@ -42,21 +42,30 @@ for (const path of PAGES) {
       expect(stray).toEqual([]);
     });
 
-    test('should show a header with a home logo link, a works link and a WhatsApp button', async ({ page }) => {
+    test('should show a header with a home logo link, its one navigation control and no WhatsApp', async ({ page }) => {
       const header = page.locator('header.topbar');
       await expect(header).toBeVisible();
       await expect(header.locator('a.topbar__logo')).toHaveAttribute('href', '/');
       await expect(header.locator('a.topbar__logo')).toHaveAccessibleName(/مداد/);
-      const works = header.getByRole('link', { name: 'الأعمال', exact: true });
-      await expect(works).toBeVisible();
-      await expect(works).toHaveAttribute('href', '/works');
-      await expect(header.locator(`a.btn[href="${WHATSAPP}"]`)).toBeVisible();
+      // Owner decision: contact lives only in the closing section and the footer.
+      await expect(header.locator('a[href*="wa.me"], a.btn')).toHaveCount(0);
+      await expect(header.locator('nav a')).toHaveCount(1);
     });
 
-    test('should mark the works link aria-current only on /works', async ({ page }) => {
-      const works = page.locator('header a.topbar__link');
-      if (path === '/works') await expect(works).toHaveAttribute('aria-current', 'page');
-      else await expect(works).not.toHaveAttribute('aria-current', /.+/);
+    test('should show the works link outside /works and a back control inside /works', async ({ page }) => {
+      if (path === '/works') {
+        await expect(page.locator(WORKS_LINK)).toHaveCount(0);
+        const back = page.locator('header nav a.back');
+        await expect(back).toBeVisible();
+        // Opened directly (no referrer from this site): it follows its own href home.
+        await expect(back).toHaveAttribute('href', '/');
+        await expect(back).toHaveAccessibleName('العودة للرئيسية');
+      } else {
+        const works = page.locator(WORKS_LINK);
+        await expect(works).toBeVisible();
+        await expect(works).toHaveAccessibleName('الأعمال');
+        await expect(page.locator('header a.back')).toHaveCount(0);
+      }
     });
 
     test('should keep the header stuck to the top after scrolling', async ({ page }) => {
@@ -76,7 +85,8 @@ for (const path of PAGES) {
 
     test('should open every WhatsApp link in a new tab with rel noopener', async ({ page }) => {
       const links = page.locator('a[href*="wa.me"], a[href*="whatsapp"]');
-      expect(await links.count()).toBeGreaterThanOrEqual(2);
+      // Home: closing + footer. Other pages: footer only.
+      expect(await links.count()).toBeGreaterThanOrEqual(path === '/' ? 2 : 1);
       for (const a of await links.all()) {
         await expect(a).toHaveAttribute('href', WHATSAPP);
         await expect(a).toHaveAttribute('target', '_blank');
@@ -151,12 +161,12 @@ for (const path of PAGES) {
   });
 }
 
-test('should open the header WhatsApp button in a new tab without an opener', async ({ page, context }) => {
+test('should open the closing WhatsApp button in a new tab without an opener', async ({ page, context }) => {
   await stubExternal(context);
   await page.goto('/');
   const [popup] = await Promise.all([
     context.waitForEvent('page'),
-    page.locator(`header a.btn[href="${WHATSAPP}"]`).click(),
+    page.locator(`.closing a.btn[href="${WHATSAPP}"]`).click(),
   ]);
   await popup.waitForLoadState();
   expect(popup.url()).toBe(WHATSAPP);

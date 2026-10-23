@@ -50,7 +50,9 @@ for (const path of PAGES) {
 
 test('should add .is-pressed on Enter keydown on a .btn and remove it on keyup', async ({ page, context }) => {
   await page.goto('/');
-  const btn = page.locator('header a.btn');
+  // The closing WhatsApp button (the header has no button since the owner's phase-2 decision).
+  const btn = page.locator('.closing a.btn');
+  await btn.scrollIntoViewIfNeeded();
   await btn.focus();
   const popup = context.waitForEvent('page');
   await page.keyboard.down('Enter');

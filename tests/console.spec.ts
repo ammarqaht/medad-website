@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-import { PAGES, stubExternal, watchProblems } from './helpers';
+import { PAGES, stubExternal, watchProblems, WORKS_LINK } from './helpers';
 
 /* Phase acceptance: no console errors; NFR-16: CSP (meta) blocks nothing of ours. */
 
@@ -32,7 +32,7 @@ test('should report no console errors on an unknown route except the document 40
 test('should keep the console clean across a flood transition and back', async ({ page }) => {
   const p = await watchProblems(page);
   await page.goto('/');
-  await page.locator('header a.topbar__link[href="/works"]').click();
+  await page.locator(WORKS_LINK).click();
   await page.waitForURL('**/works');
   await page.waitForTimeout(800);
   await page.goBack();

@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-import { blockPageModule, floodIsHidden, stubExternal } from './helpers';
+import { blockPageModule, floodIsHidden, stubExternal, WORKS_LINK } from './helpers';
 
 /* NFR-07: content never stays hidden behind motion, even if page JS fails. */
 
@@ -48,11 +48,21 @@ test('should lift the arriving ink within 3s when the page module script is bloc
   }
 });
 
-test('should note that aborting /_astro/*.js alone does not disable page JS (module is inlined)', async ({ page }) => {
+test('should ship page JS only as external /_astro modules, so aborting them falls back to visible content', async ({ page, request }) => {
+  // Astro now emits the page modules as files: no inline module scripts in the HTML.
+  for (const path of ['/', '/works']) {
+    const html = await (await request.get(path)).text();
+    expect(html, path).not.toMatch(/<script type="module">[\s\S]*?\S[\s\S]*?<\/script>/);
+    expect(html, path).toMatch(/<script type="module" src="\/_astro\/[^"]+\.js">/);
+  }
   await page.route('**/_astro/*.js', (r) => r.abort());
   await page.goto('/');
-  // The base module is inlined by Astro, so stamp-in still runs normally.
-  await expect(page.locator('[data-pop]').first()).toHaveClass(/\bis-in\b/, { timeout: 2000 });
+  // boot.js lifts .js after 3s, so every stamped element shows in its final state.
+  await expect(page.locator('html')).not.toHaveClass(/\bjs\b/, { timeout: 3500 });
+  for (const el of await page.locator('[data-pop]').all()) {
+    await el.scrollIntoViewIfNeeded();
+    await expect(el).toHaveCSS('opacity', '1');
+  }
 });
 
 test.describe('JavaScript disabled', () => {
@@ -67,7 +77,7 @@ test.describe('JavaScript disabled', () => {
       await expect(page.locator('h1')).toBeVisible();
     }
     await page.goto('/');
-    await page.locator('header a.topbar__link[href="/works"]').click();
+    await page.locator(WORKS_LINK).click();
     await page.waitForURL('**/works');
     await expect(page.locator('h1')).toBeVisible();
   });
