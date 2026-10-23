@@ -9,9 +9,33 @@ export function initArms(): void {
   const arms = document.querySelector<HTMLElement>('[data-arms]');
   if (!arms) return;
 
+  // The fork: from the bottom of the title to the top centre of each card.
+  const fork = arms.querySelector<SVGSVGElement>('.arms__fork');
+  const title = arms.querySelector<HTMLElement>('.arms__title');
+  const cards = Array.from(arms.querySelectorAll<HTMLElement>('.arm'));
+  const drawFork = () => {
+    if (!fork || !title || cards.length < 2) return;
+    const box = arms.getBoundingClientRect();
+    const t = title.getBoundingClientRect();
+    const sx = t.left + t.width / 2 - box.left;
+    const sy = t.bottom - box.top + 12;
+    fork.setAttribute('viewBox', `0 0 ${box.width} ${box.height}`);
+    fork.querySelectorAll('path').forEach((path, i) => {
+      const c = cards[i].getBoundingClientRect();
+      const ex = c.left + c.width / 2 - box.left;
+      const ey = c.top - box.top + 4;
+      const split = sy + (ey - sy) * 0.35;
+      path.setAttribute('d', `M${sx},${sy} V${split} C${sx},${(split + ey) / 2} ${ex},${(split + ey) / 2} ${ex},${ey}`);
+      path.style.setProperty('--len', String(Math.ceil(path.getTotalLength())));
+    });
+  };
+  drawFork();
+  document.fonts?.ready.then(drawFork);
+  new ResizeObserver(drawFork).observe(arms);
+
   new IntersectionObserver(
     (entries, io) => {
-      if (entries[0].isIntersecting) {
+      if (entries[entries.length - 1].isIntersecting) {
         arms.classList.add('is-forked');
         io.disconnect();
       }
@@ -38,6 +62,9 @@ export function initArms(): void {
       open(i);
     });
   });
+  // Any touch or keyboard focus hands control to the visitor (WCAG 2.2.2).
+  const group = screens[0]?.parentElement;
+  ['focusin', 'pointerdown'].forEach((ev) => group?.addEventListener(ev, stop, { once: true }));
   if (screens.length && !reducedMotion()) {
     let visible = false;
     new IntersectionObserver((e) => (visible = e[e.length - 1].isIntersecting)).observe(screens[0].parentElement!);
@@ -57,11 +84,19 @@ export function initArms(): void {
     btn.addEventListener('click', () => {
       if (quiz.classList.contains('is-solved')) return;
       const right = Number(btn.dataset.i) === answer;
-      if (say) say.textContent = (right ? quiz.dataset.right : quiz.dataset.wrong) || '';
+      // Clear then set, so a repeated message is announced again.
+      const msg = (right ? quiz.dataset.right : quiz.dataset.wrong) || '';
+      if (say) {
+        say.textContent = '';
+        requestAnimationFrame(() => (say.textContent = msg));
+      }
       if (right) {
         quiz.classList.add('is-solved');
         btn.classList.add('is-right');
         btn.setAttribute('aria-pressed', 'true');
+        quiz.querySelectorAll<HTMLButtonElement>('.quiz__opt').forEach((o) => {
+          if (o !== btn) o.disabled = true;
+        });
         return;
       }
       btn.classList.remove('is-wrong');

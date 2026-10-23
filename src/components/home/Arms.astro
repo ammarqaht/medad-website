@@ -10,10 +10,7 @@ const { digital, live } = arms;
 <section class="arms" aria-labelledby="arms-title" data-arms>
   <h2 class="arms__title display" id="arms-title" data-ink>{arms.title}</h2>
 
-  <svg class="arms__fork" viewBox="0 0 400 120" preserveAspectRatio="none" aria-hidden="true">
-    <path d="M200 0 V40 C200 80 300 70 300 120" />
-    <path d="M200 40 C200 80 100 70 100 120" />
-  </svg>
+  <svg class="arms__fork" aria-hidden="true"><path /><path /></svg>
 
   <div class="arms__grid">
     <article class="arm arm--digital box" data-pop>
@@ -53,6 +50,7 @@ const { digital, live } = arms;
 
 <style>
   .arms {
+    position: relative;
     max-inline-size: var(--max);
     margin-inline: auto;
     padding: clamp(32px, 6vw, 80px) var(--gutter) clamp(56px, 8vw, 112px);
@@ -60,9 +58,10 @@ const { digital, live } = arms;
     justify-items: center;
   }
   .arms__title { font-size: clamp(40px, 6.4vw, 96px); line-height: 1.15; text-align: center; text-wrap: balance; }
-  .arms__fork { inline-size: min(70%, 720px); block-size: clamp(60px, 9vw, 120px); max-inline-size: none; overflow: visible; display: none; }
-  .arms__fork path { fill: none; stroke: var(--ink); stroke-width: 6; stroke-linecap: square; vector-effect: non-scaling-stroke; }
-  .arms__grid { inline-size: 100%; display: grid; gap: 32px; margin-block-start: 28px; }
+  /* The fork is drawn by arms.ts from the title down to the top of each card. */
+  .arms__fork { position: absolute; inset: 0; inline-size: 100%; block-size: 100%; max-inline-size: none; overflow: visible; display: none; pointer-events: none; }
+  .arms__fork path { fill: none; stroke: var(--ink); stroke-width: 6; stroke-linecap: square; }
+  .arms__grid { position: relative; z-index: 1; inline-size: 100%; display: grid; gap: 32px; margin-block-start: 28px; }
 
   .arm { display: grid; gap: 18px; align-content: start; padding: clamp(22px, 3vw, 40px); }
   .arm--digital { rotate: -1deg; }
@@ -150,10 +149,10 @@ const { digital, live } = arms;
 
   @media (min-width: 900px) {
     .arms__fork { display: block; }
-    .arms__grid { grid-template-columns: 1fr 1fr; gap: 48px; margin-block-start: 0; }
+    .arms__grid { grid-template-columns: 1fr 1fr; gap: 48px; margin-block-start: clamp(72px, 8vw, 120px); }
     .arm--live { margin-block-start: 56px; }
   }
-  :global(.js) .arms__fork path { stroke-dasharray: 400; stroke-dashoffset: 400; }
+  :global(.js) .arms__fork path { stroke-dasharray: var(--len, 600); stroke-dashoffset: var(--len, 600); }
   :global(.js) .arms:global(.is-forked) .arms__fork path { animation: fork 600ms steps(7, jump-end) forwards; }
   @keyframes fork { to { stroke-dashoffset: 0; } }
 
