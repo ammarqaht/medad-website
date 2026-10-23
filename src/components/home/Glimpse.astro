@@ -87,6 +87,15 @@ const { glimpse } = site.home;
     .file + .file { margin-inline-start: -24px; }
     .file--2 { margin-block-start: 40px; }
   }
+  /* Touch screens have no hover: the files lift out on their own, in turn */
+  @media (hover: none) and (prefers-reduced-motion: no-preference) {
+    :global(.js) .file:global(.is-in) { animation: lift 4.5s steps(3, jump-none) infinite; }
+    :global(.js) .file--2:global(.is-in) { animation-delay: 1.5s; }
+    :global(.js) .file--3:global(.is-in) { animation-delay: 3s; }
+    :global(.js) .file__open { animation: poke 1.2s steps(2, jump-none) infinite; }
+  }
+  @keyframes lift { 0%, 30%, 100% { translate: 0 0; } 10%, 22% { translate: 0 -14px; } }
+  @keyframes poke { 50% { translate: -6px 0; } }
   @media (prefers-reduced-motion: reduce) {
     .file { transition: none; }
     .file:hover { translate: none; }
