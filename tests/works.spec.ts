@@ -54,7 +54,7 @@ test.describe('work pages', () => {
   }
 
   test('should show the pending sheet with a way back on works without a demo', async ({ page }) => {
-    await page.goto('/works/injaz');
+    await page.goto('/works/malamih');
     await expect(page.locator('.pend a[href="/works"]')).toBeVisible();
     await expect(page.locator('astro-island')).toHaveCount(0);
   });

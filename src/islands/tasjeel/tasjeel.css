@@ -1,0 +1,298 @@
+/* Tasjeel demo in Medad Neo-Brutalism (DESIGN.md §5, §9). Medad palette and
+   fonts only, 3px ink borders, hard shadows to the inline end, stepped motion,
+   no radius. Built for a phone screen first; wider frames only get more air. */
+
+.tj {
+  --tj-off: calc(var(--off) * .6);
+  --tj-sx: calc(var(--tj-off) * -1);
+  --tj-shadow: var(--tj-sx) var(--tj-off) 0 0 var(--ink);
+  --tj-shadow-s: calc(var(--tj-sx) * .6) calc(var(--tj-off) * .6) 0 0 var(--ink);
+  container-type: inline-size;
+  min-block-size: 100%;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-size: 15px;
+  font-weight: 700;
+  line-height: 1.5;
+}
+.tj :where(h3, h4, p, ul, ol, dl, dd, fieldset, legend) { margin: 0; }
+.tj :where(ul, ol) { list-style: none; padding: 0; }
+.tj fieldset { padding: 0; border: 0; min-inline-size: 0; }
+:where(.tj) :where(button, input) { font: inherit; color: inherit; }
+:where(.tj) button { cursor: pointer; -webkit-tap-highlight-color: transparent; }
+.tj :focus-visible { outline: 3px solid var(--ink); outline-offset: 3px; }
+.tj-sr {
+  position: absolute;
+  inline-size: 1px;
+  block-size: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/* ---------- App bar ---------- */
+.tj-bar {
+  position: sticky;
+  inset-block-start: 0;
+  z-index: 3;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 8px 10px;
+  background: var(--paper);
+  border-block-end: var(--bw) solid var(--ink);
+}
+.tj-bar__brand {
+  padding: 0 10px 3px;
+  font-family: var(--font-display);
+  font-size: 21px;
+  font-weight: 900;
+  line-height: 1.3;
+  background: var(--green-500);
+  border: var(--bw) solid var(--ink);
+  rotate: -2deg;
+}
+.tj-tool,
+.tj-btn,
+.tj-chip,
+.tj-opt > span {
+  min-block-size: 44px;
+  border: var(--bw) solid var(--ink);
+  font-weight: 900;
+  transition: translate var(--snap), box-shadow var(--snap), background-color var(--snap);
+}
+.tj-tool {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 12px;
+  font-size: 14px;
+  background: var(--white);
+  box-shadow: var(--tj-shadow);
+}
+.tj-tool__icon {
+  inline-size: 13px;
+  block-size: 13px;
+  background: currentColor;
+  clip-path: polygon(0 0, 100% 0, 100% 100%, 30% 100%, 30% 70%, 70% 70%, 70% 30%, 30% 30%, 30% 50%, 0 25%);
+}
+.tj-tool:hover, .tj-chip:hover { background: var(--green-300); }
+.tj-tool:active, .tj-btn:active, .tj-chip:active { translate: var(--tj-sx) var(--tj-off); box-shadow: none; }
+
+/* ---------- Progress: three steps ---------- */
+.tj-steps {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 6px;
+  padding: 10px 10px 0;
+}
+.tj-step {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-block-size: 36px;
+  padding: 2px 4px 4px;
+  border: var(--bw) solid var(--ink);
+  background: var(--white);
+  font-size: 14px;
+  font-weight: 900;
+  line-height: 1.3;
+  text-align: center;
+  min-inline-size: 0;
+}
+.tj-step.is-past { background: var(--green-300); }
+.tj-step.is-now { background: var(--ink); color: var(--paper); }
+
+.tj-page { padding: 14px 12px 22px; }
+.tj-enter { animation: tj-enter var(--stamp) both; }
+@keyframes tj-enter {
+  from { opacity: 0; translate: 0 8px; }
+  to { opacity: 1; translate: 0 0; }
+}
+
+/* ---------- Shared type and buttons ---------- */
+.tj-h {
+  font-family: var(--font-display);
+  font-size: 23px;
+  font-weight: 900;
+  line-height: 1.3;
+  text-wrap: balance;
+}
+.tj-h--xl { font-size: 28px; }
+.tj-h--sm { font-size: 19px; }
+.tj-h:focus { outline: none; }
+.tj-h:focus-visible { outline: 3px solid var(--ink); outline-offset: 4px; }
+.tj-lead { font-size: 16px; }
+
+.tj-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 6px 18px;
+  font-size: 16px;
+  background: var(--green-300);
+  box-shadow: var(--tj-shadow);
+}
+.tj-btn:hover { translate: calc(var(--tj-sx) / 2) calc(var(--tj-off) / 2); box-shadow: calc(var(--tj-sx) / 2) calc(var(--tj-off) / 2) 0 0 var(--ink); }
+.tj-btn--go { background: var(--green-500); font-size: 17px; }
+.tj-btn--go::after {
+  /* blunt arrow pointing to the reading direction */
+  content: "";
+  inline-size: 14px;
+  block-size: 14px;
+  background: currentColor;
+  clip-path: polygon(0 50%, 55% 0, 55% 30%, 100% 30%, 100% 70%, 55% 70%, 55% 100%);
+}
+.tj-btn--plain { background: var(--white); }
+.tj-actions { display: flex; flex-wrap: wrap; gap: 10px; }
+.tj-actions .tj-btn { flex: 1 1 auto; }
+
+.tj-chip {
+  padding: 4px 12px;
+  font-size: 14px;
+  background: var(--white);
+  box-shadow: var(--tj-shadow-s);
+}
+
+/* ---------- Step 1: intro ---------- */
+.tj-intro { display: grid; gap: 14px; }
+.tj-details {
+  display: grid;
+  background: var(--white);
+  border: var(--bw) solid var(--ink);
+  box-shadow: var(--tj-shadow);
+}
+.tj-details__row {
+  display: grid;
+  grid-template-columns: 64px minmax(0, 1fr);
+  gap: 10px;
+  padding: 8px 10px;
+  border-block-end: var(--bw) solid var(--gray);
+}
+.tj-details__row:last-child { border-block-end: 0; }
+.tj-details dt { font-weight: 900; }
+.tj-details dd { font-weight: 700; }
+
+/* ---------- Step 2: the form ---------- */
+.tj-form { display: grid; gap: 10px; }
+.tj-form__head { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.tj-demo {
+  padding: 6px 10px;
+  background: var(--green-300);
+  border: var(--bw) solid var(--ink);
+  font-size: 14px;
+  font-weight: 900;
+}
+.tj-fields { display: grid; gap: 12px; }
+.tj-pair { display: grid; gap: 12px; }
+@container (min-width: 380px) { .tj-pair { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+.tj-field { display: grid; gap: 4px; align-content: start; min-inline-size: 0; }
+.tj-field label, .tj-group legend { font-size: 14px; font-weight: 900; }
+.tj-group legend { padding: 0; margin-block-end: 4px; }
+.tj-field input {
+  min-block-size: 44px;
+  inline-size: 100%;
+  padding: 6px 10px;
+  font-size: 16px;
+  font-weight: 700;
+  background: var(--white);
+  border: var(--bw) solid var(--ink);
+  border-radius: 0;
+  transition: background-color var(--snap), box-shadow var(--snap);
+}
+.tj-field input::placeholder { color: var(--ink-muted); opacity: 1; }
+.tj-field input:focus { outline: 3px solid var(--ink); outline-offset: 2px; background: var(--green-300); box-shadow: var(--tj-shadow); }
+.tj-field.is-bad input { box-shadow: inset 0 -6px 0 0 var(--ink); }
+.tj-field.is-bad input:focus { box-shadow: var(--tj-shadow), inset 0 -6px 0 0 var(--ink); }
+
+.tj-opts { display: grid; gap: 8px; }
+.tj-opts--3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.tj-opts--2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.tj-opt { position: relative; display: grid; min-inline-size: 0; }
+.tj-opt input {
+  position: absolute;
+  inset: 0;
+  inline-size: 100%;
+  block-size: 100%;
+  margin: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+.tj-opt > span {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px 6px;
+  background: var(--white);
+  box-shadow: var(--tj-shadow-s);
+  font-size: 15px;
+  text-align: center;
+}
+.tj-opt:hover > span { background: var(--paper); }
+.tj-opt input:checked + span {
+  background: var(--green-300);
+  translate: calc(var(--tj-sx) * .6) calc(var(--tj-off) * .6);
+  box-shadow: none;
+}
+.tj-opt input:focus-visible + span { outline: 3px solid var(--ink); outline-offset: 3px; }
+.tj-group.is-bad .tj-opt > span { box-shadow: inset 0 -6px 0 0 var(--ink); }
+.tj-group:disabled legend { color: var(--ink-muted); }
+.tj-hint {
+  display: flex;
+  align-items: center;
+  min-block-size: 44px;
+  padding: 4px 10px;
+  border: var(--bw) dashed var(--ink-muted);
+  color: var(--ink-muted);
+  font-size: 14px;
+}
+.tj-err {
+  margin-block-start: 6px;
+  padding: 4px 10px;
+  background: var(--ink);
+  color: var(--paper);
+  font-size: 14px;
+  font-weight: 900;
+}
+.tj-field .tj-err { margin-block-start: 2px; }
+
+/* ---------- Step 3: confirmation ---------- */
+.tj-done { display: grid; gap: 14px; }
+.tj-member {
+  display: grid;
+  justify-items: center;
+  justify-self: center;
+  padding: 8px 28px 12px;
+  background: var(--ink);
+  color: var(--paper);
+  border: var(--bw) solid var(--ink);
+  box-shadow: var(--tj-sx) var(--tj-off) 0 0 var(--green-500);
+  rotate: -1.5deg;
+  animation: tj-stamp var(--stamp) both;
+}
+.tj-member__label { font-size: 14px; color: var(--green-400); }
+.tj-member__num { font-family: var(--font-display); font-size: 52px; font-weight: 900; line-height: 1.15; }
+@keyframes tj-stamp {
+  from { scale: 1.5; opacity: 0; }
+  to { scale: 1; opacity: 1; }
+}
+.tj-notices {
+  display: grid;
+  gap: 8px;
+  padding: 10px 12px;
+  background: var(--white);
+  border: var(--bw) solid var(--ink);
+  box-shadow: var(--tj-shadow);
+}
+.tj-notices ul { display: grid; gap: 6px; }
+.tj-notices li { padding-inline-start: 10px; border-inline-start: 5px solid var(--green-500); font-size: 14px; }
+
+/* ---------- Reduced motion: no movement, colour changes only ---------- */
+@media (prefers-reduced-motion: reduce) {
+  .tj-enter, .tj-member { animation: none; }
+  .tj *, .tj *::after, .tj *::before { transition-duration: .01ms !important; }
+  .tj-btn:hover, .tj button:active, .tj-opt input:checked + span { translate: none; }
+}

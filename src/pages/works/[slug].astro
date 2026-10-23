@@ -8,6 +8,9 @@ import DeviceFrame from '../../components/works/DeviceFrame.astro';
 import DemoPending from '../../components/works/DemoPending.astro';
 import HalqahDemo from '../../islands/halqah/HalqahDemo';
 import NabdaDemo from '../../islands/nabda/NabdaDemo';
+import TasjeelDemo from '../../islands/tasjeel/TasjeelDemo';
+import TahfeezDemo from '../../islands/tahfeez/TahfeezDemo';
+import InjazDemo from '../../islands/injaz/InjazDemo';
 import { works, worksCopy, type Work } from '../../content/works';
 import { WHATSAPP } from '../../content/site';
 import '../../styles/works.css';
@@ -21,7 +24,8 @@ const { work } = Astro.props;
 const p = worksCopy.page;
 const howTo = worksCopy.howTo[work.slug];
 const label = `${p.demoLabel} ${work.name}`;
-const live = work.demo && (work.slug === 'halqah' || work.slug === 'nabda');
+const LIVE = ['halqah', 'nabda', 'tasyeer-tasjeel', 'tasyeer-tahfeez', 'injaz'];
+const live = work.demo && LIVE.includes(work.slug);
 ---
 <BaseLayout title={work.name} description={work.line}>
   <article class="wk wrap">
@@ -36,7 +40,11 @@ const live = work.demo && (work.slug === 'halqah' || work.slug === 'nabda');
     <section class="wk__demo" aria-label={label}>
       {live ? (
         <DeviceFrame kind={work.frame} adaptive scroll label={label}>
-          {work.slug === 'nabda' ? <NabdaDemo client:visible /> : <HalqahDemo client:visible />}
+          {work.slug === 'halqah' && <HalqahDemo client:visible />}
+          {work.slug === 'nabda' && <NabdaDemo client:visible />}
+          {work.slug === 'tasyeer-tasjeel' && <TasjeelDemo client:visible />}
+          {work.slug === 'tasyeer-tahfeez' && <TahfeezDemo client:visible />}
+          {work.slug === 'injaz' && <InjazDemo client:visible />}
           <noscript><p class="pend__line">{p.noscript}</p></noscript>
         </DeviceFrame>
       ) : (
