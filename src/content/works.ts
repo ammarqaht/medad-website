@@ -10,9 +10,9 @@
 
 export type ArmId = 'digital' | 'live';
 export type Frame = 'browser' | 'phone';
-export type Slug = 'halqah' | 'tasyeer-tasjeel' | 'tasyeer-tahfeez' | 'injaz' | 'nabda';
+export type Slug = 'halqah' | 'tasyeer-tasjeel' | 'tasyeer-tahfeez' | 'injaz' | 'nabda' | 'malamih';
 export type Fill = 'white' | 'soft' | 'green' | 'ink';
-export type Sketch = 'rows' | 'form' | 'ledger' | 'board' | 'pulse';
+export type Sketch = 'rows' | 'form' | 'ledger' | 'board' | 'pulse' | 'faces';
 
 export interface Arm {
   id: ArmId;
@@ -96,6 +96,15 @@ export const works: Work[] = [
     demo: false,
     sketch: 'pulse',
   },
+  {
+    slug: 'malamih',
+    name: 'ملامح',
+    short: 'ملامح',
+    line: 'مسابقة حية جديدة تجمع القاعة على شاشة واحدة، ونسختها التجريبية قيد الطباعة.',
+    frame: 'phone',
+    demo: false,
+    sketch: 'faces',
+  },
 ];
 
 /* Folders follow the approved categories (brief §3.3): one folder each. */
@@ -111,6 +120,7 @@ export const folders: Folder[] = [
   },
   { id: 'injaz', arm: 'digital', name: 'إنجاز', fill: 'green', works: ['injaz'] },
   { id: 'nabda', arm: 'live', name: 'نبضة', fill: 'ink', works: ['nabda'] },
+  { id: 'malamih', arm: 'live', name: 'ملامح', fill: 'soft', works: ['malamih'] },
 ];
 
 export const workBySlug = (slug: Slug): Work => works.find((w) => w.slug === slug)!;

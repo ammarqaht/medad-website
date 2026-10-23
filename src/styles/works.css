@@ -257,6 +257,11 @@
 .sk__rank { block-size: 13px; border: 2px solid var(--ink); background: var(--green-300); inline-size: 92%; }
 .sk__rank--0 { background: var(--green-500); }
 .sk__rank--1 { inline-size: 74%; } .sk__rank--2 { inline-size: 58%; } .sk__rank--3 { inline-size: 40%; background: var(--white); }
+.sk--faces .sk__screen { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; align-content: center; }
+.sk__face { position: relative; aspect-ratio: 1; border: 2px solid var(--ink); background: var(--white); display: grid; grid-template-columns: 1fr 1fr; align-content: center; justify-items: center; row-gap: 6px; padding: 6px; }
+.sk__face span { inline-size: 6px; block-size: 6px; background: var(--ink); }
+.sk__face b { grid-column: 1 / -1; inline-size: 55%; block-size: 4px; background: var(--ink); }
+.sk__face--1 { background: var(--green-500); }
 .sk__pulse { inline-size: 100%; block-size: 70%; align-self: center; color: var(--green-500); stroke-dasharray: 260; stroke-dashoffset: 0; }
 .sk--pulse .sk__screen { align-content: center; block-size: 100%; }
 .sheet:hover .sk__pulse, .pend .sk__pulse { animation: pulse-draw 1.2s steps(10, jump-end) infinite; }

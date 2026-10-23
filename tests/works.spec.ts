@@ -1,12 +1,12 @@
 import { expect, test } from '@playwright/test';
 
-const SLUGS = ['halqah', 'tasyeer-tasjeel', 'tasyeer-tahfeez', 'injaz', 'nabda'];
+const SLUGS = ['halqah', 'tasyeer-tasjeel', 'tasyeer-tahfeez', 'injaz', 'nabda', 'malamih'];
 
 test.describe('works gallery', () => {
   test('should list the five works, each linking to its page', async ({ page }) => {
     await page.goto('/works');
     const links = page.locator('a[data-sheet]');
-    await expect(links).toHaveCount(5);
+    await expect(links).toHaveCount(SLUGS.length);
     for (const slug of SLUGS) await expect(page.locator(`a[data-sheet][href="/works/${slug}"]`)).toHaveCount(1);
   });
 
