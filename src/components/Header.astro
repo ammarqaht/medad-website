@@ -66,6 +66,16 @@ const back = onWork
   }
   .topbar__works:hover { background: var(--green-800); translate: calc(var(--off) / -2) calc(var(--off) / 2); box-shadow: calc(var(--sx) / 2) calc(var(--off) / 2) 0 0 var(--green-500); }
   .topbar__works:active { translate: var(--sx) var(--off); box-shadow: none; }
+  /* Clickable things carry the blunt arrow; decorative boxes never do */
+  .topbar__works::after {
+    content: "";
+    inline-size: .85em;
+    block-size: .85em;
+    background: currentColor;
+    clip-path: polygon(0 50%, 55% 0, 55% 30%, 100% 30%, 100% 70%, 55% 70%, 55% 100%);
+    transition: translate var(--snap);
+  }
+  .topbar__works:hover::after { translate: -4px 0; }
 
   /* Back: a green slip with an arrow pointing back (right in RTL) */
   .back {

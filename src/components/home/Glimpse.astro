@@ -96,7 +96,16 @@ const { glimpse } = site.home;
     .files { gap: 22px; }
     .file__body { justify-items: center; text-align: center; padding: 22px 16px 18px; }
     .file__body::before { inset-inline-start: 50%; translate: 50% 0; inline-size: 34%; }
-    .file__line, .file__open { display: none; }
+    .file__line { display: none; }
+    .file__open {
+      position: absolute;
+      inset-inline-end: 16px;
+      inset-block-start: 50%;
+      translate: 0 -50%;
+      inline-size: 22px;
+      block-size: 22px;
+      margin: 0;
+    }
     .file__name { font-size: 32px; }
     .glimpse__cta { justify-self: center; }
   }

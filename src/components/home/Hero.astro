@@ -1,7 +1,6 @@
 ---
 /* Hero: the ink opener stage, the brand word written out of the ink, and the
    headline stamped in word by word (last word boxed in green). */
-import Button from '../Button.astro';
 import { site } from '../../content/site';
 import { text } from '../../content/brand';
 
@@ -29,9 +28,7 @@ const words = hero.headline.split(' ');
   </h1>
   <p class="hero__line box">{hero.line}</p>
 
-  <!-- Two paths from the first screen: the works, or the story below -->
   <div class="hero__go">
-    <Button href="/works">{hero.works}</Button>
     <a class="hero__cue" href="#story">
       <span>{hero.scroll}</span>
       <span class="hero__arrow" aria-hidden="true"></span>

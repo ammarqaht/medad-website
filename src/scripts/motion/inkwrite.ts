@@ -6,11 +6,11 @@
    Timing is in 12fps steps and scales with each line's length. */
 import { frames } from './steps';
 import { reducedMotion } from './reduced';
-import { REVEAL_MARGIN } from './pop';
+import { REVEAL_MARGIN, readingOrder } from './pop';
 
-const PER_CHAR = 0.05; // seconds of writing per character
+const PER_CHAR = 0.04; // seconds of writing per character
 const MIN_LINE = 0.4;
-const MAX_LINE = 1.4;
+const MAX_LINE = 1.1;
 
 /* The heading's text as it wraps right now, one string per rendered line. */
 function splitLines(el: HTMLElement): string[] {
@@ -35,23 +35,25 @@ function splitLines(el: HTMLElement): string[] {
   return lines.map((l) => l.join(' '));
 }
 
-function write(el: HTMLElement): void {
+/** Writes one heading; returns how long the pen is busy with it (ms). */
+function write(el: HTMLElement): number {
   const original = el.textContent || '';
   try {
-    build(el, original);
+    return build(el, original);
   } catch (err) {
     // Never lose the heading: put the text back and show it.
     console.error(err);
     el.textContent = original;
     el.classList.remove('is-writing');
     el.classList.add('is-written');
+    return 0;
   }
 }
 
-function build(el: HTMLElement, original: string): void {
+function build(el: HTMLElement, original: string): number {
   if (reducedMotion()) {
     el.classList.add('is-written');
-    return;
+    return 0;
   }
   const lines = splitLines(el);
   el.textContent = '';
@@ -82,6 +84,26 @@ function build(el: HTMLElement, original: string): void {
     el.classList.remove('is-writing');
     el.classList.add('is-written');
   }, delay * 1000 + 150);
+  return delay * 1000;
+}
+
+/* One pen for the whole page: headings wait their turn and are written one
+   after another, in the order they reached the reveal line (reading order
+   within a group). */
+const queue: HTMLElement[] = [];
+let busy = false;
+function next(): void {
+  const el = queue.shift();
+  if (!el) {
+    busy = false;
+    return;
+  }
+  busy = true;
+  window.setTimeout(next, write(el) + 60);
+}
+function enqueue(els: HTMLElement[]): void {
+  queue.push(...readingOrder(els));
+  if (!busy) next();
 }
 
 export function initInkWrite(root: ParentNode = document): void {
@@ -99,11 +121,13 @@ export function initInkWrite(root: ParentNode = document): void {
   });
   const io = new IntersectionObserver(
     (entries) => {
+      const arrived: HTMLElement[] = [];
       entries.forEach((e) => {
         if (!e.isIntersecting) return;
-        byParent.get(e.target)?.forEach(write);
+        arrived.push(...(byParent.get(e.target) ?? []));
         io.unobserve(e.target);
       });
+      if (arrived.length) enqueue(arrived);
     },
     { threshold: 0, rootMargin: REVEAL_MARGIN },
   );

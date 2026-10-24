@@ -3,19 +3,29 @@ import { initBack, initFlood } from './transition';
 import { initPop } from './motion/pop';
 import { initPress } from './motion/press';
 import { initInkWrite } from './motion/inkwrite';
+import { whenUncovered } from './motion/uncovered';
 
-let ok = true;
-for (const init of [initPop, initInkWrite, initFlood, initBack, initPress]) {
-  try {
-    init();
-  } catch (err) {
-    ok = false;
-    console.error(err);
+const run = (inits: (() => void)[]) => {
+  let ok = true;
+  for (const init of inits) {
+    try {
+      init();
+    } catch (err) {
+      ok = false;
+      console.error(err);
+    }
   }
-}
-// Every reveal is wired: cancel boot.js's fail-open timer. If anything failed,
-// the timer lifts .js and all hidden content shows in its final state.
-if (ok) window.clearTimeout(window.__medadBoot?.js);
+  return ok;
+};
+
+// The curtain and controls start now; reveals wait until the page is uncovered.
+run([initFlood, initBack, initPress]);
+// We own the reveals: cancel boot.js's fail-open timer. If they fail when they
+// run, .js is lifted and all hidden content shows in its final state.
+window.clearTimeout(window.__medadBoot?.js);
+whenUncovered(() => {
+  if (!run([initPop, initInkWrite])) document.documentElement.classList.remove('js');
+});
 
 // Safety net: whatever an observer missed is revealed in its final state,
 // but only when the visitor can see it (in view after a while, or at the very

@@ -4,7 +4,6 @@
    Live experiences: a one-question quiz to play right here. */
 import { site } from '../../content/site';
 import { html } from '../../content/brand';
-import Button from '../Button.astro';
 const { arms } = site.home;
 const { digital, live } = arms;
 ---
@@ -29,7 +28,6 @@ const { digital, live } = arms;
           </button>
         ))}
       </div>
-      <a class="arm__cta" href={digital.href}>{digital.cta}<span class="arm__arrow" aria-hidden="true"></span></a>
     </article>
 
     <article class="arm arm--live box" data-pop="0.12">
@@ -45,10 +43,8 @@ const { digital, live } = arms;
         </div>
         <p class="quiz__say" aria-live="polite">{live.quiz.prompt}</p>
       </div>
-      <a class="arm__cta" href={live.href}>{live.cta}<span class="arm__arrow" aria-hidden="true"></span></a>
     </article>
   </div>
-  <div class="arms__all"><Button href="/works" variant="paper">{arms.all}</Button></div>
 </section>
 
 <style>
@@ -66,27 +62,12 @@ const { digital, live } = arms;
   .arms__fork path { fill: none; stroke: var(--ink); stroke-width: 6; stroke-linecap: square; }
   .arms__grid { position: relative; z-index: 1; inline-size: 100%; display: grid; gap: 32px; margin-block-start: 28px; }
 
-  .arms__all { margin-block-start: clamp(36px, 5vw, 56px); }
   .arm { display: grid; gap: 18px; align-content: start; padding: clamp(22px, 3vw, 40px); }
   .arm--digital { rotate: -1deg; }
   .arm--live { background: var(--ink); color: var(--paper); box-shadow: var(--sx) var(--off) 0 0 var(--green-500); rotate: .8deg; }
   .arm__title { font-size: clamp(34px, 4vw, 56px); line-height: 1.2; }
   .arm__text { font-size: clamp(19px, 1.7vw, 22px); line-height: 1.6; max-inline-size: 36ch; }
 
-  .arm__cta {
-    justify-self: start;
-    display: inline-flex;
-    align-items: center;
-    gap: 12px;
-    min-block-size: 44px;
-    font-weight: 900;
-    font-size: clamp(19px, 1.8vw, 22px);
-    text-decoration: none;
-    border-block-end: var(--bw) solid currentColor;
-  }
-  .arm--live .arm__cta:focus-visible { outline-color: var(--green-400); }
-  .arm__arrow { inline-size: .9em; block-size: .9em; background: currentColor; clip-path: polygon(0 50%, 55% 0, 55% 30%, 100% 30%, 100% 70%, 55% 70%, 55% 100%); transition: translate var(--snap); }
-  .arm__cta:hover .arm__arrow { translate: -6px 0; }
 
   /* ---------- Digital: three screens, one open at a time ---------- */
   .screens { display: flex; gap: 12px; block-size: 150px; align-items: end; }
@@ -192,11 +173,6 @@ const { digital, live } = arms;
     .quiz__q { font-size: 24px; }
     .quiz__opt { padding: 8px 16px; }
   }
-  @media (hover: none) and (prefers-reduced-motion: no-preference) {
-    .arm__arrow { animation: poke 1.2s steps(2, jump-none) infinite; }
-  }
-  @keyframes poke { 50% { translate: -6px 0; } }
-
   @media (min-width: 900px) {
     .arms__fork { display: block; }
     .arms__grid { grid-template-columns: 1fr 1fr; gap: 48px; margin-block-start: clamp(72px, 8vw, 120px); }
@@ -206,8 +182,8 @@ const { digital, live } = arms;
   @keyframes fork { to { stroke-dashoffset: 0; } }
 
   @media (prefers-reduced-motion: reduce) {
-    .screen, .quiz__opt, .arm__arrow { transition: background-color .2s ease; }
-    .screen:hover, .quiz__opt:hover, .arm__cta:hover .arm__arrow { translate: none; }
+    .screen, .quiz__opt { transition: background-color .2s ease; }
+    .screen:hover, .quiz__opt:hover { translate: none; }
     .screen[aria-pressed="true"] .screen__ui > *, .quiz__opt:global(.is-right), .quiz__opt:global(.is-wrong) { animation: none; }
     :global(.js) .quiz .quiz__opt { animation: none !important; }
     :global(.js) .arms__fork path { stroke-dashoffset: 0; }

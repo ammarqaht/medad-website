@@ -78,6 +78,19 @@
   transition: translate var(--snap), box-shadow var(--snap), background-color var(--snap), color var(--snap);
   -webkit-tap-highlight-color: transparent;
 }
+.chip { gap: 10px; }
+/* Clickable marker: a triangle pointing along the reading direction,
+   turning down once the filter is selected */
+.chip::before {
+  content: "";
+  flex: none;
+  inline-size: .6em;
+  block-size: .7em;
+  background: currentColor;
+  clip-path: polygon(100% 0, 100% 100%, 0 50%);
+  transition: rotate var(--snap);
+}
+.chip[aria-pressed="true"]::before { rotate: -90deg; }
 .chip:hover { background: var(--green-800); translate: calc(var(--off) / -2) calc(var(--off) / 2); box-shadow: calc(var(--sx) / 2) calc(var(--off) / 2) 0 0 var(--green-500); }
 .chip[aria-pressed="true"] { background: var(--green-300); color: var(--ink); translate: var(--sx) var(--off); box-shadow: 0 0 0 0 var(--green-500); }
 
