@@ -269,29 +269,18 @@ pending-sheet title. Not on the hero, meaning title or the works gallery title.
 - Safety: any error restores the text; an 8s net reveals visible headings that were missed.
 
 ### 5.8 Works archive (`/works`, `src/pages/works/index.astro`, `components/works/`, `styles/works.css`)
-- **Head:** huge title with a green highlighted word (`.gal__hl`), a white `.box` line, and on 1000px+ a striped
-  "barcode tape" sticker. Title is not ink-written.
-- **Filter chips** (`.chip`, buttons with `aria-pressed`): one per arm plus "all". Ink chip, paper text, green
-  shadow; **pressed = green-300, translated into its shadow**. Pressing the active arm returns to all. State is
-  in the URL (`?arm=digital|live`, `history.replaceState`) and announced in a status line. The bar is `hidden`
-  until JS runs.
-- **Shelves** (`.shelf`, one per arm, ink rule between): sticky head (rotated green-300 / green-500 title + a
-  small box line) in cols 1 to 4 on 960px+, folder stack in cols 5 to 12. A shelf that reappears after
-  filtering re-stamps (`shelf-stamp`).
-- **Folders** (`FolderCard.astro`, data in `content/works.ts`): `.fold` with a tab carrying the folder name
-  (ink-written) at an offset (`--tab` 0 / 24% / 48%), fill = `white | soft (green-300) | green (green-500) | ink`
-  (ink folder = paper text, green shadow), slight alternating rotation, `-12px` overlap (`-8px` on phones).
-  **One folder per family**: «تسيير» holds two sheets (التسجيل، التحفيز); other folders hold one. A name stands
-  alone: no category word next to a name, no name repeated.
-- **Sheets** (`.sheet`, links to `/works/<slug>`): white paper in the folder with a **sketch** (`Sketch.astro`: flat
-  miniature screen, 16:9, kinds `rows | form | ledger | board | pulse | faces`), the line, and an ink "open"
-  button-look with arrow. Hover half-presses and the sketch paper peeks up 6px; the pulse sketch draws in steps.
-  On touch (`hover: none`) sheets peek and the arrow nudges by themselves once their folder has landed.
-- **Pull:** choosing a sheet pulls it out of its folder (500ms, 6 steps; other folders sink 8px), then
-  `archive.ts` re-dispatches the click so the ink flood carries the visitor. One pull at a time; reduced motion
-  or modified clicks skip the pull; bfcache restore puts the sheet away.
-- **Phone (under 600px):** tighter; each sheet becomes a row: 76px square sketch on the start, name beside it,
-  line and open button full width below; sketch details trimmed (rows 4+ hidden).
+- Intro: «أرشيف الأعمال» (last word boxed green), one short overview line, filter chips الكل / حلول رقمية / تجارب
+  حية (triangle cue, pointing down when on; `?arm=digital|live` preselects).
+- One **Finder-style window per arm** (`ArchiveWindow.astro`): a title bar (three small squares, ink-written arm
+  name; green-300 for digital, green-500 for live), the arm line in a strip, then a dotted desk of **folder
+  icons** (shared `src/components/Folder.astro`, same drawing as the home «من أعمالنا») with names and arrows
+  under them, and a **Quick-Look preview pane** (beside the desk from 900px, below it on phones): name, one line,
+  the work's sketch and an «افتح» button. «تسيير» is one folder with two labelled papers (التسجيل / التحفيز);
+  its preview lists both works with their own «افتح».
+- Click/tap/Enter/Space selects (toggle button pressed, roving tab order, arrow keys move in reading order,
+  Home/End); double-click or «افتح» opens: the paper rises out in 6 steps (480ms), then the ink flood. The first
+  folder is selected on load, so the preview is never empty. Without JS every preview shows as plain links.
+- Phones: 3 folders per row, preview below with a small sketch.
 
 ### 5.9 Work page (`/works/[slug]`, `src/pages/works/[slug].astro`)
 Header: rotated green-300 title `.box` (ink-written, `rotate: -2deg`) overlapping a white line `.box`

@@ -1,0 +1,90 @@
+---
+/* One arm as a Finder-like window: a title bar with three small squares and
+   the arm name, a body with the folders as icons (name under each, arrow
+   cue), and a preview pane for the selected folder. The first folder is
+   selected from the start, so the preview is never empty. */
+import Folder from '../Folder.astro';
+import Sketch from './Sketch.astro';
+import { foldersIn, workBySlug, worksCopy, type Arm } from '../../content/works';
+
+interface Props { arm: Arm; index: number }
+const { arm, index } = Astro.props;
+const g = worksCopy.gallery;
+const list = foldersIn(arm.id);
+---
+<section class={`win win--${arm.id} win--n${index % 2}`} data-arm={arm.id} data-window data-pop aria-labelledby={`win-${arm.id}`}>
+  <div class="win__bar">
+    <span class="win__dots" aria-hidden="true"><span></span><span></span><span></span></span>
+    <h2 class="win__title display" id={`win-${arm.id}`}><span data-ink>{arm.name}</span></h2>
+  </div>
+  <p class="win__line">{arm.line}</p>
+
+  <div class="win__body">
+    <div class="icons" role="group" aria-label={`${g.foldersOf} ${arm.name}`} data-icons>
+      {list.map((f, i) => {
+        const works = f.works.map(workBySlug);
+        return (
+          <div class="icons__item">
+            <button
+              type="button"
+              class={`icon folder-host${i === 0 ? ' is-selected' : ''}`}
+              aria-pressed={i === 0 ? 'true' : 'false'}
+              aria-controls={`peek-${f.id}`}
+              tabindex={i === 0 ? 0 : -1}
+              data-icon
+              data-peek={`peek-${f.id}`}
+            >
+              <Folder
+                fill={f.fill}
+                size="md"
+                papers={works.length > 1 ? 2 : 1}
+                labels={works.length > 1 ? works.map((w) => w.short) : []}
+                delay={(i % 3) as 0 | 1 | 2}
+              />
+              <span class="icon__name display">{f.name}<span class="icon__arrow" aria-hidden="true"></span></span>
+            </button>
+          </div>
+        );
+      })}
+    </div>
+
+    <div class="peeks" role="region" aria-label={`${g.preview}، ${arm.name}`}>
+      {list.map((f, i) => {
+        const works = f.works.map(workBySlug);
+        const multi = works.length > 1;
+        return (
+          <article class={`peek${i === 0 ? ' is-shown' : ''}${multi ? ' peek--multi' : ''}`} id={`peek-${f.id}`} data-peek-pane aria-labelledby={`peek-${f.id}-name`}>
+            <h3 class="peek__name display" id={`peek-${f.id}-name`}>{f.name}</h3>
+            {multi ? (
+              <Fragment>
+                {f.line && <p class="peek__line">{f.line}</p>}
+                <ul class="peek__works">
+                  {works.map((w) => (
+                    <li class="peek__work">
+                      <span class="peek__sketch peek__sketch--sm"><Sketch kind={w.sketch} /></span>
+                      <div class="peek__text">
+                        <h4 class="peek__short display">{w.short}</h4>
+                        <p class="peek__line">{w.line}</p>
+                        <a class="btn btn--lg peek__open" href={`/works/${w.slug}`} data-sheet>
+                          {g.open}<span class="works-sr"> {w.name}</span>
+                        </a>
+                      </div>
+                    </li>
+                  ))}
+                </ul>
+              </Fragment>
+            ) : (
+              <Fragment>
+                <p class="peek__line">{works[0].line}</p>
+                <span class="peek__sketch"><Sketch kind={works[0].sketch} /></span>
+                <a class="btn btn--lg peek__open" href={`/works/${works[0].slug}`} data-sheet>
+                  {g.open}<span class="works-sr"> {works[0].name}</span>
+                </a>
+              </Fragment>
+            )}
+          </article>
+        );
+      })}
+    </div>
+  </div>
+</section>

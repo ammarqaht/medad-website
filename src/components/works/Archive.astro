@@ -1,9 +1,11 @@
 ---
-/* The works archive (FR-10 to FR-12): two shelves, one per arm, each a stack
-   of printed folders. Arm filters are buttons (no reload); `?arm=digital`
-   or `?arm=live` preselects one. Without JS every folder simply shows. */
-import FolderCard from './FolderCard.astro';
-import { arms, foldersIn, worksCopy } from '../../content/works';
+/* The works archive (FR-10 to FR-12): one Finder-like window per arm. Each
+   window shows its folders as desktop icons (shared Folder.astro) and a
+   Quick-Look preview of the selected folder: name, one line, sketch, and an
+   «افتح» button per work. `?arm=digital` / `?arm=live` preselects an arm.
+   Without JS every preview shows and every «افتح» is a plain link. */
+import ArchiveWindow from './ArchiveWindow.astro';
+import { arms, worksCopy } from '../../content/works';
 const g = worksCopy.gallery;
 ---
 <div class="arc" data-archive>
@@ -15,17 +17,9 @@ const g = worksCopy.gallery;
   </div>
   <p class="works-sr" aria-live="polite" data-filter-status data-label={g.showing}></p>
 
-  {arms.map((arm) => (
-    <section class={`shelf shelf--${arm.id}`} data-arm={arm.id} aria-labelledby={`shelf-${arm.id}`}>
-      <div class="shelf__head">
-        <h2 class="shelf__title display box" id={`shelf-${arm.id}`} data-pop><span data-ink>{arm.name}</span></h2>
-        <p class="shelf__line box" data-pop="0.1">{arm.line}</p>
-      </div>
-      <ul class="stack">
-        {foldersIn(arm.id).map((f, i) => <FolderCard folder={f} index={i} />)}
-      </ul>
-    </section>
-  ))}
+  <div class="arc__windows">
+    {arms.map((arm, i) => <ArchiveWindow arm={arm} index={i} />)}
+  </div>
 </div>
 
 <script>

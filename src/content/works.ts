@@ -136,7 +136,10 @@ export const worksCopy = {
     line: 'أعمال من حبرنا: منصات تعمل كل يوم، ومسابقات تجمع القاعة. افتح أي ملف وجرّبه بنفسك.',
     filtersLabel: 'تصفية الأعمال',
     all: 'الكل',
-    open: 'افتح الملف',
+    open: 'افتح',
+    /** Accessible names for a window's folder group and its preview pane. */
+    foldersOf: 'ملفات',
+    preview: 'معاينة',
     showing: 'يظهر الآن',
   },
   page: {

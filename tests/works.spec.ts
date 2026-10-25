@@ -30,6 +30,53 @@ test.describe('works gallery', () => {
     await expect(page.locator('h1')).toContainText('نبضة');
   });
 
+  test('should select a folder by click and by arrow keys, and show its preview', async ({ page }) => {
+    await page.goto('/works');
+    const win = page.locator('[data-window][data-arm="digital"]');
+    await win.scrollIntoViewIfNeeded();
+    const icons = win.locator('[data-icon]');
+    // First folder selected from the start: the preview is never empty.
+    await expect(icons.first()).toHaveAttribute('aria-pressed', 'true');
+    await expect(win.locator('#peek-halqah')).toBeVisible();
+    await expect(win.locator('#peek-tasyeer')).toBeHidden();
+
+    // Click selects (does not navigate); the family folder lists both works.
+    await icons.nth(1).click();
+    await expect(page).toHaveURL(/\/works$/);
+    await expect(icons.nth(1)).toHaveAttribute('aria-pressed', 'true');
+    await expect(icons.first()).toHaveAttribute('aria-pressed', 'false');
+    await expect(win.locator('#peek-tasyeer a[data-sheet]')).toHaveCount(2);
+    await expect(win.locator('#peek-tasyeer a[href="/works/tasyeer-tasjeel"]')).toBeVisible();
+    await expect(win.locator('#peek-tasyeer a[href="/works/tasyeer-tahfeez"]')).toBeVisible();
+
+    // Arrows follow reading order (RTL): left = next. Roving tabindex follows.
+    await icons.nth(1).focus();
+    await page.keyboard.press('ArrowLeft');
+    await expect(icons.nth(2)).toHaveAttribute('aria-pressed', 'true');
+    await expect(icons.nth(2)).toBeFocused();
+    await expect(icons.nth(2)).toHaveAttribute('tabindex', '0');
+    await page.keyboard.press('ArrowRight');
+    await expect(icons.nth(1)).toHaveAttribute('aria-pressed', 'true');
+    await page.keyboard.press('Space');
+    await expect(icons.nth(1)).toHaveAttribute('aria-pressed', 'true');
+  });
+
+  test('should open a work by double-clicking its folder', async ({ page }) => {
+    await page.goto('/works');
+    const icon = page.locator('[data-window][data-arm="digital"] [data-icon][data-peek="peek-injaz"]');
+    await icon.scrollIntoViewIfNeeded();
+    await icon.dblclick();
+    await page.waitForURL('**/works/injaz');
+  });
+
+  test('should show every preview with plain links when JavaScript is off', async ({ browser }) => {
+    const context = await browser.newContext({ javaScriptEnabled: false });
+    const page = await context.newPage();
+    await page.goto('/works');
+    for (const slug of SLUGS) await expect(page.locator(`a[data-sheet][href="/works/${slug}"]`)).toBeVisible();
+    await context.close();
+  });
+
   test('should not load the Halqah island on / or /works', async ({ page }) => {
     for (const path of ['/', '/works']) {
       const scripts: string[] = [];

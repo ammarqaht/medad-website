@@ -4,8 +4,11 @@
    sheet of paper peeking out that sways a little. The work's name sits under
    its folder, as on a desktop. A button opens all the works. */
 import Button from '../Button.astro';
+import Folder from '../Folder.astro';
 import { site } from '../../content/site';
 const { glimpse } = site.home;
+/* white, green, soft: the same three fills as before, in order */
+const FILLS = ['white', 'green', 'soft'] as const;
 ---
 <section class="glimpse" aria-labelledby="glimpse-title">
   <h2 class="glimpse__title display" id="glimpse-title" data-ink>{glimpse.title}</h2>
@@ -13,12 +16,8 @@ const { glimpse } = site.home;
   <ul class="files">
     {glimpse.items.map((f, i) => (
       <li class={`file file--${i + 1}`} data-pop>
-        <a class="file__link" href={f.href}>
-          <span class="folder" aria-hidden="true">
-            <span class="folder__back"></span>
-            <span class="folder__paper"><i></i><i></i><i></i></span>
-            <span class="folder__front"></span>
-          </span>
+        <a class="file__link folder-host" href={f.href}>
+          <Folder fill={FILLS[i % FILLS.length]} delay={(i % 3) as 0 | 1 | 2} />
           <span class="file__name display">{f.name}<span class="file__open" aria-hidden="true"></span></span>
         </a>
       </li>
@@ -47,9 +46,6 @@ const { glimpse } = site.home;
     align-items: start;
   }
   .file { display: grid; justify-items: center; }
-  .file--1 { --file-bg: var(--white); }
-  .file--2 { --file-bg: var(--green-500); }
-  .file--3 { --file-bg: var(--green-300); }
 
   .file__link {
     display: grid;
@@ -58,69 +54,6 @@ const { glimpse } = site.home;
     inline-size: 100%;
     color: var(--ink);
     text-decoration: none;
-  }
-
-  /* The folder: back panel with a tab, a sheet of paper, the front panel */
-  .folder {
-    position: relative;
-    display: block;
-    inline-size: min(100%, 240px);
-    aspect-ratio: 5 / 4;
-    transition: translate var(--snap);
-  }
-  .folder__back,
-  .folder__front,
-  .folder__paper {
-    position: absolute;
-    border: var(--bw) solid var(--ink);
-  }
-  .folder__back {
-    inset: 16% 0 0 0;
-    background: var(--file-bg);
-    box-shadow: var(--shadow);
-  }
-  /* the tab, on the start side (right in RTL), mirroring a desktop folder */
-  .folder__back::before {
-    content: "";
-    position: absolute;
-    inset-block-end: 100%;
-    inset-inline-start: -3px;
-    inline-size: 40%;
-    block-size: 18%;
-    min-block-size: 12px;
-    margin-block-end: calc(var(--bw) * -1);
-    background: var(--file-bg);
-    border: var(--bw) solid var(--ink);
-    border-block-end: 0;
-    /* slanted on its inner side (left in RTL), straight on the outer edge */
-    clip-path: polygon(16% 0, 100% 0, 100% 100%, 0 100%);
-  }
-  .folder__paper {
-    inset: 7% 8% 30% 16%;
-    background: var(--paper);
-    display: grid;
-    align-content: start;
-    gap: 9%;
-    padding: 12% 12%;
-    transform-origin: 50% 100%;
-    transition: translate var(--snap);
-  }
-  .folder__paper i { display: block; block-size: 7%; min-block-size: 3px; background: var(--ink); }
-  .folder__paper i:nth-child(2) { inline-size: 70%; }
-  .folder__paper i:nth-child(3) { inline-size: 45%; }
-  .folder__front {
-    inset: 32% 0 0 0;
-    background: var(--file-bg);
-  }
-  /* a hard highlight line on the front lip */
-  .folder__front::before {
-    content: "";
-    position: absolute;
-    inset-inline: 8%;
-    inset-block-start: 14%;
-    block-size: var(--bw);
-    background: var(--ink);
-    opacity: .9;
   }
 
   .file__name {
@@ -140,21 +73,8 @@ const { glimpse } = site.home;
     transition: translate var(--snap);
   }
 
-  /* The paper sways a little in its folder, in hard frames; each folder out of step */
-  :global(.js) .file:global(.is-in) .folder__paper { animation: sway 2.4s steps(4, jump-none) infinite; }
-  :global(.js) .file--2:global(.is-in) .folder__paper { animation-delay: -.8s; }
-  :global(.js) .file--3:global(.is-in) .folder__paper { animation-delay: -1.6s; }
-  @keyframes sway {
-    0%, 100% { rotate: -2.5deg; }
-    50% { rotate: 2.5deg; }
-  }
-  /* Hover / focus: the paper rises out of the folder and the folder lifts */
-  .file__link:hover .folder,
-  .file__link:focus-visible .folder { translate: 0 -6px; }
-  .file__link:hover .folder__paper,
-  .file__link:focus-visible .folder__paper { translate: 0 -18%; }
+  /* The folder itself (tab, papers, sway, hover lift) lives in Folder.astro */
   .file__link:hover .file__open { translate: -5px 0; }
-  .file__link:active .folder { translate: 0 0; }
 
   @media (max-width: 599px) {
     .glimpse { gap: 24px; padding-block: 32px 56px; }
@@ -164,7 +84,6 @@ const { glimpse } = site.home;
   }
 
   @media (prefers-reduced-motion: reduce) {
-    :global(.js) .file:global(.is-in) .folder__paper { animation: none; }
-    .folder, .folder__paper, .file__open { transition: none; }
+    .file__open { transition: none; }
   }
 </style>

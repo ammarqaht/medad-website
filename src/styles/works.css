@@ -1,5 +1,5 @@
 /* ============================================================
-   Works section: archive, folders, device frame, pending sheet,
+   Works section: archive windows, device frame, pending sheet,
    work page, and the ink-writing effect. Imported only by the
    /works pages. Neo-Brutalism (DESIGN.md §5, §9): ink borders,
    hard shadows to the inline end, stepped motion, no radius.
@@ -94,155 +94,121 @@
 .chip:hover { background: var(--green-800); translate: calc(var(--off) / -2) calc(var(--off) / 2); box-shadow: calc(var(--sx) / 2) calc(var(--off) / 2) 0 0 var(--green-500); }
 .chip[aria-pressed="true"] { background: var(--green-300); color: var(--ink); translate: var(--sx) var(--off); box-shadow: 0 0 0 0 var(--green-500); }
 
-/* ---------- Shelves: one per arm ---------- */
-.shelf { display: grid; gap: 28px; padding-block: clamp(24px, 4vw, 56px); }
-.shelf + .shelf { border-block-start: var(--bw) solid var(--ink); }
-.shelf[hidden] { display: none; }
-.shelf.is-restamp { animation: shelf-stamp var(--stamp) both; }
-@keyframes shelf-stamp { from { scale: 1.04; opacity: 0; } to { scale: 1; opacity: 1; } }
-.shelf__head { display: grid; gap: 16px; justify-items: start; align-content: start; }
-.shelf__title {
-  padding: 6px 22px 14px;
-  background: var(--green-300);
-  font-size: clamp(36px, 4.6vw, 64px);
-  line-height: 1.2;
-  rotate: -2deg;
-}
-.shelf--live .shelf__title { background: var(--green-500); rotate: 1.5deg; }
-.shelf__line {
-  padding: 12px 18px 14px;
-  max-inline-size: 30ch;
-  font-size: clamp(19px, 1.6vw, 22px);
-  line-height: 1.6;
-  rotate: .6deg;
-  margin-block-start: 10px;
-}
-@media (min-width: 960px) {
-  .shelf { grid-template-columns: repeat(12, minmax(0, 1fr)); align-items: start; column-gap: 24px; }
-  .shelf__head { grid-column: 1 / span 4; position: sticky; inset-block-start: 110px; }
-  .stack { grid-column: 5 / -1; }
-}
-
-/* ---------- Folders, stacked ---------- */
-.stack { display: grid; list-style: none; margin: 0; padding: 0; }
-.fold {
-  --fill: var(--white);
-  --text: var(--ink);
-  --tab: 0%;
-  position: relative;
-  padding-block-start: 56px;
-  rotate: -.5deg;
-}
-.fold + .fold { margin-block-start: -12px; }
-.fold--n1 { --tab: 24%; rotate: .5deg; }
-.fold--n2 { --tab: 48%; rotate: -.3deg; }
-.fold--soft { --fill: var(--green-300); }
-.fold--green { --fill: var(--green-500); }
-.fold--ink { --fill: var(--ink); --text: var(--paper); }
-.fold__tab {
-  position: absolute;
-  z-index: 2;
-  inset-block-start: 0;
-  inset-inline-start: var(--tab);
-  margin: 0;
-  min-block-size: 59px;
-  padding: 4px 26px 12px;
-  border: var(--bw) solid var(--ink);
-  border-block-end: 0;
-  background: var(--fill);
-  color: var(--text);
-  font-size: clamp(28px, 3.2vw, 40px);
-  line-height: 1.25;
-  box-shadow: var(--sx) 0 0 0 var(--ink);
-}
-.fold__body {
-  position: relative;
-  z-index: 1;
-  container-type: inline-size;
-  display: grid;
-  gap: 18px;
-  padding: clamp(16px, 2.4vw, 26px);
-  border: var(--bw) solid var(--ink);
-  background: var(--fill);
-  color: var(--text);
-  box-shadow: var(--shadow);
-}
-.fold--ink .fold__body, .fold--ink .fold__tab { box-shadow: var(--sx) var(--off) 0 0 var(--green-500); }
-.fold--ink .fold__tab { box-shadow: var(--sx) 0 0 0 var(--green-500); }
-.fold__line { margin: 0; font-size: clamp(19px, 1.6vw, 22px); line-height: 1.6; }
-.fold__sheets { display: grid; gap: 22px; list-style: none; margin: 0; padding: 0; }
-@container (min-width: 640px) { .fold__sheets--multi { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
-
-/* A sheet: white paper in the folder, the link to the work */
-.sheet {
-  position: relative;
-  display: grid;
-  gap: 16px;
-  padding: 16px;
-  border: var(--bw) solid var(--ink);
+/* ---------- Windows: one per arm, Finder-like (DESIGN.md §5.8) ---------- */
+.arc__windows { display: grid; gap: clamp(36px, 5vw, 64px); }
+.win {
   background: var(--white);
-  color: var(--ink);
-  text-decoration: none;
+  border: var(--bw) solid var(--ink);
   box-shadow: var(--shadow);
-  transition: translate var(--snap), box-shadow var(--snap);
+}
+.win--n0 { rotate: -.4deg; }
+.win--n1 { rotate: .4deg; }
+.win[hidden] { display: none; }
+.win.is-restamp { animation: shelf-stamp var(--stamp) both; }
+@keyframes shelf-stamp { from { scale: 1.04; opacity: 0; } to { scale: 1; opacity: 1; } }
+.win__bar {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 6px clamp(14px, 2vw, 22px) 10px;
+  background: var(--green-300);
+  border-block-end: var(--bw) solid var(--ink);
+}
+.win--live .win__bar { background: var(--green-500); }
+.win__dots { display: flex; gap: 8px; flex: none; }
+.win__dots span { inline-size: 14px; block-size: 14px; border: var(--bw) solid var(--ink); background: var(--white); }
+.win__dots span:nth-child(2) { background: var(--paper); }
+.win__dots span:nth-child(3) { background: var(--ink); }
+.win__title { margin: 0; font-size: clamp(30px, 3.6vw, 48px); line-height: 1.25; }
+.win__line {
+  margin: 0;
+  padding: 10px clamp(14px, 2vw, 22px) 12px;
+  border-block-end: var(--bw) solid var(--ink);
+  background: var(--white);
+  font-size: clamp(17px, 1.4vw, 20px);
+  line-height: 1.5;
+}
+.win__body { display: grid; }
+@media (min-width: 900px) {
+  .win__body { grid-template-columns: minmax(0, 1fr) minmax(320px, 42%); }
+  .icons { align-content: center; }
+  .peeks { border-inline-start: var(--bw) solid var(--ink); }
+}
+
+/* The folders, as desktop icons on a dotted desk */
+.icons {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  align-content: start;
+  gap: 28px 18px;
+  padding: clamp(28px, 3vw, 44px) clamp(14px, 2.4vw, 32px);
+  background-color: var(--paper);
+  background-image: radial-gradient(var(--gray) 1.6px, transparent 1.7px);
+  background-size: 26px 26px;
+}
+.icon {
+  display: grid;
+  justify-items: center;
+  gap: 14px;
+  inline-size: 100%;
+  min-block-size: 44px;
+  padding: 30px 4px 8px;
+  border: 0;
+  background: transparent;
+  color: var(--ink);
+  font: inherit;
+  cursor: pointer;
   -webkit-tap-highlight-color: transparent;
 }
-.fold--ink .sheet { box-shadow: var(--sx) var(--off) 0 0 var(--green-500); }
-.fold--ink .sheet:focus-visible { outline-color: var(--green-400); }
-.sheet:hover { translate: calc(var(--off) / -2) calc(var(--off) / 2); box-shadow: calc(var(--sx) / 2) calc(var(--off) / 2) 0 0 var(--ink); }
-.fold--ink .sheet:hover { box-shadow: calc(var(--sx) / 2) calc(var(--off) / 2) 0 0 var(--green-500); }
-.sheet__paper { display: block; transition: translate var(--snap); }
-.sheet:hover .sheet__paper, .sheet:focus-visible .sheet__paper { translate: 0 -6px; }
-.sheet__text { display: grid; gap: 10px; justify-items: start; align-content: center; }
-.sheet__name { font-size: clamp(28px, 3vw, 40px); line-height: 1.2; }
-.sheet__line { font-size: clamp(19px, 1.6vw, 22px); line-height: 1.6; }
-.sheet__open {
+.icon__name {
   display: inline-flex;
   align-items: center;
-  gap: 10px;
-  min-block-size: 44px;
-  padding: 8px 16px;
-  border: var(--bw) solid var(--ink);
-  background: var(--ink);
-  color: var(--paper);
-  font-size: 17px;
-  font-weight: 900;
-  line-height: 1;
+  gap: 8px;
+  padding: 0 10px 4px;
+  border: var(--bw) solid transparent;
+  font-size: clamp(20px, 2vw, 28px);
+  line-height: 1.25;
+  transition: background-color var(--snap);
 }
-.sheet__open::after {
-  content: "";
-  inline-size: .9em;
-  block-size: .9em;
+.icon.is-selected .icon__name { background: var(--green-300); border-color: var(--ink); }
+.icon__arrow {
+  flex: none;
+  inline-size: .62em;
+  block-size: .62em;
   background: currentColor;
   clip-path: polygon(0 50%, 55% 0, 55% 30%, 100% 30%, 100% 70%, 55% 70%, 55% 100%);
   transition: translate var(--snap);
 }
-.sheet:hover .sheet__open::after { translate: -4px 0; }
-@container (min-width: 560px) {
-  .fold__sheets:not(.fold__sheets--multi) .sheet {
-    grid-template-columns: minmax(0, 1fr) minmax(180px, 40%);
-    align-items: center;
-    gap: 24px;
-    padding: 20px;
-  }
-  .fold__sheets:not(.fold__sheets--multi) .sheet__paper { order: 2; }
-}
+@media (hover: hover) { .icon:hover .icon__arrow { translate: -5px 0; } }
 
-/* Pull: the sheet comes out of the folder toward the viewer, the rest is pushed back */
-.sheet.is-pulled { z-index: 5; animation: sheet-pull 500ms steps(6, jump-end) forwards; }
-.sheet.is-pulled .sheet__paper { animation: paper-open 500ms steps(6, jump-end) forwards; }
-.fold.is-open { z-index: 4; }
-.arc.is-pulling .fold:not(.is-open) .fold__body,
-.arc.is-pulling .fold:not(.is-open) .fold__tab { translate: 0 8px; box-shadow: none; transition: translate var(--snap), box-shadow var(--snap); }
-@keyframes sheet-pull {
-  0% { translate: 0 0; scale: 1; rotate: 0deg; }
-  35% { translate: 0 -34px; scale: 1.02; rotate: -1.5deg; box-shadow: -10px 10px 0 0 var(--ink); }
-  100% { translate: 0 -22px; scale: 1.06; rotate: 0deg; box-shadow: -14px 14px 0 0 var(--ink); }
+/* Quick-Look preview of the selected folder */
+.peeks { background: var(--white); padding: clamp(18px, 2.4vw, 30px); }
+.js .peek:not(.is-shown) { display: none; }
+html:not(.js) .peek + .peek { margin-block-start: 22px; padding-block-start: 22px; border-block-start: var(--bw) solid var(--ink); }
+.peek { display: grid; gap: 14px; align-content: start; justify-items: start; }
+.peek.is-fresh { animation: peek-in var(--stamp) both; }
+@keyframes peek-in { from { opacity: 0; translate: 0 8px; } to { opacity: 1; translate: 0 0; } }
+.peek__name { margin: 0; font-size: clamp(32px, 3.4vw, 48px); line-height: 1.15; }
+.peek__line { margin: 0; font-size: clamp(19px, 1.6vw, 22px); line-height: 1.6; }
+.peek__sketch { display: block; inline-size: min(100%, 360px); }
+.peek__open { font-size: clamp(19px, 1.8vw, 22px); padding: 12px 22px; }
+.peek__works { display: grid; gap: 18px; inline-size: 100%; list-style: none; margin: 0; padding: 0; }
+.peek__work {
+  display: grid;
+  grid-template-columns: 110px minmax(0, 1fr);
+  align-items: start;
+  gap: 14px;
+  padding-block-start: 16px;
+  border-block-start: var(--bw) solid var(--ink);
 }
-@keyframes paper-open {
-  from { scale: 1; }
-  to { scale: 1.12; }
-}
+.peek__text { display: grid; gap: 8px; justify-items: start; }
+.peek__short { margin: 0; font-size: clamp(26px, 2.6vw, 34px); line-height: 1.2; }
+.peek__sketch--sm .sk { aspect-ratio: 1 / 1; }
+.peek__sketch--sm .sk__bar { padding: 3px 5px; gap: 3px; }
+.peek__sketch--sm .sk__bar span { inline-size: 6px; block-size: 6px; }
+.peek__sketch--sm .sk__screen { gap: 4px; padding: 6px; }
+.peek__sketch--sm .sk__cells span { inline-size: 10px; block-size: 9px; }
+.peek__sketch--sm .sk__row:nth-child(n+4) { display: none; }
 
 /* ---------- Sketches: flat miniature screens ---------- */
 .sk {
@@ -277,27 +243,8 @@
 .sk__face--1 { background: var(--green-500); }
 .sk__pulse { inline-size: 100%; block-size: 70%; align-self: center; color: var(--green-500); stroke-dasharray: 260; stroke-dashoffset: 0; }
 .sk--pulse .sk__screen { align-content: center; block-size: 100%; }
-.sheet:hover .sk__pulse, .pend .sk__pulse { animation: pulse-draw 1.2s steps(10, jump-end) infinite; }
+.peek.is-shown .sk__pulse, .pend .sk__pulse, html:not(.js) .peek .sk__pulse { animation: pulse-draw 1.2s steps(10, jump-end) infinite; }
 @keyframes pulse-draw { from { stroke-dashoffset: 260; } to { stroke-dashoffset: 0; } }
-
-/* Touch screens have no hover: the sheets move by themselves once their
-   folder lands. The paper peeks out of the folder and the pulse keeps beating. */
-@media (hover: none) {
-  .fold__body.is-in .sheet__paper { animation: paper-peek 2.4s steps(1, end) infinite; }
-  .fold__sheets li:nth-child(2) .sheet__paper { animation-delay: 1.2s; }
-  .fold__body.is-in .sk__pulse { animation: pulse-draw 1.2s steps(10, jump-end) infinite; }
-  .fold__body.is-in .sheet__open::after { animation: open-nudge 1.2s steps(1, end) infinite; }
-}
-@keyframes paper-peek {
-  0%, 60% { translate: 0 0; }
-  70% { translate: 0 -4px; }
-  80% { translate: 0 -8px; }
-  90% { translate: 0 -4px; }
-}
-@keyframes open-nudge {
-  0%, 50% { translate: 0 0; }
-  60% { translate: -4px 0; }
-}
 
 /* ---------- Device frame (DESIGN.md §9) ---------- */
 .frame {
@@ -457,32 +404,29 @@
   .gal__line { padding: 12px 14px 14px; font-size: 19px; }
   .arc__filters { gap: 10px; margin-block-end: 12px; }
   .chip { min-block-size: 44px; padding: 8px 14px; font-size: 16px; }
-  .shelf { gap: 16px; padding-block: 18px 22px; }
-  .shelf__head { gap: 8px; }
-  .shelf__title { padding: 2px 16px 10px; font-size: 32px; }
-  .shelf__line { margin-block-start: 4px; padding: 8px 12px 10px; font-size: 19px; }
-  .fold { padding-block-start: 46px; }
-  .fold + .fold { margin-block-start: -8px; }
-  .fold__tab { min-block-size: 49px; padding: 2px 18px 8px; font-size: 26px; }
-  .fold__body { gap: 12px; padding: 12px; }
-  .fold__line { font-size: 19px; }
-  .fold__sheets { gap: 14px; }
-  .sheet {
-    grid-template-columns: 76px minmax(0, 1fr);
-    align-items: center;
-    gap: 10px 12px;
-    padding: 12px;
-  }
-  .sheet__text { display: contents; }
-  .sheet .sk { aspect-ratio: 1 / 1; }
-  .sheet .sk__bar { padding: 3px 5px; gap: 3px; }
-  .sheet .sk__bar span { inline-size: 5px; block-size: 5px; }
-  .sheet .sk__screen { gap: 4px; padding: 5px; }
-  .sheet .sk__cells span { inline-size: 9px; block-size: 8px; }
-  .sheet .sk__row:nth-child(n+4) { display: none; }
-  .sheet__name { font-size: 28px; }
-  .fold__sheets--multi .sheet__line { grid-column: 1 / -1; }
-  .sheet__open { grid-column: 1 / -1; justify-self: start; font-size: 16px; padding: 6px 14px; }
+  .arc__windows { gap: 28px; }
+  .win__bar { gap: 10px; padding: 4px 12px 8px; }
+  .win__dots { gap: 5px; }
+  .win__dots span { inline-size: 11px; block-size: 11px; }
+  .win__title { font-size: 26px; }
+  .win__line { padding: 8px 12px 10px; font-size: 16px; }
+  .peeks { border-block-start: var(--bw) solid var(--ink); padding: 14px; }
+  .icons { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px 6px; padding: 18px 8px 14px; }
+  .icon { gap: 8px; padding: 24px 0 4px; }
+  .icon__name { font-size: 17px; padding: 0 6px 3px; gap: 5px; }
+  .icon__arrow { inline-size: 12px; block-size: 12px; }
+  .peek { grid-template-columns: 84px minmax(0, 1fr); gap: 10px 12px; align-items: center; }
+  .peek__name, .peek__open, .peek--multi .peek__line, .peek__works { grid-column: 1 / -1; }
+  .peek__name { font-size: 28px; }
+  .peek__line { font-size: 17px; }
+  .peek__sketch { grid-row: 2; grid-column: 1; }
+  .peek:not(.peek--multi) .peek__sketch .sk { aspect-ratio: 1 / 1; }
+  .peek:not(.peek--multi) .peek__sketch .sk__row:nth-child(n+4) { display: none; }
+  .peek__open { justify-self: start; font-size: 18px; padding: 10px 18px; }
+  .peek__works { gap: 12px; }
+  .peek__work { grid-template-columns: 72px minmax(0, 1fr); gap: 10px; padding-block-start: 12px; }
+  .peek__short { font-size: 24px; }
+  .peek__work .peek__sketch { grid-row: auto; }
 
   .wk { padding-block: 24px 56px; }
   .wk__head { gap: 14px; margin-block-end: 24px; }
@@ -498,12 +442,8 @@
 
 /* ---------- Reduced motion: fades and colour only ---------- */
 @media (prefers-reduced-motion: reduce) {
-  .fold__body.is-in .sheet__paper, .fold__body.is-in .sk__pulse, .fold__body.is-in .sheet__open::after,
-  .shelf.is-restamp, .sheet.is-pulled, .sheet.is-pulled .sheet__paper,
-  .pend__paper, .sheet:hover .sk__pulse, .pend .sk__pulse { animation: none; }
-  .chip, .sheet, .sheet__paper, .sheet__open::after { transition: background-color .2s ease, color .2s ease; }
-  .chip:hover, .chip[aria-pressed="true"], .sheet:hover, .sheet:hover .sheet__paper,
-  .sheet:focus-visible .sheet__paper, .sheet:hover .sheet__open::after { translate: none; }
-  .sheet:hover { box-shadow: var(--shadow); outline: 3px solid var(--green-500); }
+  .win.is-restamp, .peek.is-fresh, .pend__paper, .sk__pulse { animation: none !important; }
+  .chip, .icon__name, .icon__arrow { transition: background-color .2s ease, color .2s ease; }
+  .chip:hover, .chip[aria-pressed="true"], .icon:hover .icon__arrow { translate: none; }
   .chip[aria-pressed="true"] { box-shadow: 0 0 0 0 var(--green-500); }
 }

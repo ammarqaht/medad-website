@@ -1,0 +1,154 @@
+---
+/* A desktop-style folder in the house style (DESIGN.md §5.5 Glimpse, §5.8):
+   a back panel with a tab on the start side (slanted on its inner side), one
+   or two sheets of paper peeking out, and a front panel with a hard lip line.
+   Ink borders, hard shadow, flat fills. Decorative: the name lives beside it.
+
+   Motion hooks, set by whoever hosts the folder:
+   - an ancestor with `.is-in` (stamp-in): the paper sways ±2.5deg in hard steps;
+   - `.folder-host` hovered (desktop) or keyboard-focused: the folder lifts 6px
+     and the paper rises out;
+   - `.folder-host.is-selected`: the paper stays a little raised;
+   - `.folder-host.is-opening`: the paper rises out of the folder (480ms, steps). */
+interface Props {
+  fill?: 'white' | 'soft' | 'green' | 'ink';
+  size?: 'lg' | 'md';
+  /** One or two sheets of paper. */
+  papers?: 1 | 2;
+  /** Optional text on each paper (front paper first). */
+  labels?: string[];
+  /** Sway out of step with its neighbours (0, 1, 2). */
+  delay?: 0 | 1 | 2;
+}
+const { fill = 'white', size = 'lg', papers = 1, labels = [], delay = 0 } = Astro.props;
+const sheets = Array.from({ length: papers }, (_, i) => labels[i]);
+---
+<span class={`folder folder--${fill} folder--${size} folder--d${delay}${papers > 1 ? ' folder--two' : ''}`} aria-hidden="true">
+  <span class="folder__back"></span>
+  {sheets.slice().reverse().map((label, r) => {
+    const i = sheets.length - 1 - r;
+    return (
+      <span class={`folder__paper folder__paper--${i + 1}`}>
+        {label ? <span class="folder__label">{label}</span> : <Fragment><i></i><i></i><i></i></Fragment>}
+      </span>
+    );
+  })}
+  <span class="folder__front"></span>
+</span>
+
+<style>
+  .folder {
+    --file-bg: var(--white);
+    --lip: var(--ink);
+    --file-shadow: var(--ink);
+    position: relative;
+    display: block;
+    inline-size: min(100%, 240px);
+    aspect-ratio: 5 / 4;
+    transition: translate var(--snap);
+  }
+  .folder--md { inline-size: min(100%, 150px); }
+  .folder--soft { --file-bg: var(--green-300); }
+  .folder--green { --file-bg: var(--green-500); }
+  .folder--ink { --file-bg: var(--ink); --lip: var(--paper); --file-shadow: var(--green-500); }
+
+  .folder__back,
+  .folder__front,
+  .folder__paper {
+    position: absolute;
+    border: var(--bw) solid var(--ink);
+  }
+  .folder__back {
+    inset: 16% 0 0 0;
+    background: var(--file-bg);
+    box-shadow: var(--sx) var(--off) 0 0 var(--file-shadow);
+  }
+  /* the tab, on the start side (right in RTL), mirroring a desktop folder */
+  .folder__back::before {
+    content: "";
+    position: absolute;
+    inset-block-end: 100%;
+    inset-inline-start: -3px;
+    inline-size: 40%;
+    block-size: 18%;
+    min-block-size: 12px;
+    margin-block-end: calc(var(--bw) * -1);
+    background: var(--file-bg);
+    border: var(--bw) solid var(--ink);
+    border-block-end: 0;
+    /* slanted on its inner side (left in RTL), straight on the outer edge */
+    clip-path: polygon(16% 0, 100% 0, 100% 100%, 0 100%);
+  }
+  .folder__paper {
+    inset: 7% 8% 30% 16%;
+    background: var(--paper);
+    display: grid;
+    align-content: start;
+    gap: 9%;
+    padding: 12% 12%;
+    transform-origin: 50% 100%;
+    transition: translate var(--snap);
+  }
+  .folder__paper i { display: block; block-size: 7%; min-block-size: 3px; background: var(--ink); }
+  .folder__paper i:nth-child(2) { inline-size: 70%; }
+  .folder__paper i:nth-child(3) { inline-size: 45%; }
+  /* Two papers: the back one stands higher and further to the start, so both labels read */
+  .folder--two .folder__paper--1 { inset: 4% 14% 24% 10%; }
+  .folder--two .folder__paper--2 { inset: -24% 4% 50% 22%; background: var(--white); }
+  .folder__label {
+    font-family: var(--font-body);
+    font-size: 14px;
+    font-weight: 900;
+    line-height: 1.2;
+    color: var(--ink);
+    white-space: nowrap;
+  }
+  .folder--two .folder__paper { padding: 2px 8%; }
+  .folder__front {
+    inset: 32% 0 0 0;
+    background: var(--file-bg);
+  }
+  /* a hard highlight line on the front lip */
+  .folder__front::before {
+    content: "";
+    position: absolute;
+    inset-inline: 8%;
+    inset-block-start: 14%;
+    block-size: var(--bw);
+    background: var(--lip);
+    opacity: .9;
+  }
+
+  /* The paper sways a little in its folder, in hard frames; each folder out of step */
+  :global(.js .is-in) .folder__paper { animation: sway 2.4s steps(4, jump-none) infinite; }
+  :global(.js .is-in) .folder--d1 .folder__paper { animation-delay: -.8s; }
+  :global(.js .is-in) .folder--d2 .folder__paper { animation-delay: -1.6s; }
+  :global(.js .is-in) .folder__paper--2 { animation-delay: -1.2s; }
+  @keyframes sway {
+    0%, 100% { rotate: -2.5deg; }
+    50% { rotate: 2.5deg; }
+  }
+
+  /* Hover (pointer devices) and keyboard focus: the folder lifts, the paper rises out */
+  @media (hover: hover) {
+    :global(.folder-host:hover) .folder { translate: 0 -6px; }
+    :global(.folder-host:hover) .folder__paper { translate: 0 -18%; }
+  }
+  :global(.folder-host:focus-visible) .folder { translate: 0 -6px; }
+  :global(.folder-host:focus-visible) .folder__paper,
+  :global(.folder-host.is-selected) .folder__paper { translate: 0 -18%; }
+  :global(.folder-host:active) .folder { translate: 0 0; }
+
+  /* Opening: the paper rises out of the folder before the page changes */
+  :global(html .folder-host.is-opening) .folder__paper { animation: paper-out 480ms steps(6, jump-end) forwards; }
+  :global(html .folder-host.is-opening) .folder { translate: 0 -6px; }
+  @keyframes paper-out {
+    from { translate: 0 -18%; rotate: 0deg; }
+    to { translate: 0 -78%; rotate: -3deg; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    :global(.js .is-in) .folder__paper, :global(html .folder-host.is-opening) .folder__paper { animation: none; }
+    .folder, .folder__paper { transition: none; }
+  }
+</style>
