@@ -1,14 +1,14 @@
 ---
 /* Closing (FR-09): the only call to contact on the page, at the very end. */
 import Button from '../Button.astro';
-import { site, WHATSAPP } from '../../content/site';
+import { site, waLink } from '../../content/site';
 const { closing } = site.home;
 ---
 <section class="closing" aria-labelledby="closing-title">
   <div class="closing__slab box" data-pop>
     <h2 class="closing__title display" id="closing-title" data-ink>{closing.headline}</h2>
     <p class="closing__line">{closing.line}</p>
-    <Button href={WHATSAPP} variant="paper">{closing.cta}</Button>
+    <Button href={waLink()} variant="paper">{closing.cta}</Button>
     <svg class="ring" viewBox="0 0 100 100" aria-hidden="true">
       <circle cx="50" cy="50" r="46" /><circle cx="50" cy="50" r="18" />
     </svg>

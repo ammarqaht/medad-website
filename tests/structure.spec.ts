@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-import { PAGES, WHATSAPP, BRAND, WORKS_LINK, stubExternal } from './helpers';
+import { PAGES, WHATSAPP, WA_PREFIX, BRAND, WORKS_LINK, stubExternal } from './helpers';
 
 /* FR-01, FR-02, NFR-01, NFR-02, NFR-09 (targets), NFR-10 */
 
@@ -79,7 +79,7 @@ for (const path of PAGES) {
     test('should show a footer with the paper logo, a WhatsApp link and copyright', async ({ page }) => {
       const footer = page.locator('footer.footer');
       await expect(footer.locator('img[src="/logo/medad-mark-paper.png"]')).toBeVisible();
-      await expect(footer.locator(`a[href="${WHATSAPP}"]`)).toBeVisible();
+      await expect(footer.locator(`a[href^="${WA_PREFIX}"]`)).toBeVisible();
       await expect(footer).toContainText('©');
     });
 
@@ -88,7 +88,7 @@ for (const path of PAGES) {
       // Home: closing + footer. Other pages: footer only.
       expect(await links.count()).toBeGreaterThanOrEqual(path === '/' ? 2 : 1);
       for (const a of await links.all()) {
-        await expect(a).toHaveAttribute('href', WHATSAPP);
+        expect((await a.getAttribute('href'))?.startsWith(WA_PREFIX)).toBe(true);
         await expect(a).toHaveAttribute('target', '_blank');
         await expect(a).toHaveAttribute('rel', /\bnoopener\b/);
       }
@@ -166,10 +166,10 @@ test('should open the closing WhatsApp button in a new tab without an opener', a
   await page.goto('/');
   const [popup] = await Promise.all([
     context.waitForEvent('page'),
-    page.locator(`.closing a.btn[href="${WHATSAPP}"]`).click(),
+    page.locator(`.closing a.btn[href^="${WA_PREFIX}"]`).click(),
   ]);
   await popup.waitForLoadState();
-  expect(popup.url()).toBe(WHATSAPP);
+  expect(popup.url().startsWith(WA_PREFIX)).toBe(true);
   expect(await popup.evaluate(() => window.opener)).toBeNull();
   expect(new URL(page.url()).pathname).toBe('/');
 });
@@ -179,9 +179,9 @@ test('should open the footer WhatsApp link in a new tab without an opener', asyn
   await page.goto('/works');
   const [popup] = await Promise.all([
     context.waitForEvent('page'),
-    page.locator(`footer a[href="${WHATSAPP}"]`).click(),
+    page.locator(`footer a[href^="${WA_PREFIX}"]`).click(),
   ]);
   await popup.waitForLoadState();
-  expect(popup.url()).toBe(WHATSAPP);
+  expect(popup.url().startsWith(WA_PREFIX)).toBe(true);
   expect(await popup.evaluate(() => window.opener)).toBeNull();
 });

@@ -12,7 +12,7 @@ import TasjeelDemo from '../../islands/tasjeel/TasjeelDemo';
 import TahfeezDemo from '../../islands/tahfeez/TahfeezDemo';
 import InjazDemo from '../../islands/injaz/InjazDemo';
 import { works, worksCopy, type Work } from '../../content/works';
-import { WHATSAPP } from '../../content/site';
+import { waLink, WA_MESSAGES } from '../../content/site';
 import '../../styles/works.css';
 
 export function getStaticPaths() {
@@ -58,7 +58,7 @@ const live = work.demo && LIVE.includes(work.slug);
       <h2 class="wk__close-title display" id="wk-close"><span data-ink>{p.closing.headline}</span></h2>
       <p class="wk__close-line">{p.closing.line}</p>
       <div class="wk__close-cta">
-        <Button href={WHATSAPP} variant="paper">{p.closing.cta}</Button>
+        <Button href={waLink(WA_MESSAGES.work(work.name))} variant="paper">{p.closing.cta}</Button>
         <a class="wk__all" href="/works">{p.closing.all}</a>
       </div>
     </section>

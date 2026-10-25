@@ -1,6 +1,6 @@
 import { test, expect, type Page } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
-import { WHATSAPP, blockPageModule, stubExternal, watchProblems } from './helpers';
+import { WHATSAPP, WA_PREFIX, blockPageModule, stubExternal, watchProblems } from './helpers';
 
 /* Phase 2, the home page: FR-04..FR-09, NFR-05/06/07/09/10 and the owner's decisions
    (contact only at the end, the arms screens + quiz, ink-written headings, the opener). */
@@ -351,7 +351,7 @@ test('should link the three glimpse files to their works pages', async ({ page }
 test('should offer WhatsApp only in the closing section and footer, with the right link', async ({ page }) => {
   await page.goto('/');
   const cta = page.locator('.closing a.btn');
-  await expect(cta).toHaveAttribute('href', WHATSAPP);
+  await expect(cta).toHaveAttribute('href', new RegExp('^' + WA_PREFIX.replace(/[.?]/g, '\\$&')));
   await expect(cta).toHaveAttribute('target', '_blank');
   await expect(cta).toHaveAttribute('rel', /noopener/);
   const places = await page.locator('a[href*="wa.me"]').evaluateAll((as) =>
@@ -361,11 +361,11 @@ test('should offer WhatsApp only in the closing section and footer, with the rig
   expect(places).toContain('footer');
   expect(places.filter((p) => p !== 'closing' && p !== 'footer')).toEqual([]);
   for (const href of await page.locator('a[href*="wa.me"]').evaluateAll((as) => as.map((a) => a.getAttribute('href')))) {
-    expect(href).toBe(WHATSAPP);
+    expect(href?.startsWith(WA_PREFIX)).toBe(true);
   }
   await expect(page.locator('header a[href="/works"]')).toHaveCount(1);
   const [popup] = await Promise.all([page.waitForEvent('popup'), cta.click()]);
-  expect(popup.url()).toBe(WHATSAPP);
+  expect(popup.url().startsWith(WHATSAPP)).toBe(true);
 });
 
 /* ---------------- NFR-10: no horizontal scroll ---------------- */

@@ -4,6 +4,18 @@
 
 export const WHATSAPP = 'https://wa.me/966535451898';
 
+/* Pre-filled WhatsApp messages: the visitor lands in a chat that already
+   says why they are writing. Short, warm, and in the visitor's voice. */
+export const WA_MESSAGES = {
+  general: 'مرحباً مداد، عندي فكرة وأبغى أتكلم معكم عنها.',
+  work: (name: string) => `مرحباً مداد، شفت عمل «${name}» في موقعكم وعندي فكرة قريبة منه.`,
+};
+
+/** WhatsApp link that opens the chat with a message ready to send. */
+export function waLink(message: string = WA_MESSAGES.general): string {
+  return `${WHATSAPP}?text=${encodeURIComponent(message)}`;
+}
+
 export const site = {
   meta: {
     title: '{مداد}',

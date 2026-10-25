@@ -1,11 +1,11 @@
 ---
-import { site, WHATSAPP } from '../content/site';
+import { site, waLink } from '../content/site';
 import { html } from '../content/brand';
 ---
 <footer class="footer">
   <img class="footer__logo" src="/logo/medad-mark-paper.png" alt="مداد" width="808" height="267" />
   <p class="footer__line">{site.footer.line}</p>
-  <a class="footer__wa" href={WHATSAPP} target="_blank" rel="noopener noreferrer">{site.footer.cta}</a>
+  <a class="footer__wa" href={waLink()} target="_blank" rel="noopener noreferrer">{site.footer.cta}</a>
   <p class="footer__copy" set:html={html(site.footer.copyright)} />
 </footer>
 
