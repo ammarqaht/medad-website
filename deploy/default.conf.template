@@ -26,6 +26,12 @@ server {
 
   error_page 404 /404.html;
 
+  # One address: www.medaad.tech redirects to medaad.tech (canonical, OG and
+  # sitemap all use the bare domain). HTTPS is terminated at CranL's edge.
+  if ($host ~* ^www\.(.+)$) {
+    return 301 https://$1$request_uri;
+  }
+
   # Hashed build assets never change under the same name.
   location ^~ /_astro/ {
     include /etc/nginx/snippets/headers.conf;

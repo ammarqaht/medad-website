@@ -1,7 +1,7 @@
 # CLAUDE.md
 
 Medad (مداد) public website: a detailed Arabic (RTL) introduction page for the studio and its products.
-Status: **phase 1 (foundation)**. Stack: Astro 7 static + Preact islands, GSAP + Lenis, nginx on CranL. Plan and scope: `docs/requirements.md` (local only).
+Status: **v1.0.0, release candidate** (all phases built; launch on medaad.tech per docs/RUNBOOK.md). Stack: Astro 7 static + Preact islands, GSAP + Lenis, nginx on CranL. Plan and scope: `docs/requirements.md` (local only).
 
 ## Read first
 - `DESIGN.md`: the approved Neo-Brutalism design system. Every UI change must follow it.
