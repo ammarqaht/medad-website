@@ -85,7 +85,7 @@ test.describe('opener (FR-04)', () => {
   test('should run on the first visit and end in under 5s with html.opening removed', async ({ page }) => {
     await recordOpening(page);
     await page.goto('/');
-    await expect(page.locator('[data-hero]')).toHaveClass(/\bis-dyeing\b/, { timeout: 2000 });
+    await expect(page.locator('html')).toHaveClass(/\bopening\b/, { timeout: 2000 });
     await waitOpenerGone(page);
     const op = await opening(page);
     test.info().annotations.push({ type: 'opener', description: JSON.stringify(op) });
@@ -107,7 +107,7 @@ test.describe('opener (FR-04)', () => {
     test(`should skip to the final state at once on ${how}`, async ({ page }) => {
       await recordOpening(page);
       await page.goto('/');
-      await expect(page.locator('[data-hero]')).toHaveClass(/\bis-dyeing\b/, { timeout: 2000 });
+      await expect(page.locator('html')).toHaveClass(/\bopening\b/, { timeout: 2000 });
       const t0 = await page.evaluate(() => performance.now());
       await skip(page);
       await waitOpenerGone(page, 400);
@@ -153,8 +153,8 @@ test.describe('opener (FR-04)', () => {
       const imgs = word.locator('img');
       await expect(imgs).toHaveCount(2);
       expect(await imgs.evaluateAll((els) => els.map((e) => e.getAttribute('src')))).toEqual([
-        '/logo/medad-mark-ink.png',
-        '/logo/medad-mark-paper.png',
+        '/logo/medad-mark-ink.webp',
+        '/logo/medad-mark-paper.webp',
       ]);
       // Decorative inside the named role=img; loaded, not broken.
       for (const img of await imgs.all()) {
@@ -164,7 +164,7 @@ test.describe('opener (FR-04)', () => {
       expect(await word.locator('.brand-word').count()).toBe(0);
       await expectBrandMarkVisible(page);
     };
-    await expect(page.locator('[data-hero]')).toHaveClass(/\bis-dyeing\b/, { timeout: 2000 });
+    await expect(page.locator('html')).toHaveClass(/\bopening\b/, { timeout: 2000 });
     await waitOpenerGone(page);
     await check();
   });
@@ -479,7 +479,7 @@ test.describe('mobile 375px touch', () => {
     try {
       const p2 = await fresh.newPage();
       await p2.goto(page.url());
-      await expect(p2.locator('[data-hero]')).toHaveClass(/\bis-dyeing\b/, { timeout: 2000 });
+      await expect(p2.locator('html')).toHaveClass(/\bopening\b/, { timeout: 2000 });
       await p2.locator('[data-stage]').tap({ position: { x: 20, y: 20 } });
       await expect(p2.locator('html')).not.toHaveClass(/\bopening\b/, { timeout: 400 });
     } finally {

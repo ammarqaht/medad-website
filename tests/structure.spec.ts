@@ -78,7 +78,7 @@ for (const path of PAGES) {
 
     test('should show a footer with the paper logo, a WhatsApp link and copyright', async ({ page }) => {
       const footer = page.locator('footer.footer');
-      await expect(footer.locator('img[src="/logo/medad-mark-paper.png"]')).toBeVisible();
+      await expect(footer.locator('img[src="/logo/medad-mark-paper.webp"]')).toBeVisible();
       await expect(footer.locator(`a[href^="${WA_PREFIX}"]`)).toBeVisible();
       await expect(footer).toContainText('©');
     });

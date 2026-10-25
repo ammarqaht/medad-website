@@ -1,10 +1,10 @@
 /* The ink opener (FR-04), at 12 frames per second:
    1. The paper is empty.
-   2. Drops fall one by one, right to left (the writing direction); each one
-      splashes where it lands and reveals its part of the logo in ink.
-   3. Once the word is full, a blot bursts out behind it with a hard green
-      shadow and straight impact strokes that vanish; the logo turns to paper
-      and is stamped down. The end state is a clean blot, nothing around it.
+   2. One drop of ink falls to the centre of the stage.
+   3. It spreads, frame by frame, into a blot. The logo is paper the ink never
+      touches: it sits in paper colour from the start, so it emerges in white
+      as the ink reaches around it. A hard green shadow lands and short impact
+      strokes fly out once the blot is full. The end state is a clean blot.
    4. The headline stamps in word by word.
    The text is in the HTML from the start; this only animates its reveal.
    Any input (scroll, touch, key, a tap on the stage) skips to the end. Later visits in the session, reduced motion
@@ -16,16 +16,15 @@ import { FLOOD_DRAIN_MS, FLOOD_HOLD_MS } from '../transition';
 const SEEN = 'medad-opened';
 const FRAME = 1000 / FPS;
 
-const DROPS = 5; // drops that dye the word
-const FALL = 5; // frames a drop takes to fall
-const GAP = 3; // frames between drops
-const BURST_AT = (DROPS - 1) * GAP + FALL + 2;
-const SPREAD = [0.18, 0.42, 0.68, 0.9, 1.06, 0.97, 1];
-const SHADOW_AT = BURST_AT + 4;
+const FALL = 6; // frames the drop takes to fall
+/* The blot's growth after impact: slow at first, a stepped overshoot at the end. */
+const SPREAD = [0.05, 0.1, 0.17, 0.26, 0.37, 0.49, 0.61, 0.73, 0.84, 0.94, 1.04, 0.98, 1];
+const FULL_AT = FALL + 10; // first frame at full size
+const SHADOW_AT = FULL_AT + 1;
 const STROKES = 5; // frames the impact strokes fly out
-const END = BURST_AT + SPREAD.length + 1;
+const END = FALL + SPREAD.length + 2;
 
-/* Canvas reaches past the stage so splatter is never cut at its edges. */
+/* Canvas reaches past the stage so the impact strokes are never cut at its edges. */
 const BLEED = 0.07;
 
 type Shape = {
@@ -107,7 +106,7 @@ export function initOpener(): void {
     ctx.fill();
   };
 
-  /* The big blot behind the word, with its splatter. */
+  /* The blot behind the logo. */
   const blot = (scale: number, dx: number, dy: number, color: string) => {
     if (!ctx || scale <= 0) return;
     const cx = bx + sw / 2 + dx;
@@ -115,16 +114,12 @@ export function initOpener(): void {
     blob(cx, cy, sw * 0.4 * scale, sh * 0.37 * scale, color);
   };
 
-  /* Where drop i lands: across the word, right to left. */
-  const landing = (i: number) => ({
-    x: wordBox.x + wordBox.w * (1 - (i + 0.5) / DROPS),
-    y: wordBox.y + wordBox.h * 0.55,
-  });
-
-  const fallingDrop = (i: number, f: number) => {
+  /* The single drop, falling to the centre of the stage. */
+  const fallingDrop = (f: number) => {
     if (!ctx) return;
-    const { x, y } = landing(i);
-    const r = Math.max(6, sw * 0.016);
+    const x = bx + sw / 2;
+    const y = by + sh / 2;
+    const r = Math.max(8, sw * 0.022);
     const p = (f + 1) / FALL;
     const cy = -r * 3 + (y + r * 3) * p * p;
     ctx.fillStyle = INK;
@@ -136,12 +131,6 @@ export function initOpener(): void {
     ctx.fill();
   };
 
-  const splat = (i: number, age: number) => {
-    const { x, y } = landing(i);
-    const grow = [0.5, 1.15, 1][Math.min(age, 2)];
-    const r = wordBox.h * 0.22 * grow;
-    blob(x, y, r * 1.2, r * 0.8, INK);
-  };
 
   /* Impact: short straight strokes fly out from the blot's edge, like a stamp
      hitting paper. Kept out of the lower sector, where the headline sits. */
@@ -177,30 +166,18 @@ export function initOpener(): void {
     }
     if (frame < 0) return;
 
-    if (frame >= BURST_AT) {
-      const i = frame - BURST_AT;
-      if (frame >= SHADOW_AT) {
-        const [dx, dy] = shadowOffset();
-        blot(1, dx, dy, GREEN);
-      }
-      blot(SPREAD[Math.min(i, SPREAD.length - 1)], 0, 0, INK);
-      strokes(i - 3);
+    if (frame < FALL) {
+      fallingDrop(frame);
+      return;
     }
-    // Drops falling and the splats they leave on the word (until the burst covers them).
-    for (let d = 0; d < DROPS; d++) {
-      const f = frame - d * GAP;
-      if (f < 0) continue;
-      if (f < FALL) fallingDrop(d, f);
-      else if (frame < BURST_AT + 3) splat(d, f - FALL);
+    if (frame >= SHADOW_AT) {
+      const [dx, dy] = shadowOffset();
+      blot(1, dx, dy, GREEN);
     }
+    blot(SPREAD[Math.min(frame - FALL, SPREAD.length - 1)], 0, 0, INK);
+    strokes(frame - FULL_AT);
   };
 
-  /* How much of the word is dyed: one part per landed drop. */
-  const dye = () => {
-    let landed = 0;
-    for (let d = 0; d < DROPS; d++) if (frame - d * GAP >= FALL) landed++;
-    word.style.setProperty('--dyed', `${(landed / DROPS) * 100}%`);
-  };
 
   const seen = () => {
     try {
@@ -217,8 +194,7 @@ export function initOpener(): void {
     done = true;
     window.clearTimeout(timer);
     root.classList.remove('opening');
-    hero.classList.remove('is-dyeing', 'is-burst', 'is-titling');
-    word.style.removeProperty('--dyed');
+    hero.classList.remove('is-titling');
     try {
       final = true;
       draw();
@@ -259,7 +235,6 @@ export function initOpener(): void {
 
   // Seen as soon as it starts: leaving mid-opener does not replay it.
   seen();
-  hero.classList.add('is-dyeing');
   // Arriving under the ink flood: wait for its fixed hold and drain before the first drop.
   const wait = root.hasAttribute('data-flood')
     ? Math.max(0, FLOOD_HOLD_MS - performance.now()) + FLOOD_DRAIN_MS + 60
@@ -272,8 +247,6 @@ export function initOpener(): void {
     try {
       frame++;
       draw();
-      dye();
-      if (frame === BURST_AT + 4) hero.classList.add('is-burst', 'has-blot');
       if (frame === END) {
         hero.classList.add('is-titling');
         timer = window.setTimeout(finish, 1500);

@@ -39,7 +39,7 @@ server {
     access_log off;
   }
   # Fonts and logos keep their names across deploys but do not change.
-  location ~* \.(woff2|png|ico)$ {
+  location ~* \.(woff2|png|webp|ico)$ {
     include /etc/nginx/snippets/headers.conf;
     add_header Cache-Control "public, max-age=2592000";
     access_log off;

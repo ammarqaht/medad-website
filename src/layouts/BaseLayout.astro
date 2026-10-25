@@ -51,7 +51,7 @@ const org = {
   <meta name="twitter:title" content={fullTitle} />
   <meta name="twitter:description" content={text(description)} />
   <meta name="twitter:image" content={ogImage} />
-  {!title && <link rel="preload" href="/logo/medad-mark-paper.png" as="image" fetchpriority="high" />}
+  {!title && <link rel="preload" href="/logo/medad-mark-paper.webp" as="image" fetchpriority="high" />}
   {!title && <script type="application/ld+json" is:inline set:html={JSON.stringify(org)} />}
   <link rel="icon" href="/favicon.ico" sizes="any" />
   <link rel="icon" href="/logo/favicon-64.png" type="image/png" />

@@ -14,8 +14,8 @@ const words = hero.headline.split(' ');
     <canvas class="hero__ink" aria-hidden="true"></canvas>
     <!-- The logo itself, as images: ink (revealed drop by drop) and paper. -->
     <p class="hero__word" role="img" aria-label={BRAND_LABEL} data-word>
-      <img class="hero__fill" src="/logo/medad-mark-ink.png" alt="" width="808" height="267" fetchpriority="high" />
-      <img class="hero__paper" src="/logo/medad-mark-paper.png" alt="" width="808" height="267" fetchpriority="high" />
+      <img class="hero__fill" src="/logo/medad-mark-ink.webp" alt="" width="808" height="267" fetchpriority="high" />
+      <img class="hero__paper" src="/logo/medad-mark-paper.webp" alt="" width="808" height="267" fetchpriority="high" />
     </p>
   </div>
 
@@ -127,16 +127,10 @@ const words = hero.headline.split(' ');
 
 
   /* ---------- Opener choreography (html.opening set by boot.js) ---------- */
-  /* 1-2: nothing there yet; each landed drop reveals its part of the logo, right to left */
-  :global(html.opening) .hero__fill { clip-path: inset(-15% 0 -15% calc(100% - var(--dyed, 0%))); }
-  /* 3: the burst. The logo turns to paper on the ink and is stamped down */
-  :global(html.opening) .hero:global(.is-burst) .hero__paper { animation: slam 330ms steps(4, jump-end) both; }
-  @keyframes slam {
-    0% { scale: 1.14; rotate: -4deg; }
-    50% { scale: .92; rotate: 1deg; }
-    75% { scale: 1.04; rotate: 0deg; }
-    100% { scale: 1; rotate: 0deg; }
-  }
+  /* During the opener the logo is paper from the start: it emerges in white
+     as the spreading ink reaches around it. */
+  :global(html.opening) .hero__fill { visibility: hidden; }
+  :global(html.opening) .hero__paper { visibility: visible; }
 
   :global(html.opening) .w,
   :global(html.opening) .hero__line,
