@@ -63,7 +63,7 @@ for (const path of PAGES) {
       } else {
         const works = page.locator(WORKS_LINK);
         await expect(works).toBeVisible();
-        await expect(works).toHaveAccessibleName('الأعمال');
+        await expect(works).toHaveAccessibleName('أعمالنا');
         await expect(page.locator('header a.back')).toHaveCount(0);
       }
     });

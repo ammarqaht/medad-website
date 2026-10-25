@@ -11,7 +11,7 @@ test('should reveal every [data-pop] element on / and /works with JS on', async 
     const els = await page.locator('[data-pop]').all();
     expect(els.length).toBeGreaterThan(0);
     for (const el of els) {
-      await el.scrollIntoViewIfNeeded();
+      await el.evaluate((e) => e.scrollIntoView({ block: 'center' }));
       await expect(el).toHaveClass(/\bis-in\b/, { timeout: 2000 });
       await expect(el).toHaveCSS('opacity', '1', { timeout: 2000 });
     }
@@ -43,7 +43,7 @@ test('should lift the arriving ink within 3s when the page module script is bloc
   expect(Date.now() - t0).toBeLessThan(3500);
   await expect.poll(() => floodIsHidden(page), { timeout: 500 }).toBe(true);
   for (const el of await page.locator('[data-pop]').all()) {
-    await el.scrollIntoViewIfNeeded();
+    await el.evaluate((e) => e.scrollIntoView({ block: 'center' }));
     await expect(el).toHaveCSS('opacity', '1', { timeout: 3500 });
   }
 });
@@ -60,7 +60,7 @@ test('should ship page JS only as external /_astro modules, so aborting them fal
   // boot.js lifts .js after 3s, so every stamped element shows in its final state.
   await expect(page.locator('html')).not.toHaveClass(/\bjs\b/, { timeout: 3500 });
   for (const el of await page.locator('[data-pop]').all()) {
-    await el.scrollIntoViewIfNeeded();
+    await el.evaluate((e) => e.scrollIntoView({ block: 'center' }));
     await expect(el).toHaveCSS('opacity', '1');
   }
 });

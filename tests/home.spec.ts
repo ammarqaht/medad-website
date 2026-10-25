@@ -266,10 +266,16 @@ test.describe('arms (FR-07)', () => {
     await page.locator('[data-screens]').scrollIntoViewIfNeeded();
   });
 
-  test('should show the section title «ماذا نكتب؟» and both arm links to /works by arm', async ({ page }) => {
+  test('should show the section title «ماذا نكتب؟» with no links into the archive (owner: two ways into the works only)', async ({ page }) => {
     await expect(page.locator('#arms-title')).toHaveText('ماذا نكتب؟', { timeout: 5000 });
-    await expect(page.locator('.arm--digital .arm__cta')).toHaveAttribute('href', '/works?arm=digital');
-    await expect(page.locator('.arm--live .arm__cta')).toHaveAttribute('href', '/works?arm=live');
+    await expect(page.locator('.arms a[href^="/works"]')).toHaveCount(0);
+  });
+
+  test('should offer exactly two ways into the works on the home page: the header link and «كل الأعمال»', async ({ page }) => {
+    const links = page.locator('a[href="/works"]');
+    await expect(links).toHaveCount(2);
+    await expect(page.locator('header a.topbar__works')).toHaveAccessibleName('أعمالنا');
+    await expect(page.locator('.glimpse__cta a[href="/works"]')).toHaveText(/كل الأعمال/);
   });
 
   test('should open exactly the clicked screen (aria-pressed) on click', async ({ page }) => {

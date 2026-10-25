@@ -13,7 +13,7 @@ for (const path of PAGES) {
       await page.goto(path);
       // Let stamp-in content land so axe sees final colours.
       for (const el of await page.locator('[data-pop]').all()) {
-        await el.scrollIntoViewIfNeeded();
+        await el.evaluate((e) => e.scrollIntoView({ block: 'center' }));
         await expect(el).toHaveCSS('opacity', '1', { timeout: 2000 });
       }
       await page.evaluate(() => window.scrollTo(0, 0));
