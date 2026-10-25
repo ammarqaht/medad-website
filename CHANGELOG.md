@@ -1,14 +1,24 @@
 # Changelog
 
-Dates are commit dates. Versions are release milestones (one per build phase); `package.json` still says 0.1.0 and should be bumped when the launch is tagged.
+Dates are commit dates. Versions are release milestones (one per build phase); `package.json` is 1.0.0 (tag `v1.0.0`).
 
-## Unreleased: 1.0.0 launch candidate (phase 6)
+## 1.0.0 (2026-10-25 to 2026-10-26): launch candidate (phase 6)
+### Changed
+- Opener: one ink drop spreads into a blot and the logo emerges in white; no skip button; replays on reload.
+- Reveals start at a later line in reading order and only after the ink curtain drains; one pen writes the
+  headings one at a time.
+- «من أعمالنا»: desktop-style folders with a swaying sheet; only two ways into the works (header and «كل الأعمال»).
+- Clickable cues: arrows on the header link and folder labels, triangles on filter chips.
+- WhatsApp buttons open the chat with a pre-filled message (naming the work on work pages).
+- www redirects to the bare domain.
+### Performance
+- Fonts subset to the scripts in use (about 21% smaller); logos as lossless WebP (half the size).
 ### Added
 - `docs/RUNBOOK.md` (pre-deploy checklist, CranL deploy, domain, verification, rollback, monitoring) and `docs/HANDOVER.md` (Arabic owner handover).
 ### Changed
 - README rewritten: run, test on an isolated port, build, Docker, deploy, structure with islands and demos.
 ### Known open items (not blockers)
-- Font subsetting, logo as SVG/WebP, per-slug CSS split.
+- Per-slug CSS split for the demos.
 - Mobile LCP of the opener is about 3.0s (target 2.5s); owner decision pending.
 
 ## 0.5.1 (2026-10-24): Phase 5 review fixes

@@ -187,8 +187,11 @@ Order, one idea per screen: **Hero (opener) > Bands > Meaning > Story > Arms > G
 below; motion details in 7.
 
 - **Hero** (`Hero.astro` + `scripts/home/opener.ts`): a stage (`4/3`, `2.3/1` from 600px, max 860px) holding a
-  `<canvas>` and the logo as **two images** (`medad-mark-ink.png` and `medad-mark-paper.png`, never text),
-  54% of the stage. Under it: the H1 (last word boxed in green: `.hl`, ink border, shadow, `rotate: -2deg`, done
+  `<canvas>` and the logo as **two images** (`medad-mark-ink.webp` and `medad-mark-paper.webp`, never text),
+  54% of the stage. **Opener:** one ink drop falls to the centre and spreads, in 12fps steps, into a blot; the
+  logo is paper from the start, so it emerges in white as the ink reaches around it (it never turns from black
+  to white). The green shadow lands and short impact strokes fly out once the blot is full; no dots or circles
+  remain. No skip button: any scroll, touch, key or tap on the stage ends it. It replays on every reload. Under it: the H1 (last word boxed in green: `.hl`, ink border, shadow, `rotate: -2deg`, done
   by wrapping the last whole word), a white `.box` supporting line (`rotate: .6deg`, max 46ch), and a "scroll"
   cue linking to `#story` (blunt down arrow, 2-step nudge). End state: a wobbly ink blot with a **hard green
   shadow** (green-500 blot offset left-down behind the ink blot), the paper logo on it. Without canvas: a flat ink
@@ -215,15 +218,25 @@ below; motion details in 7.
     green-400 "؟" square stuck on its corner, a one-question quiz with three option buttons that nudge in turn
     until answered; right answer stamps green-400 and locks, wrong shakes and resets; message in an
     `aria-live="polite"` line (green-700 text).
-  - Each card ends with an underlined text link with a blunt arrow (pokes on touch screens, no hover there).
+  - The cards hold no links into the archive (owner: only two ways into the works, see 5.14).
   - No product or system names in this section.
-- **Glimpse** (`Glimpse.astro`): three **archive files** (white, green-500, green-300; folder tab via clip-path;
-  rotated -2/1.5/-1deg; overlap by 24px on desktop, stacked with `-18px` overlap on phones). Hover lifts the
-  file 14px and doubles its shadow; on touch screens they lift by themselves in turn. A `.btn--paper` opens the
-  whole archive.
+- **Glimpse «من أعمالنا»** (`Glimpse.astro`): three **desktop-style folders** in a row on every screen (white,
+  green-500, green-300): a back panel with a tab on the start side (right in RTL, slanted on its inner side), a
+  sheet of paper peeking out that sways ±2.5deg in hard steps (each folder out of step), and a front panel with a
+  hard lip line; ink borders, hard shadow. The work's name sits under its folder with an arrow, like a desktop
+  icon label. Hover/focus: the folder lifts 6px and the paper rises out. No descriptions, no caption. A
+  `.btn--paper` «كل الأعمال» opens the archive.
 - **Closing** (`Closing.astro`): green-500 slab with a 12px double shadow, ink-written headline (max 11ch),
   one line, a paper WhatsApp button, and a ring sticker (paper ring, ink centre) on the corner that turns on
   hover. This is the only call to contact on the home page.
+
+### 5.14 Ways into the works, and what looks clickable (owner decisions, 2026-10-25)
+- Exactly **two** ways into the works from the home page: the header link «أعمالنا» and the «كل الأعمال» button
+  after «من أعمالنا». No hero button, no floating button, no archive links in «ماذا نكتب؟».
+- Anything clickable carries a cue: buttons and the header link have the blunt arrow; filter chips have a
+  triangle that turns down when selected; folder labels have an arrow. Decorative boxes never carry one.
+- Every WhatsApp link opens the chat with a pre-filled message (`waLink()` in `src/content/site.ts`): a general
+  one on the home closing and the footer, one naming the work on a work page.
 
 ### 5.6 Ink flood: page transition (`InkFlood.astro` + `scripts/transition.ts` + `public/boot.js`)
 A fixed full-screen ink layer (`z-index: 1000`) with the brand word (green-400, `.brand-word`) in the middle.
@@ -242,11 +255,13 @@ A fixed full-screen ink layer (`z-index: 1000`) with the brand word (green-400, 
 ### 5.7 Ink writing: key headings (`motion/inkwrite.ts` + `global.css`, attribute `data-ink`)
 Used on: home arms/glimpse/closing titles, chapter titles, folder tabs, work titles, work closing title, the
 pending-sheet title. Not on the hero, meaning title or the works gallery title.
-- When the heading's parent enters the viewport (`rootMargin` -10% bottom), the heading is split into its
+- **One pen:** headings are written one at a time, in the order they reach the reveal line (reading order within
+  a group); nothing is written until the ink curtain has drained (`motion/uncovered.ts`).
+- When the heading's parent passes the reveal line (`REVEAL_MARGIN`, 22% above the bottom), the heading is split into its
   **rendered lines (whole words only)**. Each line is written **right to left** in turn (clip-path inset
   animation, `steps(frames(seconds))`) behind a **pen nib** riding the writing edge.
 - **The ink is its final colour from the first stroke** (no recolouring at the end).
-- Time per line = 0.05s x characters, clamped 0.4 to 1.4s, rounded to 12fps frames, 0.1s between lines.
+- Time per line = 0.04s x characters, clamped 0.4 to 1.1s, rounded to 12fps frames, 0.1s between lines.
 - Nib: 0.26em x 0.9em ink shape with a hard paper slit, tilted -28deg, positioned with a **physical `left`** on
   purpose (it travels leftwards in RTL), hidden at the end.
 - When the last line is done the plain text is put back (`textContent = original`) so it reflows on resize.
@@ -521,6 +536,11 @@ Low severity; the system is consistent. Recorded so nobody copies them:
 ---
 
 ## 14. Change log
+
+- 2026-10-25: Update. Opener is one drop spreading with the logo emerging in white; reveals start at the reveal
+  line (22% above the bottom) in reading order and only after the curtain drains; one pen for all ink-written
+  headings; «من أعمالنا» as desktop folders with swaying paper; two ways into the works only; click cues (arrows,
+  chip triangles); pre-filled WhatsApp messages; logos as WebP, fonts subset.
 
 - 2026-10-23: Approved (Neo-Brutalism, style 03). First version from the Style Lab.
 - 2026-10-24: Update. Added: the built home page (ink opener, crossing bands, scroll-written story with numbered

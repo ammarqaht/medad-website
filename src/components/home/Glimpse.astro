@@ -1,7 +1,8 @@
 ---
-/* A glimpse of the archive (FR-08): three works, each opening its page,
-   and a button to the whole archive. Desktop: three cards side by side with
-   a one-line description. Phone: names only, centred, in compact tiles. */
+/* A glimpse of the works (FR-08): three folders, drawn like desktop folders in
+   the house style (tab, back, front, ink borders, hard shadows), each with a
+   sheet of paper peeking out that sways a little. The work's name sits under
+   its folder, as on a desktop. A button opens all the works. */
 import Button from '../Button.astro';
 import { site } from '../../content/site';
 const { glimpse } = site.home;
@@ -12,10 +13,13 @@ const { glimpse } = site.home;
   <ul class="files">
     {glimpse.items.map((f, i) => (
       <li class={`file file--${i + 1}`} data-pop>
-        <a class="file__body" href={f.href}>
-          <span class="file__name display">{f.name}</span>
-          <span class="file__line">{f.line}</span>
-          <span class="file__open" aria-hidden="true"></span>
+        <a class="file__link" href={f.href}>
+          <span class="folder" aria-hidden="true">
+            <span class="folder__back"></span>
+            <span class="folder__paper"><i></i><i></i><i></i></span>
+            <span class="folder__front"></span>
+          </span>
+          <span class="file__name display">{f.name}<span class="file__open" aria-hidden="true"></span></span>
         </a>
       </li>
     ))}
@@ -30,88 +34,137 @@ const { glimpse } = site.home;
     margin-inline: auto;
     padding: clamp(32px, 6vw, 80px) var(--gutter) clamp(56px, 8vw, 112px);
     display: grid;
-    gap: clamp(24px, 4vw, 44px);
+    gap: clamp(28px, 4vw, 48px);
   }
   .glimpse__title { font-size: clamp(40px, 6vw, 88px); line-height: 1.15; justify-self: start; }
+  .glimpse__cta { justify-self: start; }
 
-  .files { display: grid; gap: 28px; grid-template-columns: repeat(3, 1fr); align-items: stretch; }
-  .file { display: grid; }
+  /* Three folders in a row on every screen, like icons on a desktop */
+  .files {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: clamp(12px, 4vw, 64px);
+    align-items: start;
+  }
+  .file { display: grid; justify-items: center; }
   .file--1 { --file-bg: var(--white); }
   .file--2 { --file-bg: var(--green-500); }
   .file--3 { --file-bg: var(--green-300); }
 
-  /* A sheet with a folder tab on its top edge; presses into its shadow like a button */
-  .file__body {
-    position: relative;
+  .file__link {
     display: grid;
-    align-content: start;
-    gap: 10px;
-    padding: 30px 24px 24px;
-    background: var(--file-bg);
-    border: var(--bw) solid var(--ink);
-    box-shadow: var(--shadow);
+    justify-items: center;
+    gap: clamp(10px, 1.4vw, 18px);
+    inline-size: 100%;
     color: var(--ink);
     text-decoration: none;
-    transition: translate var(--snap), box-shadow var(--snap);
   }
-  .file__body::before {
+
+  /* The folder: back panel with a tab, a sheet of paper, the front panel */
+  .folder {
+    position: relative;
+    display: block;
+    inline-size: min(100%, 240px);
+    aspect-ratio: 5 / 4;
+    transition: translate var(--snap);
+  }
+  .folder__back,
+  .folder__front,
+  .folder__paper {
+    position: absolute;
+    border: var(--bw) solid var(--ink);
+  }
+  .folder__back {
+    inset: 16% 0 0 0;
+    background: var(--file-bg);
+    box-shadow: var(--shadow);
+  }
+  /* the tab, on the start side (right in RTL), mirroring a desktop folder */
+  .folder__back::before {
     content: "";
     position: absolute;
     inset-block-end: 100%;
-    inset-inline-start: 18px;
-    inline-size: 38%;
-    block-size: 18px;
+    inset-inline-start: -3px;
+    inline-size: 40%;
+    block-size: 18%;
+    min-block-size: 12px;
+    margin-block-end: calc(var(--bw) * -1);
     background: var(--file-bg);
     border: var(--bw) solid var(--ink);
     border-block-end: 0;
-    clip-path: polygon(0 100%, 10% 0, 90% 0, 100% 100%);
-    margin-block-end: calc(var(--bw) * -1);
+    /* slanted on its inner side (left in RTL), straight on the outer edge */
+    clip-path: polygon(16% 0, 100% 0, 100% 100%, 0 100%);
   }
-  .file__body:hover { translate: calc(var(--off) / -2) calc(var(--off) / 2); box-shadow: calc(var(--sx) / 2) calc(var(--off) / 2) 0 0 var(--ink); }
-  .file__body:active { translate: var(--sx) var(--off); box-shadow: none; }
-  .file__name { font-size: clamp(34px, 3.4vw, 50px); line-height: 1.15; }
-  .file__line { font-size: 19px; line-height: 1.6; font-weight: 700; }
-  .file__open {
-    justify-self: end;
-    align-self: end;
-    margin-block-start: 6px;
-    inline-size: 30px;
-    block-size: 30px;
+  .folder__paper {
+    inset: 7% 8% 30% 16%;
+    background: var(--paper);
+    display: grid;
+    align-content: start;
+    gap: 9%;
+    padding: 12% 12%;
+    transform-origin: 50% 100%;
+    transition: translate var(--snap);
+  }
+  .folder__paper i { display: block; block-size: 7%; min-block-size: 3px; background: var(--ink); }
+  .folder__paper i:nth-child(2) { inline-size: 70%; }
+  .folder__paper i:nth-child(3) { inline-size: 45%; }
+  .folder__front {
+    inset: 32% 0 0 0;
+    background: var(--file-bg);
+  }
+  /* a hard highlight line on the front lip */
+  .folder__front::before {
+    content: "";
+    position: absolute;
+    inset-inline: 8%;
+    inset-block-start: 14%;
+    block-size: var(--bw);
     background: var(--ink);
+    opacity: .9;
+  }
+
+  .file__name {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    font-size: clamp(20px, 2.4vw, 34px);
+    line-height: 1.2;
+    text-align: center;
+  }
+  .file__open {
+    flex: none;
+    inline-size: .7em;
+    block-size: .7em;
+    background: currentColor;
     clip-path: polygon(0 50%, 55% 0, 55% 30%, 100% 30%, 100% 70%, 55% 70%, 55% 100%);
     transition: translate var(--snap);
   }
-  .file__body:hover .file__open { translate: -6px 0; }
-  .glimpse__cta { justify-self: start; }
 
-  /* Tablet: two columns would orphan the third, so stack */
-  @media (max-width: 899px) {
-    .files { grid-template-columns: 1fr; gap: 24px; }
+  /* The paper sways a little in its folder, in hard frames; each folder out of step */
+  :global(.js) .file:global(.is-in) .folder__paper { animation: sway 2.4s steps(4, jump-none) infinite; }
+  :global(.js) .file--2:global(.is-in) .folder__paper { animation-delay: -.8s; }
+  :global(.js) .file--3:global(.is-in) .folder__paper { animation-delay: -1.6s; }
+  @keyframes sway {
+    0%, 100% { rotate: -2.5deg; }
+    50% { rotate: 2.5deg; }
   }
+  /* Hover / focus: the paper rises out of the folder and the folder lifts */
+  .file__link:hover .folder,
+  .file__link:focus-visible .folder { translate: 0 -6px; }
+  .file__link:hover .folder__paper,
+  .file__link:focus-visible .folder__paper { translate: 0 -18%; }
+  .file__link:hover .file__open { translate: -5px 0; }
+  .file__link:active .folder { translate: 0 0; }
 
-  /* Phone: names only, centred, compact tiles */
   @media (max-width: 599px) {
-    .glimpse { gap: 22px; padding-block: 32px 56px; }
-    .glimpse__title { justify-self: center; text-align: center; }
-    .files { gap: 22px; }
-    .file__body { justify-items: center; text-align: center; padding: 22px 16px 18px; }
-    .file__body::before { inset-inline-start: 50%; translate: 50% 0; inline-size: 34%; }
-    .file__line { display: none; }
-    .file__open {
-      position: absolute;
-      inset-inline-end: 16px;
-      inset-block-start: 50%;
-      translate: 0 -50%;
-      inline-size: 22px;
-      block-size: 22px;
-      margin: 0;
-    }
-    .file__name { font-size: 32px; }
-    .glimpse__cta { justify-self: center; }
+    .glimpse { gap: 24px; padding-block: 32px 56px; }
+    .glimpse__title, .glimpse__cta { justify-self: center; text-align: center; }
+    .file__name { flex-direction: column; gap: 6px; font-size: 18px; }
+    .file__open { inline-size: 14px; block-size: 14px; }
   }
 
   @media (prefers-reduced-motion: reduce) {
-    .file__body, .file__open { transition: box-shadow .2s ease; }
-    .file__body:hover, .file__body:active, .file__body:hover .file__open { translate: none; }
+    :global(.js) .file:global(.is-in) .folder__paper { animation: none; }
+    .folder, .folder__paper, .file__open { transition: none; }
   }
 </style>
